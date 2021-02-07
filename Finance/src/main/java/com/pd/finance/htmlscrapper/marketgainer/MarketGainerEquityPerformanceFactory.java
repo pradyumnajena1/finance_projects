@@ -2,6 +2,7 @@ package com.pd.finance.htmlscrapper.marketgainer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquityPerformance;
+import com.pd.finance.utils.CommonUtils;
 import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class MarketGainerEquityPerformanceFactory {
             Node textNode = secondSpan.childNode(0);
             String text = textNode.attr("text");
             String  changePercentText = text.substring(text.indexOf("(")+1,text.indexOf("%"));
-            return extractDecimalFromText(changePercentText);
+            return CommonUtils.extractDecimalFromText(changePercentText);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return null;
@@ -79,7 +80,7 @@ public class MarketGainerEquityPerformanceFactory {
 
             String text = textNode.attr("text");
             String  changeText = text.substring(0,text.indexOf("("));
-            return extractDecimalFromText(changeText);
+            return CommonUtils.extractDecimalFromText(changeText);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return null;
@@ -91,40 +92,17 @@ public class MarketGainerEquityPerformanceFactory {
 
             String textValue = performanceDecimalTextNode.attr("text");
 
-            return extractDecimalFromText( textValue);
+            return CommonUtils.extractDecimalFromText( textValue);
 
     }
     private static Date extractDateFromPerformanceCell(Node performanceDateTextNode) {
 
         String textValue = performanceDateTextNode.childNode(0).attr("text");
 
-        return extractDateFromText( textValue);
+        return CommonUtils.extractDateFromText( textValue);
 
     }
-    private static BigDecimal extractDecimalFromText(String textValue) {
-        try {
 
-            textValue = textValue.replace(",","");
-            textValue = textValue.trim();
-            return new BigDecimal( textValue);
-        } catch (NumberFormatException ex) {
-            logger.error("extractDecimalFromPerformanceCell exec failed",ex);
-            return BigDecimal.ZERO;
-        }
-    }
-
-
-
-    private static Date extractDateFromText(String textValue) {
-        try {
-
-            textValue = textValue.trim();
-            return dateFormat.parse( textValue);
-        } catch (ParseException  ex) {
-            logger.error("extractDateFromPerformanceCell exec failed",ex);
-            return null;
-        }
-    }
 
     private static Node getChildNode(Node parentNode,String childNodeTagName,int index) {
         return parentNode. childNodes().stream().filter(aNode -> aNode.nodeName().equalsIgnoreCase(childNodeTagName)).collect(Collectors.toList()).get(index);

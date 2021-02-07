@@ -3,7 +3,9 @@ package com.pd.finance.htmlscrapper.equity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquityEssentials;
 import com.pd.finance.model.EquityOverview;
+import com.pd.finance.utils.CommonUtils;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +31,21 @@ public class EquityOverviewFactory {
     }
 
     private static BigInteger extractVolume(Document document) {
-        return null;
+        try {
+            String volumeText = document.select("div#nse_vol").first().childNode(0).attr("text");
+            return CommonUtils.extractIntegerFromText(volumeText);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return BigInteger.ZERO;
+        }
     }
 
     private static BigDecimal extractPE(Document document) {
-        return null;
+        Element overviewDiv = document.select("div#stk_overview").first();
+        Element tbody = overviewDiv.select("tbody").first();
+        Element td = tbody.select("tr").first().select("td:eq(2)").first();
+        String text = td.childNode(0).attr("text");
+        return CommonUtils.extractDecimalFromText(text);
     }
 
     private static BigDecimal extractPB(Document document) {
