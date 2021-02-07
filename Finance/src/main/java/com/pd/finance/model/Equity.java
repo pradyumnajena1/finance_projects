@@ -28,6 +28,15 @@ public class Equity {
     private EquitySwotDetails swotDetails;
     private TechnicalDetails technicalDetails;
     private EquityEssentials essentials;
+    private EquityOverview overview;
+
+    public EquityOverview getOverview() {
+        return overview;
+    }
+
+    public void setOverview(EquityOverview overview) {
+        this.overview = overview;
+    }
 
     public EquityEssentials getEssentials() {
         return essentials;

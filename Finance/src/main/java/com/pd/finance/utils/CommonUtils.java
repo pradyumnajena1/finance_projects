@@ -1,6 +1,8 @@
 package com.pd.finance.utils;
 
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,5 +50,10 @@ public class CommonUtils {
             logger.error("extractDateFromPerformanceCell exec failed",ex);
             return null;
         }
+    }
+
+    public static Document getDocument(String url) throws Exception{
+        Document document = Jsoup.connect(url).get();
+        return document;
     }
 }

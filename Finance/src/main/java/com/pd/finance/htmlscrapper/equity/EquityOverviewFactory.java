@@ -42,8 +42,8 @@ public class EquityOverviewFactory {
 
     private static BigDecimal extractPE(Document document) {
         Element overviewDiv = document.select("div#stk_overview").first();
-        Element tbody = overviewDiv.select("tbody").first();
-        Element td = tbody.select("tr").first().select("td:eq(2)").first();
+        Element tableBody = overviewDiv.select("tbody").first();
+        Element td = tableBody.select("tr").first().select("td:eq(1)").first();
         String text = td.childNode(0).attr("text");
         return CommonUtils.extractDecimalFromText(text);
     }

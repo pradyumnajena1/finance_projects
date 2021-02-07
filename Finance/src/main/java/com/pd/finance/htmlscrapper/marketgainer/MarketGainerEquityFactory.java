@@ -2,6 +2,7 @@ package com.pd.finance.htmlscrapper.marketgainer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.htmlscrapper.equity.EquityEssentialsFactory;
+import com.pd.finance.htmlscrapper.equity.EquityOverviewFactory;
 import com.pd.finance.htmlscrapper.equity.EquitySwotFactory;
 import com.pd.finance.htmlscrapper.equity.EquityTechnicalDetailsFactory;
 import com.pd.finance.model.*;
@@ -16,7 +17,10 @@ import org.springframework.context.annotation.Bean;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 
@@ -26,23 +30,39 @@ public class MarketGainerEquityFactory {
 
 
     public static List<Equity> fetchMarketGainerEquities(Document document) throws IOException {
-        List<Equity> equityCollector = new ArrayList<>();
+        Queue<Equity> equityCollector = new ConcurrentLinkedQueue<>();
         Node histTable = extractMarketGainersTableNode(document);
         List<Node> rows = extractMarketGainerRows(histTable);
 
-        for (Node rowNode: rows) {
-            Equity equity = createMarketGainerEquity(rowNode);
-            enrichEquity(equity);
-            equityCollector.add(equity);
-        }
-        return equityCollector;
+        rows.stream().forEach(rowNode->{
+
+                Equity equity = createMarketGainerEquity(rowNode);
+
+                enrichEquity(equity);
+                equityCollector.add(equity);
+
+
+        });
+
+        return new ArrayList<>(equityCollector);
     }
 
-    private static void enrichEquity(Equity equity) {
+    private static void enrichEquity(Equity equity ) {
         try {
             addSwotDetails(equity);
             addEssentialDetails(equity);
+            addEquityOverview(equity);
         } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+    }
+
+    private static void addEquityOverview(Equity equity) {
+        try {
+            Document document = Jsoup.connect(equity.getUrl()).get();
+            EquityOverview overview =  EquityOverviewFactory.create(document);
+            equity.setOverview(overview);
+        } catch (IOException e) {
             logger.error(e.getMessage(),e);
         }
     }
