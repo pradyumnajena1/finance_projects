@@ -1,8 +1,6 @@
 package com.pd.finance.utils;
 
-import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CommonUtils {
-    private static Logger logger = LoggerFactory.getLogger(CommonUtils.class);
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
+    private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 
     public static BigDecimal extractDecimalFromText(String textValue) {
         try {
@@ -52,8 +50,5 @@ public class CommonUtils {
         }
     }
 
-    public static Document getDocument(String url) throws Exception{
-        Document document = Jsoup.connect(url).get();
-        return document;
-    }
+
 }

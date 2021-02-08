@@ -3,7 +3,7 @@ package com.pd.finance.controller;
 import com.pd.finance.model.Equity;
 import com.pd.finance.request.MarketGainersRequest;
 import com.pd.finance.response.BaseResponse;
-import com.pd.finance.service.IMarket;
+import com.pd.finance.service.IMarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +21,11 @@ import java.util.List;
 public class MarketController {
     Logger logger = LoggerFactory.getLogger(MarketController.class);
     @Autowired
-    private IMarket market;
+    private IMarketService market;
 
 
     @RequestMapping(value = "/market/nse/gainers",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse index(@RequestBody MarketGainersRequest request) {
+    public BaseResponse getMarketGainers(@RequestBody MarketGainersRequest request) {
 
         try {
           List<Equity> equities =  market.GetGainers(request);

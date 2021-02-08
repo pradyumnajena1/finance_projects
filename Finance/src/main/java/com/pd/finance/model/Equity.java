@@ -7,11 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Equity {
     @JsonIgnore
-    private static Logger logger = LoggerFactory.getLogger(Equity.class);
+    private static final Logger logger = LoggerFactory.getLogger(Equity.class);
 
 
     private String name;
@@ -148,5 +149,19 @@ public class Equity {
 
     public void setPerformances(EquityPerformances performances) {
         this.performances = performances;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Equity equity = (Equity) o;
+        return name.equals(equity.name) &&
+                url.equals(equity.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, url);
     }
 }

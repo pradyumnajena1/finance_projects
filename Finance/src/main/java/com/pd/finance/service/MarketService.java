@@ -1,35 +1,39 @@
 package com.pd.finance.service;
 
 import com.pd.finance.config.ApplicationConfig;
+import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
 import com.pd.finance.model.Equity;
+import com.pd.finance.model.EquityOverview;
 import com.pd.finance.model.EquityPerformance;
 import com.pd.finance.model.EquitySwotDetails;
 import com.pd.finance.request.MarketGainersRequest;
+import com.pd.finance.request.OverviewFilter;
 import com.pd.finance.request.PerformanceFilter;
 import com.pd.finance.request.SwotFilter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Service
-public class MarketService implements IMarket {
-   private static  Logger logger = LoggerFactory.getLogger(MarketService.class);
-
+public class MarketService implements IMarketService {
+   private static final Logger logger = LoggerFactory.getLogger(MarketService.class);
+   @Autowired
+   private IMarketGainerEquityFactory marketGainerEquityFactory;
 
    @Autowired
-   ApplicationConfig config;
+   private ApplicationConfig config;
+   @Autowired
+   private IDocumentService documentService;
+
 
     @Override
     public List<Equity> GetGainers(MarketGainersRequest request) throws Exception{
@@ -37,7 +41,7 @@ public class MarketService implements IMarket {
 
         try{
             Document doc = getDocument();
-            List<Equity> equityCollector = MarketGainerEquityFactory.fetchMarketGainerEquities(doc);
+            List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc);
 
             List<Equity> result = filterEquities(request, equityCollector);
 
@@ -56,16 +60,19 @@ public class MarketService implements IMarket {
         return equityCollector.stream().filter(anEquity->isValidEquity(anEquity,request)).collect(Collectors.toList());
     }
 
-    private Document getDocument() throws IOException {
+    private Document getDocument() throws Exception {
         String gainersUrl = config.getEnvProperty("GainersUrl");
-        return Jsoup.connect(gainersUrl).get();
+        return documentService.getDocument(gainersUrl);
     }
 
 
     private boolean isValidEquity(Equity equity, MarketGainersRequest request) {
         boolean isValid = true;
         try {
-            List<EquityPerformance> performances = equity.getPerformances().getPerformances();
+            OverviewFilter overviewFilter = request.getOverviewFilter();
+            if(overviewFilter!=null){
+                isValid = isValid && isValidEquity(equity, overviewFilter);
+            }
             PerformanceFilter performanceFilter = request.getPerformanceFilter();
             if(performanceFilter!=null){
                 isValid = isValid && isValidEquity(equity, performanceFilter);
@@ -82,6 +89,21 @@ public class MarketService implements IMarket {
            return false;
         }
 
+    }
+
+    private boolean isValidEquity(Equity equity, OverviewFilter overviewFilter) {
+        boolean isValid = false;
+
+        try {
+            EquityOverview equityOverview = equity.getOverview();
+            isValid =  overviewFilter.getMaxPE().compareTo(equityOverview.getStockPE())>=0 &&
+                      overviewFilter.getMinVolume().compareTo(equityOverview.getVolume())<=0
+
+            ;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return isValid;
     }
 
     private boolean isValidEquity(Equity equity, SwotFilter swotFilter) {

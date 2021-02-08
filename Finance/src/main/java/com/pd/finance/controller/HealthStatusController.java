@@ -4,11 +4,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
-public class HelloController {
+public class HealthStatusController {
 
-    @RequestMapping("/")
+    @RequestMapping("/ping")
     public String index() {
-        return "Greetings from Spring Boot!";
+        return "Congratulations! your application is up and running!";
     }
 
 }

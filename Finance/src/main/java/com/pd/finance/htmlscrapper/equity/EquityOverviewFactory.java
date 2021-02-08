@@ -8,16 +8,18 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-public class EquityOverviewFactory {
+@Component
+public class EquityOverviewFactory implements IEquityOverviewFactory {
 
     @JsonIgnore
-    private static Logger logger = LoggerFactory.getLogger(EquityOverviewFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(EquityOverviewFactory.class);
 
-    public static EquityOverview create(Document document){
+    @Override
+    public   EquityOverview create(Document document){
 
         EquityOverview equityOverview = new EquityOverview();
        equityOverview.setBookValue(extractBookValue(document));
@@ -30,7 +32,7 @@ public class EquityOverviewFactory {
         return equityOverview;
     }
 
-    private static BigInteger extractVolume(Document document) {
+    private   BigInteger extractVolume(Document document) {
         try {
             String volumeText = document.select("div#nse_vol").first().childNode(0).attr("text");
             return CommonUtils.extractIntegerFromText(volumeText);
@@ -40,7 +42,7 @@ public class EquityOverviewFactory {
         }
     }
 
-    private static BigDecimal extractPE(Document document) {
+    private   BigDecimal extractPE(Document document) {
         Element overviewDiv = document.select("div#stk_overview").first();
         Element tableBody = overviewDiv.select("tbody").first();
         Element td = tableBody.select("tr").first().select("td:eq(1)").first();
@@ -48,19 +50,19 @@ public class EquityOverviewFactory {
         return CommonUtils.extractDecimalFromText(text);
     }
 
-    private static BigDecimal extractPB(Document document) {
+    private   BigDecimal extractPB(Document document) {
         return null;
     }
 
-    private static BigInteger extractMarketCap(Document document) {
+    private   BigInteger extractMarketCap(Document document) {
         return null;
     }
 
-    private static BigInteger extractFaceValue(Document document) {
+    private   BigInteger extractFaceValue(Document document) {
         return null;
     }
 
-    private static BigInteger extractBookValue(Document document) {
+    private   BigInteger extractBookValue(Document document) {
         return null;
     }
 

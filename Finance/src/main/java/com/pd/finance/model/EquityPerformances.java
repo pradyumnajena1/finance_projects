@@ -4,8 +4,8 @@ import java.util.List;
 
 public class EquityPerformances {
 
-    private String type;
-    private List<EquityPerformance> performances;
+    private final String type;
+    private final List<EquityPerformance> performances;
 
     public EquityPerformances(String type, List<EquityPerformance> performances) {
 

@@ -5,7 +5,7 @@ import com.pd.finance.request.MarketGainersRequest;
 
 import java.util.List;
 
-public interface IMarket {
+public interface IMarketService {
 
-    public List<Equity> GetGainers(MarketGainersRequest request) throws Exception;
+    List<Equity> GetGainers(MarketGainersRequest request) throws Exception;
 }

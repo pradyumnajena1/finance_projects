@@ -6,8 +6,15 @@ public class MarketGainersRequest {
 
     private PerformanceFilter performanceFilter;
     private SwotFilter swotFilter;
-    private BigDecimal maximumPe;
-    private BigDecimal minimumMarketCap;
+    private OverviewFilter overviewFilter;
+
+    public OverviewFilter getOverviewFilter() {
+        return overviewFilter;
+    }
+
+    public void setOverviewFilter(OverviewFilter overviewFilter) {
+        this.overviewFilter = overviewFilter;
+    }
 
     public SwotFilter getSwotFilter() {
         return swotFilter;
@@ -25,19 +32,5 @@ public class MarketGainersRequest {
         this.performanceFilter = performanceFilter;
     }
 
-    public BigDecimal getMaximumPe() {
-        return maximumPe;
-    }
 
-    public void setMaximumPe(BigDecimal maximumPe) {
-        this.maximumPe = maximumPe;
-    }
-
-    public BigDecimal getMinimumMarketCap() {
-        return minimumMarketCap;
-    }
-
-    public void setMinimumMarketCap(BigDecimal minimumMarketCap) {
-        this.minimumMarketCap = minimumMarketCap;
-    }
 }

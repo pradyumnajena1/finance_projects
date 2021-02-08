@@ -7,17 +7,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class EquityEssentialsFactory {
+@Component
+public class EquityEssentialsFactory implements IEquityEssentialsFactory {
 
     @JsonIgnore
-    private static Logger logger = LoggerFactory.getLogger(EquityEssentialsFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(EquityEssentialsFactory.class);
 
 
-    public static EquityEssentials create(Document document){
+    @Override
+    public   EquityEssentials create(Document document){
 
         EquityEssentials equityEssentials = new EquityEssentials();
 
@@ -32,21 +35,21 @@ public class EquityEssentialsFactory {
         return equityEssentials;
     }
 
-    private static Map<String, Boolean> extractOthers(Document document) {
+    private   Map<String, Boolean> extractOthers(Document document) {
         return collectQuestionsForSegment(document, "ul#id_others");
     }
 
-    private static Map<String, Boolean> extractOwnerships(Document document) {
+    private   Map<String, Boolean> extractOwnerships(Document document) {
         return collectQuestionsForSegment(document, "ul#id_ownership");
     }
-    private static Map<String, Boolean> extractFinancial(Document document) {
+    private   Map<String, Boolean> extractFinancial(Document document) {
         return collectQuestionsForSegment(document, "ul#id_financials");
     }
-    private static Map<String, Boolean> extractIndustryComparison(Document document) {
+    private   Map<String, Boolean> extractIndustryComparison(Document document) {
         return collectQuestionsForSegment(document, "ul#id_induscmp");
     }
 
-    private static Map<String, Boolean> collectQuestionsForSegment(Document document, String selectorQuery) {
+    private   Map<String, Boolean> collectQuestionsForSegment(Document document, String selectorQuery) {
         Map<String, Boolean> questionsCollector = new HashMap<>();
         try {
             Element financialUl = document.select(selectorQuery).first();
@@ -62,7 +65,7 @@ public class EquityEssentialsFactory {
 
 
 
-    private static void addQuestionAndAnswer(Map<String, Boolean> questionsCollector, Element li) {
+    private   void addQuestionAndAnswer(Map<String, Boolean> questionsCollector, Element li) {
         try {
             String question = li.child(0).attr("text");
             Element firstPath = li.select("path").first();
@@ -74,7 +77,7 @@ public class EquityEssentialsFactory {
     }
 
 
-    private static String extractEssentials(Document document) {
+    private   String extractEssentials(Document document) {
         String essentials = null;
         try {
             Element essentialsDiv = document.select("div#mcessential_div").first();
