@@ -1,34 +1,36 @@
 package com.pd.finance.model;
 
 public class TechnicalDetails {
-    private TechnicalDetails daily;
-    private TechnicalDetails weekly;
-    private TechnicalDetails monthly;
+
+
+    private TechnicalAnalysis daily;
+    private TechnicalAnalysis weekly;
+    private TechnicalAnalysis monthly;
 
     public TechnicalDetails() {
     }
 
-    public TechnicalDetails getDaily() {
+    public TechnicalAnalysis getDaily() {
         return daily;
     }
 
-    public void setDaily(TechnicalDetails daily) {
+    public void setDaily(TechnicalAnalysis daily) {
         this.daily = daily;
     }
 
-    public TechnicalDetails getWeekly() {
+    public TechnicalAnalysis getWeekly() {
         return weekly;
     }
 
-    public void setWeekly(TechnicalDetails weekly) {
+    public void setWeekly(TechnicalAnalysis weekly) {
         this.weekly = weekly;
     }
 
-    public TechnicalDetails getMonthly() {
+    public TechnicalAnalysis getMonthly() {
         return monthly;
     }
 
-    public void setMonthly(TechnicalDetails monthly) {
+    public void setMonthly(TechnicalAnalysis monthly) {
         this.monthly = monthly;
     }
 }

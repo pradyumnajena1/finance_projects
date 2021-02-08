@@ -2,34 +2,43 @@ package com.pd.finance.model;
 
 public class TechnicalAnalysis {
 
-    private int movingAverages;
-    private int technicalIndicator;
-    private int movingAveragesCrossovers;
+    private TechAnalysisSummary summary;
+    private MovingAvgDetails movingAverages;
+    private TechnicalIndicatorDetails technicalIndicator;
+    private MovingAvgCrossoverDetails movingAveragesCrossovers;
 
     public TechnicalAnalysis() {
     }
 
-    public int getMovingAverages() {
+    public TechAnalysisSummary getSummary() {
+        return summary;
+    }
+
+    public void setSummary(TechAnalysisSummary summary) {
+        this.summary = summary;
+    }
+
+    public MovingAvgDetails getMovingAverages() {
         return movingAverages;
     }
 
-    public void setMovingAverages(int movingAverages) {
+    public void setMovingAverages(MovingAvgDetails movingAverages) {
         this.movingAverages = movingAverages;
     }
 
-    public int getTechnicalIndicator() {
+    public TechnicalIndicatorDetails getTechnicalIndicator() {
         return technicalIndicator;
     }
 
-    public void setTechnicalIndicator(int technicalIndicator) {
+    public void setTechnicalIndicator(TechnicalIndicatorDetails technicalIndicator) {
         this.technicalIndicator = technicalIndicator;
     }
 
-    public int getMovingAveragesCrossovers() {
+    public MovingAvgCrossoverDetails getMovingAveragesCrossovers() {
         return movingAveragesCrossovers;
     }
 
-    public void setMovingAveragesCrossovers(int movingAveragesCrossovers) {
+    public void setMovingAveragesCrossovers(MovingAvgCrossoverDetails movingAveragesCrossovers) {
         this.movingAveragesCrossovers = movingAveragesCrossovers;
     }
 }

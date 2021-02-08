@@ -13,6 +13,7 @@ import java.util.Date;
 public class CommonUtils {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
+    public static final int FetchAllEquities = -1;
 
     public static BigDecimal extractDecimalFromText(String textValue) {
         try {

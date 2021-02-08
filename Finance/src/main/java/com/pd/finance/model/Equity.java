@@ -156,12 +156,11 @@ public class Equity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Equity equity = (Equity) o;
-        return name.equals(equity.name) &&
-                url.equals(equity.url);
+        return name.equals(equity.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, url);
+        return Objects.hash(name);
     }
 }

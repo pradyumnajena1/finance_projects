@@ -41,7 +41,7 @@ public class MarketService implements IMarketService {
 
         try{
             Document doc = getDocument();
-            List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc);
+            List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc,request.getDebugFilter()!=null?request.getDebugFilter().getNumEquities():-1);
 
             List<Equity> result = filterEquities(request, equityCollector);
 

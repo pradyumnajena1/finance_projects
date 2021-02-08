@@ -7,5 +7,5 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IMarketGainerEquityFactory {
-    List<Equity> fetchMarketGainerEquities(Document document) throws IOException;
+    List<Equity> fetchMarketGainerEquities(Document document,int maxEquitiesToFetch) throws IOException;
 }

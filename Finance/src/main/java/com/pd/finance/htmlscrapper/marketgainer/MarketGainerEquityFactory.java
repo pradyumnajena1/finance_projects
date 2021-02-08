@@ -3,7 +3,9 @@ package com.pd.finance.htmlscrapper.marketgainer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.htmlscrapper.equity.*;
 import com.pd.finance.model.*;
+import com.pd.finance.service.ICacheService;
 import com.pd.finance.service.IDocumentService;
+import com.pd.finance.utils.CommonUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -36,19 +38,24 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     @Autowired
     private IEquitySwotFactory swotFactory;
     @Autowired
+    private IEquityTechnicalDetailsFactory technicalDetailsFactory;
+    @Autowired
     private IMarketGainerEquityPerformancesFactory performancesFactory;
     @Autowired
     private IDocumentService documentService;
-    private ConcurrentHashMap<Equity,Equity> enrichedEquityCache = new ConcurrentHashMap<>();
+    @Autowired
+    private ICacheService cacheService;
 
 
     @Override
-    public   List<Equity> fetchMarketGainerEquities(Document document) throws IOException {
+    public   List<Equity> fetchMarketGainerEquities(Document document,int maxEquitiesToFetch) throws IOException {
         Queue<Equity> equityCollector = new ConcurrentLinkedQueue<>();
         Node histTable = extractMarketGainersTableNode(document);
         List<Node> rows = extractMarketGainerRows(histTable);
-        //use for testing
-        rows = rows.subList(0,5);
+        if(maxEquitiesToFetch!= CommonUtils.FetchAllEquities){
+            rows = rows.subList(0,Math.max(0, Math.min(rows.size(),maxEquitiesToFetch)));
+        }
+
         rows.stream().forEach(rowNode->processEquityRowNode(equityCollector, rowNode));
 
         return new ArrayList<>(equityCollector);
@@ -58,7 +65,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
 
         try {
             Equity equity = createMarketGainerEquity(rowNode);
-            Equity enrichedEquity =  enrichedEquityCache.computeIfAbsent(equity,anEquity ->  enrichEquity(anEquity));
+            Equity enrichedEquity =  cacheService.getEnrichedEquity(equity,anEquity ->  enrichEquity(anEquity));
             equityCollector.add(enrichedEquity);
         } catch (Exception e) {
           logger.error(e.getMessage(),e);
@@ -70,10 +77,21 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             addSwotDetails(equity);
             addEssentialDetails(equity);
             addEquityOverview(equity);
+            addTechnicalDetails(equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
         return equity;
+    }
+
+    private void addTechnicalDetails(Equity equity) {
+        try {
+            Document document = documentService.getDocument(equity.getUrl());
+            TechnicalDetails technicalDetails =  technicalDetailsFactory.create(document);
+            equity.setTechnicalDetails(technicalDetails);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 
     private   void addEquityOverview(Equity equity) {

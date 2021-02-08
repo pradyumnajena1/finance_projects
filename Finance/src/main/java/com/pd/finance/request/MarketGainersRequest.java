@@ -7,6 +7,15 @@ public class MarketGainersRequest {
     private PerformanceFilter performanceFilter;
     private SwotFilter swotFilter;
     private OverviewFilter overviewFilter;
+    private DebugFilter debugFilter = new DebugFilter();
+
+    public DebugFilter getDebugFilter() {
+        return debugFilter;
+    }
+
+    public void setDebugFilter(DebugFilter debugFilter) {
+        this.debugFilter = debugFilter;
+    }
 
     public OverviewFilter getOverviewFilter() {
         return overviewFilter;
