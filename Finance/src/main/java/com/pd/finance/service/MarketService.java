@@ -3,14 +3,8 @@ package com.pd.finance.service;
 import com.pd.finance.config.ApplicationConfig;
 import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
-import com.pd.finance.model.Equity;
-import com.pd.finance.model.EquityOverview;
-import com.pd.finance.model.EquityPerformance;
-import com.pd.finance.model.EquitySwotDetails;
-import com.pd.finance.request.MarketGainersRequest;
-import com.pd.finance.request.OverviewFilter;
-import com.pd.finance.request.PerformanceFilter;
-import com.pd.finance.request.SwotFilter;
+import com.pd.finance.model.*;
+import com.pd.finance.request.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -67,28 +61,118 @@ public class MarketService implements IMarketService {
 
 
     private boolean isValidEquity(Equity equity, MarketGainersRequest request) {
-        boolean isValid = true;
+          logger.info("isValidEquity exec started for equity {}",equity.getName());
         try {
             OverviewFilter overviewFilter = request.getOverviewFilter();
             if(overviewFilter!=null){
-                isValid = isValid && isValidEquity(equity, overviewFilter);
+                if(!isValidEquity(equity, overviewFilter)){
+                    logger.info("isValidEquity overviewFilter didn't matched for equity {}",equity.getName());
+                    return false;
+                }
             }
             PerformanceFilter performanceFilter = request.getPerformanceFilter();
             if(performanceFilter!=null){
-                isValid = isValid && isValidEquity(equity, performanceFilter);
+                 if(!isValidEquity(equity, performanceFilter)){
+                     logger.info("isValidEquity performanceFilter didn't matched for equity {}",equity.getName());
+                     return false;
+                 }
             }
             SwotFilter swotFilter = request.getSwotFilter();
             if(swotFilter!=null){
-                isValid = isValid && isValidEquity(equity, swotFilter);
+                if(!isValidEquity(equity, swotFilter)){
+                    logger.info("isValidEquity swotFilter didn't matched for equity {}",equity.getName());
+                    return false;
+                }
             }
-            // BigDecimal minimumGainPerSession = performanceFilter.getMinimumGainPerSession()!=null? performanceFilter.getMinimumGainPerSession(): new BigDecimal("0.0");
+            TechnicalPeriodFilter technicalPeriodFilter = request.getTechnicalPeriodFilter();
+            if(technicalPeriodFilter!=null){
+                if(!isValid(equity,technicalPeriodFilter)){
+                    logger.info("isValidEquity technicalPeriodFilter didn't matched for equity {}",equity.getName());
+                    return false;
+                }
+            }
 
-            return isValid;
+            return true;
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
            return false;
         }
 
+    }
+
+    private boolean isValid(Equity equity, TechnicalPeriodFilter technicalPeriodFilter) {
+
+
+        TechnicalDetails technicalDetails = equity.getTechnicalDetails();
+        if(technicalDetails==null){
+            return false;
+        }
+
+        if (!isValid(technicalPeriodFilter.getDailyTechnicalFilter(), technicalDetails.getDaily())){
+            logger.info("isValidEquity DailyTechnicalFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        if (!isValid(technicalPeriodFilter.getWeeklyTechnicalFilter(), technicalDetails.getWeekly())){
+            logger.info("isValidEquity WeeklyTechnicalFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        if (!isValid(technicalPeriodFilter.getMonthlyTechnicalFilter(), technicalDetails.getMonthly())){
+            logger.info("isValidEquity MonthlyTechnicalFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValid(TechnicalFilter technicalFilter, TechnicalAnalysis technicalAnalysis) {
+        if(technicalFilter!=null){
+
+            if(technicalAnalysis==null){
+                return false;
+            }
+            TechAnalysisSummary summary = technicalAnalysis.getSummary();
+            if(summary==null){
+                return false;
+            }
+
+
+            if (!isValid(technicalFilter.getMovingAvgFilter(), summary.getMovingAverages())){
+                logger.info("MovingAverages filter not matching returning false");
+                return false;
+            }
+
+            if (!isValid(technicalFilter.getMovingAvgCrossOverFilter(), summary.getMovingAveragesCrossOver())){
+                logger.info("MovingAveragesCrossOver filter not matching returning false");
+                return false;
+            }
+
+            if (!isValid(technicalFilter.getTechnicalIndicatorFilter(), summary.getTechnicalIndicator())){
+                logger.info("TechnicalIndicator filter not matching returning false");
+                return false;
+            }
+
+
+        }
+        return true;
+    }
+
+    private boolean isValid(TechnicalSummaryFilter summaryFilter, TechAnalysisSummaryValue summaryValue) {
+        if(summaryFilter!=null){
+
+            if(summaryValue==null){
+                return false;
+            }
+            Integer maxBearishFilter = summaryFilter.getMaxBearish();
+            if(maxBearishFilter!=null && maxBearishFilter < summaryValue.getBearish()){
+                return false;
+            }
+            Integer minBullishFilter = summaryFilter.getMinBullish();
+            if(minBullishFilter!=null && minBullishFilter > summaryValue.getBullish()){
+                return false;
+            }
+
+        }
+        return true;
     }
 
     private boolean isValidEquity(Equity equity, OverviewFilter overviewFilter) {

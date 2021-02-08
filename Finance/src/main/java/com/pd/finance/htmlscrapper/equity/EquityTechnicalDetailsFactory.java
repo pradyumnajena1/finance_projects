@@ -6,10 +6,13 @@ import com.pd.finance.service.IDocumentService;
 import com.pd.finance.utils.CommonUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 @Component
 public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFactory {
@@ -39,27 +42,30 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
     }
 
     private TechnicalAnalysis extractTechDetailsMonthly(String technicalDetailsTemplateUrl) {
-        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, "monthly","div#techratingsumm");
+        TechnicalAnalysisPeriodCssSelectors cssSelectors = new TechnicalAnalysisPeriodCssSelectors("monthly", "div#techrs_m", "div#movavg_m", "div#movavgcr_m", "div#techind_m");
+        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, cssSelectors);
     }
 
     private TechnicalAnalysis extractTechDetailsWeekly(String technicalDetailsTemplateUrl) {
-        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, "weekly","div#techratingsumm");
+        TechnicalAnalysisPeriodCssSelectors cssSelectors = new TechnicalAnalysisPeriodCssSelectors("weekly", "div#techratingsumm", "div#movingavg", "div#movavgco", "div#techind");
+        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, cssSelectors);
     }
 
     private TechnicalAnalysis extractTechDetailsDaily(String technicalDetailsTemplateUrl) {
-        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, "daily","div#techratingsumd");
+        TechnicalAnalysisPeriodCssSelectors cssSelectors = new TechnicalAnalysisPeriodCssSelectors("daily", "div#techratingsumd", "div#movingavgd", "div#movavgcod", "div#techindd");
+        return extractTechnicalAnalysisForPeriod(technicalDetailsTemplateUrl, cssSelectors);
     }
 
-    private TechnicalAnalysis extractTechnicalAnalysisForPeriod(String technicalDetailsTemplateUrl, String period, String cssQuery) {
+    private TechnicalAnalysis extractTechnicalAnalysisForPeriod(String technicalDetailsTemplateUrl, TechnicalAnalysisPeriodCssSelectors technicalAnalysisPeriodCssSelectors) {
         TechnicalAnalysis technicalAnalysis = new TechnicalAnalysis();
         try {
-            String technicalDetailsDailyUrl = getTechnicalDetailsUrl(technicalDetailsTemplateUrl, period);
-            Document document = documentService.getDocument(technicalDetailsDailyUrl);
-            technicalAnalysis.setSummary(extractSummary(document, cssQuery));
+            String technicalDetailsPeriodUrl = getTechnicalDetailsUrl(technicalDetailsTemplateUrl, technicalAnalysisPeriodCssSelectors.getPeriod());
+            Document document = documentService.getDocument(technicalDetailsPeriodUrl);
+            technicalAnalysis.setSummary(extractSummary(document, technicalAnalysisPeriodCssSelectors.getSummaryCssQuery()));
 
-            technicalAnalysis.setMovingAverages(extractMovingAverages(document));
-            technicalAnalysis.setMovingAveragesCrossovers(extractMovingAvgCrossovers(document));
-            technicalAnalysis.setTechnicalIndicator(extractTechnicalIndicator(document));
+            technicalAnalysis.setMovingAverages(extractMovingAverages(document, technicalAnalysisPeriodCssSelectors.getMovingAvgCssQuery()));
+            technicalAnalysis.setMovingAveragesCrossovers(extractMovingAvgCrossovers(document, technicalAnalysisPeriodCssSelectors.getMovingAvgCrossoverCssQuery()));
+            technicalAnalysis.setTechnicalIndicator(extractTechnicalIndicator(document, technicalAnalysisPeriodCssSelectors.getTechnicalIndicatorCssQuery()));
 
 
         } catch (Exception e) {
@@ -68,16 +74,85 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
         return technicalAnalysis;
     }
 
-    private TechnicalIndicatorDetails extractTechnicalIndicator(Document document) {
-        return null;
+    private TechnicalIndicatorDetails extractTechnicalIndicator(Document document, String technicalIndicatorCssQuery) {
+        TechnicalIndicatorDetails technicalIndicatorDetails = new TechnicalIndicatorDetails();
+        ArrayList<TechIndicatorLineItem> lineItems = new ArrayList<>();
+        technicalIndicatorDetails.setLineItems(lineItems);
+        Element containerDiv = document.select(technicalIndicatorCssQuery).first();
+
+        Elements elements = containerDiv.select("tbody > tr");
+        elements.stream().forEach(aRow->{
+            TechIndicatorLineItem techIndicatorLineItem = extractTechIndicatorLineItem(aRow);
+            lineItems.add(techIndicatorLineItem);
+
+        });
+        return technicalIndicatorDetails;
     }
 
-    private MovingAvgCrossoverDetails extractMovingAvgCrossovers(Document document) {
-        return null;
+    private TechIndicatorLineItem extractTechIndicatorLineItem(Element aRow) {
+        TechIndicatorLineItem techIndicatorLineItem = new TechIndicatorLineItem();
+        try {
+            techIndicatorLineItem.setIndicator(aRow.select("td:eq(0)").first().text());
+            techIndicatorLineItem.setLevel(aRow.select("td:eq(1)").first().text());
+            techIndicatorLineItem.setIndication(aRow.select("td:eq(2)").first().text());
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return techIndicatorLineItem;
     }
 
-    private MovingAvgDetails extractMovingAverages(Document document) {
-        return null;
+    private MovingAvgCrossoverDetails extractMovingAvgCrossovers(Document document, String movingAvgCrossoverCssQuery) {
+        MovingAvgCrossoverDetails crossoverDetails = new MovingAvgCrossoverDetails();
+        ArrayList<MovingAvgCrossoverLineItem> lineItems = new ArrayList<>();
+        crossoverDetails.setLineItems(lineItems);
+        Element containerDiv = document.select(movingAvgCrossoverCssQuery).first();
+        Elements elements = containerDiv.select("tbody > tr");
+        elements.stream().forEach(aRow->{
+            MovingAvgCrossoverLineItem crossoverLineItem = extractMovingAvgCrossoverLineItem(aRow);
+            lineItems.add(crossoverLineItem);
+
+        });
+        return crossoverDetails;
+    }
+
+    private MovingAvgCrossoverLineItem extractMovingAvgCrossoverLineItem(Element aRow) {
+        MovingAvgCrossoverLineItem crossoverLineItem = new MovingAvgCrossoverLineItem();
+        try {
+            crossoverLineItem.setPeriod(  aRow.select("td:eq(0)").first().text() );
+            crossoverLineItem.setMovingAvgCrossover(aRow.select("td:eq(1)").first().text());
+            crossoverLineItem.setIndication(aRow.select("td:eq(2)").first().text());
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return crossoverLineItem;
+    }
+
+    private MovingAvgDetails extractMovingAverages(Document document, String movingAvgCssQuery) {
+        MovingAvgDetails movingAvgDetails = new MovingAvgDetails();
+        ArrayList<MovingAverageLineItem> lineItems = new ArrayList<>();
+        movingAvgDetails.setLineItems(lineItems);
+        Element containerDiv = document.select(movingAvgCssQuery).first();
+        Elements elements = containerDiv.select("tbody > tr");
+        elements.stream().forEach(aRow->{
+            MovingAverageLineItem movingAverageLineItem = extractMovingAverageLineItem(aRow);
+            lineItems.add(movingAverageLineItem);
+
+        });
+        return movingAvgDetails;
+    }
+
+    private MovingAverageLineItem extractMovingAverageLineItem(Element aRow) {
+        MovingAverageLineItem movingAverageLineItem = new MovingAverageLineItem();
+
+        try {
+            movingAverageLineItem.setIndication(aRow.select("td:eq(2)").first().text());
+            movingAverageLineItem.setPeriod(CommonUtils.extractIntegerFromText( aRow.select("td:eq(0)").first().text()).intValue());
+            movingAverageLineItem.setSMA(CommonUtils.extractDecimalFromText( aRow.select("td:eq(1)").first().text()));
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+
+        return movingAverageLineItem;
     }
 
     private TechAnalysisSummary extractSummary(Document document, String cssQuery) {
@@ -110,17 +185,22 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
     private TechAnalysisSummaryValue extractTechnicalSummaryLineItem(Element techRatingSummaryDiv, String trend, String rowSelector) {
         TechAnalysisSummaryValue summaryValue = new TechAnalysisSummaryValue();
         summaryValue.setTrend(trend);
-        int value = extractTechnicalSummaryValueValue(techRatingSummaryDiv, rowSelector);
+        String value = extractTechnicalSummaryValueValue(techRatingSummaryDiv, rowSelector);
         summaryValue.setValue(value);
         return summaryValue;
     }
 
-    private int extractTechnicalSummaryValueValue(Element techRatingSummaryDiv,String rowSelector) {
-        Element tbody = techRatingSummaryDiv.select("tbody").first();
-        Element tr = tbody.select(rowSelector).first();
-        Element valueTd = tr.select("td:eq(2)").first();
-        Element strongElement = valueTd.select("div:eq(0)").first().select("span:eq(0)").first().select("strong:eq(0)").first();
-        return CommonUtils.extractIntegerFromText(strongElement.text()).intValue();
+    private String extractTechnicalSummaryValueValue(Element techRatingSummaryDiv,String rowSelector) {
+        String value = null;
+        try {
+            Element tbody = techRatingSummaryDiv.select("tbody").first();
+            Element tr = tbody.select(rowSelector).first();
+            Element valueTd = tr.select("td:eq(2)").first();
+            value=  valueTd.select("div:eq(0)").first().text();
+        } catch (Exception e) {
+           logger.error(e.getMessage(),e);
+        }
+        return value;
     }
 
     private String getTechnicalDetailsUrl(String technicalDetailsTemplateUrl, String period) {

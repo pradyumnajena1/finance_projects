@@ -1,6 +1,9 @@
 package com.pd.finance.request;
 
-import java.math.BigDecimal;
+import org.springframework.validation.FieldError;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MarketGainersRequest {
 
@@ -8,6 +11,7 @@ public class MarketGainersRequest {
     private SwotFilter swotFilter;
     private OverviewFilter overviewFilter;
     private DebugFilter debugFilter = new DebugFilter();
+    private TechnicalPeriodFilter technicalPeriodFilter;
 
     public DebugFilter getDebugFilter() {
         return debugFilter;
@@ -41,5 +45,19 @@ public class MarketGainersRequest {
         this.performanceFilter = performanceFilter;
     }
 
+    public TechnicalPeriodFilter getTechnicalPeriodFilter() {
+        return technicalPeriodFilter;
+    }
 
+    public void setTechnicalPeriodFilter(TechnicalPeriodFilter technicalPeriodFilter) {
+        this.technicalPeriodFilter = technicalPeriodFilter;
+    }
+
+    public List<FieldError> validate(){
+        List<FieldError> errors = new ArrayList<>();
+        if(technicalPeriodFilter !=null){
+            errors.addAll(technicalPeriodFilter.validate());
+        }
+        return  errors;
+    }
 }
