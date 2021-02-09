@@ -76,6 +76,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
 
     private   Equity enrichEquity(Equity equity ) {
         try {
+            addBasicDetails(equity);
             addSwotDetails(equity);
             addEssentialDetails(equity);
             addEquityOverview(equity);
@@ -85,6 +86,17 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             logger.error(e.getMessage(),e);
         }
         return equity;
+    }
+
+    private void addBasicDetails(Equity equity) {
+        try {
+            Document document = documentService.getDocument(equity.getUrl());
+
+             equity.setBseId(document.select("input#bseid").first().attr("value"));
+            equity.setNseId(document.select("input#nseid").first().attr("value"));
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 
     private void addEquityInsights(Equity equity) {

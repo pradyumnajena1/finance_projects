@@ -16,6 +16,8 @@ public class Equity {
 
 
     private String name;
+    private String nseId;
+    private String bseId;
     private String url;
     private String sector;
     private String exchange;
@@ -38,6 +40,22 @@ public class Equity {
 
     public void setInsights(EquityInsights insights) {
         this.insights = insights;
+    }
+
+    public String getNseId() {
+        return nseId;
+    }
+
+    public void setNseId(String nseId) {
+        this.nseId = nseId;
+    }
+
+    public String getBseId() {
+        return bseId;
+    }
+
+    public void setBseId(String bseId) {
+        this.bseId = bseId;
     }
 
     public EquityOverview getOverview() {
