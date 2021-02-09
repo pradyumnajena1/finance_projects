@@ -3,12 +3,14 @@ package com.pd.finance.htmlscrapper.equity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquityEssentials;
 import com.pd.finance.model.EquitySwotDetails;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +20,13 @@ public class EquityEssentialsFactory implements IEquityEssentialsFactory {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(EquityEssentialsFactory.class);
 
+
+    public static void main(String[] args) throws Exception{
+        EquityEssentialsFactory factory = new EquityEssentialsFactory();
+        Document document = Jsoup.parse(new File("C:\\Users\\prjen\\Desktop\\Template.html"), "UTF-8");
+        EquityEssentials equityEssentials = factory.create(document);
+        System.out.println("done");
+    }
 
     @Override
     public   EquityEssentials create(Document document){
@@ -33,6 +42,17 @@ public class EquityEssentialsFactory implements IEquityEssentialsFactory {
 
 
         return equityEssentials;
+    }
+
+    private   String extractEssentials(Document document) {
+        String essentials = null;
+        try {
+            Element essentialsDiv = document.select("div#mcessential_div > div > div > div").first();
+            essentials = essentialsDiv.text();
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return  essentials;
     }
 
     private   Map<String, Boolean> extractOthers(Document document) {
@@ -67,9 +87,9 @@ public class EquityEssentialsFactory implements IEquityEssentialsFactory {
 
     private   void addQuestionAndAnswer(Map<String, Boolean> questionsCollector, Element li) {
         try {
-            String question = li.child(0).attr("text");
+            String question = li.text();
             Element firstPath = li.select("path").first();
-            boolean answer = firstPath.attr("fill").equalsIgnoreCase("");
+            boolean answer = firstPath.attr("style").contains("#3BB54A");
             questionsCollector.put(question,answer);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -77,16 +97,5 @@ public class EquityEssentialsFactory implements IEquityEssentialsFactory {
     }
 
 
-    private   String extractEssentials(Document document) {
-        String essentials = null;
-        try {
-            Element essentialsDiv = document.select("div#mcessential_div").first();
-            Element first = essentialsDiv.select("div:containsOwn( Pass)").first();
 
-            essentials = first.childNode(0).attr("text");
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-        }
-        return  essentials;
-    }
 }

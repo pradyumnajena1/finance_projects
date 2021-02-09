@@ -12,6 +12,15 @@ public class MarketGainersRequest {
     private OverviewFilter overviewFilter;
     private DebugFilter debugFilter = new DebugFilter();
     private TechnicalPeriodFilter technicalPeriodFilter;
+    private EquityInsightFilter insightFilter;
+
+    public EquityInsightFilter getInsightFilter() {
+        return insightFilter;
+    }
+
+    public void setInsightFilter(EquityInsightFilter insightFilter) {
+        this.insightFilter = insightFilter;
+    }
 
     public DebugFilter getDebugFilter() {
         return debugFilter;

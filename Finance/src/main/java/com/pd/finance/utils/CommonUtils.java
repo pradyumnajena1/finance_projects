@@ -19,6 +19,7 @@ public class CommonUtils {
         try {
 
             textValue = textValue.replace(",","");
+            textValue = textValue.replace("%","");
             textValue = textValue.trim();
             return new BigDecimal( textValue);
         } catch (NumberFormatException ex) {

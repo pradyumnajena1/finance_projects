@@ -42,6 +42,8 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     @Autowired
     private IMarketGainerEquityPerformancesFactory performancesFactory;
     @Autowired
+    private IEquityInsightsFactory insightsFactory;
+    @Autowired
     private IDocumentService documentService;
     @Autowired
     private ICacheService cacheService;
@@ -78,10 +80,21 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             addEssentialDetails(equity);
             addEquityOverview(equity);
             addTechnicalDetails(equity);
+            addEquityInsights(equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
         return equity;
+    }
+
+    private void addEquityInsights(Equity equity) {
+        try {
+            Document document = documentService.getDocument(equity.getUrl());
+            EquityInsights equityInsights =  insightsFactory.create(document);
+            equity.setInsights(equityInsights);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 
     private void addTechnicalDetails(Equity equity) {

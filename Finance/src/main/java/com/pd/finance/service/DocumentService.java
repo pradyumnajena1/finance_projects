@@ -33,7 +33,7 @@ public class DocumentService implements IDocumentService{
         try {
             logger.warn("getDocument dint find in cache , fetching from source for url {}",anUrl);
             return Jsoup.connect(anUrl).get();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return null;
         }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,13 @@ public class MarketService implements IMarketService {
                     return false;
                 }
             }
+            EquityInsightFilter insightFilter = request.getInsightFilter();
+            if(insightFilter!=null){
+                if(!isValid(equity,insightFilter)){
+                    logger.info("isValidEquity insightFilter didn't matched for equity {}",equity.getName());
+                    return false;
+                }
+            }
 
             return true;
         } catch (Exception e) {
@@ -99,6 +107,139 @@ public class MarketService implements IMarketService {
         }
 
     }
+
+    private boolean isValid(Equity equity, EquityInsightFilter insightFilter) {
+        EquityInsights insights = equity.getInsights();
+        if(insights==null){
+            return false;
+        }
+
+        if(!isValid(insightFilter.getFinancialInsightFilter(),insights.getFinancialInsights())){
+            logger.info("isValidEquity FinancialInsightFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        if(!isValid(insightFilter.getPriceInsightFilter(),insights.getPriceInsights())){
+            logger.info("isValidEquity PriceInsightFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        if(!isValid(insightFilter.getIndustryComparisionFilter(),insights.getIndustryComparisionInsights())){
+            logger.info("isValidEquity IndustryComparisionFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        if(!isValid(insightFilter.getShareholdingPatternsFilter(),insights.getShareholdingPatternInsights())){
+            logger.info("isValidEquity ShareholdingPatternsFilter didn't matched for equity {}",equity.getName());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValid(InsightsFilter shareholdingPatternsFilter, ShareholdingPatternInsights shareholdingPatternInsights) {
+        if(shareholdingPatternsFilter!=null){
+            if(shareholdingPatternInsights==null){
+                return false;
+            }
+            Integer maxBearish = shareholdingPatternsFilter.getMaxBearish();
+            Integer minBullish = shareholdingPatternsFilter.getMinBullish();
+            List<EquityInsightLineItem> lineItems = shareholdingPatternInsights.getLineItems();
+
+            if (!isValid(maxBearish, minBullish, lineItems)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+    private boolean isValid(InsightsFilter industryComparisionFilter, IndustryComparisionInsights industryComparisionInsights) {
+        if(industryComparisionFilter!=null){
+            if(industryComparisionInsights==null){
+                return false;
+            }
+            Integer maxBearish = industryComparisionFilter.getMaxBearish();
+            Integer minBullish = industryComparisionFilter.getMinBullish();
+            List<EquityInsightLineItem> lineItems = industryComparisionInsights.getLineItems();
+
+            if (!isValid(maxBearish, minBullish, lineItems)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValid(InsightsFilter priceInsightFilter, PriceInsights priceInsights) {
+        if(priceInsightFilter!=null){
+            if(priceInsights==null){
+                return false;
+            }
+            Integer maxBearish = priceInsightFilter.getMaxBearish();
+            Integer minBullish = priceInsightFilter.getMinBullish();
+            List<EquityInsightLineItem> lineItems = priceInsights.getLineItems();
+
+            if (!isValid(maxBearish, minBullish, lineItems)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean isValid(Integer maxBearish, Integer minBullish, List<EquityInsightLineItem> lineItems) {
+        if( (maxBearish!=null || minBullish!=null) && (lineItems ==null)){
+            return false;
+        }
+        if(maxBearish !=null){
+            long count = lineItems.stream().filter(lineItem -> lineItem.getMarketSentiments() == StockMarketSentiments.Bearish).count();
+            if(count >maxBearish){
+                return false;
+            }
+        }
+        if(minBullish!=null ){
+            long count = lineItems.stream().filter(lineItem -> lineItem.getMarketSentiments() == StockMarketSentiments.Bullish).count();
+            if(count <minBullish){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValid(FinancialInsightFilter financialInsightFilter, FinancialInsights financialInsights) {
+          if(financialInsightFilter!=null){
+              if(financialInsights==null){
+                  return false;
+              }
+              BigDecimal minNetProfitCagrGrowth = financialInsightFilter.getMinNetProfitCagrGrowth();
+              BigDecimal netProfitCagrGrowth = financialInsights.getNetProfitCagrGrowth();
+              if (!isValid(minNetProfitCagrGrowth, netProfitCagrGrowth)) return false;
+
+              BigDecimal minOperatingProfitCagrGrowth = financialInsightFilter.getMinOperatingProfitCagrGrowth();
+              BigDecimal operatingProfitCagrGrowth = financialInsights.getOperatingProfitCagrGrowth();
+              if (!isValid(minOperatingProfitCagrGrowth, operatingProfitCagrGrowth)) return false;
+
+              BigDecimal minRevenueCagrGrowth = financialInsightFilter.getMinRevenueCagrGrowth();
+              BigDecimal revenueCagrGrowth = financialInsights.getRevenueCagrGrowth();
+              if (!isValid(minRevenueCagrGrowth, revenueCagrGrowth)) return false;
+
+              BigDecimal minPiotroskiScore = financialInsightFilter.getMinPiotroskiScore();
+              BigDecimal piotroskiScore = financialInsights.getPiotroskiScore();
+              if (!isValid(minPiotroskiScore, piotroskiScore)) return false;
+
+
+          }
+        return true;
+    }
+
+    private boolean isValid(BigDecimal minExpectedValue, BigDecimal actualValue) {
+        if (minExpectedValue != null) {
+
+            if (actualValue == null) {
+                return false;
+            }
+            if (minExpectedValue.compareTo(actualValue) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     private boolean isValid(Equity equity, TechnicalPeriodFilter technicalPeriodFilter) {
 
