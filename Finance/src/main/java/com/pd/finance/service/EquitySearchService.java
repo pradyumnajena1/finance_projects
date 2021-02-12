@@ -1,68 +1,44 @@
 package com.pd.finance.service;
 
-import com.pd.finance.config.ApplicationConfig;
-import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
-import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
 import com.pd.finance.model.*;
+import com.pd.finance.persistence.EquityRepository;
 import com.pd.finance.request.*;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-
 @Service
-public class MarketService implements IMarketService {
-   private static final Logger logger = LoggerFactory.getLogger(MarketService.class);
-   @Autowired
-   private IMarketGainerEquityFactory marketGainerEquityFactory;
-
-   @Autowired
-   private ApplicationConfig config;
-   @Autowired
-   private IDocumentService documentService;
-
+public class EquitySearchService implements IEquitySearchService {
+    private static final Logger logger = LoggerFactory.getLogger(EquitySearchService.class);
+    @Autowired
+    private EquityRepository equityRepository;
 
     @Override
-    public List<Equity> GetGainers(MarketGainersRequest request) throws Exception{
+    public List<Equity> search(EquitySearchRequest searchRequest){
+        List<Equity> equitiesCollector  = new ArrayList<>();
 
+        Page<Equity> page = equityRepository.findAll(PageRequest.of(0, 100));
+        List<Equity> list = page.filter(equity -> isValidEquity(equity, searchRequest)).toList();
 
-        try{
-            Document doc = getDocument();
-            List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc,request.getDebugFilter()!=null?request.getDebugFilter().getNumEquities():-1);
-
-            List<Equity> result = filterEquities(request, equityCollector);
-
-            return result;
-        }catch (Exception ex){
-            logger.error("Failed to execute GetGainers",ex);
-               throw ex;
-        }
-
-
-
-
-    }
-
-    private List<Equity> filterEquities(MarketGainersRequest request, List<Equity> equityCollector) {
-        return equityCollector.stream().filter(anEquity->isValidEquity(anEquity,request)).collect(Collectors.toList());
-    }
-
-    private Document getDocument() throws Exception {
-        String gainersUrl = config.getEnvProperty("GainersUrl");
-        return documentService.getDocument(gainersUrl);
+        equitiesCollector.addAll(list);
+        return equitiesCollector;
     }
 
 
-    private boolean isValidEquity(Equity equity, MarketGainersRequest request) {
-          logger.info("isValidEquity exec started for equity {}",equity.getName());
+
+
+
+    private boolean isValidEquity(Equity equity, EquitySearchRequest request) {
+        logger.info("isValidEquity exec started for equity {}",equity.getName());
         try {
             OverviewFilter overviewFilter = request.getOverviewFilter();
             if(overviewFilter!=null){
@@ -73,10 +49,10 @@ public class MarketService implements IMarketService {
             }
             PerformanceFilter performanceFilter = request.getPerformanceFilter();
             if(performanceFilter!=null){
-                 if(!isValidEquity(equity, performanceFilter)){
-                     logger.info("isValidEquity performanceFilter didn't matched for equity {}",equity.getName());
-                     return false;
-                 }
+                if(!isValidEquity(equity, performanceFilter)){
+                    logger.info("isValidEquity performanceFilter didn't matched for equity {}",equity.getName());
+                    return false;
+                }
             }
             SwotFilter swotFilter = request.getSwotFilter();
             if(swotFilter!=null){
@@ -102,8 +78,8 @@ public class MarketService implements IMarketService {
 
             return true;
         } catch (Exception e) {
-           logger.error(e.getMessage(),e);
-           return false;
+            logger.error(e.getMessage(),e);
+            return false;
         }
 
     }
@@ -202,28 +178,28 @@ public class MarketService implements IMarketService {
     }
 
     private boolean isValid(FinancialInsightFilter financialInsightFilter, FinancialInsights financialInsights) {
-          if(financialInsightFilter!=null){
-              if(financialInsights==null){
-                  return false;
-              }
-              BigDecimal minNetProfitCagrGrowth = financialInsightFilter.getMinNetProfitCagrGrowth();
-              BigDecimal netProfitCagrGrowth = financialInsights.getNetProfitCagrGrowth();
-              if (!isValid(minNetProfitCagrGrowth, netProfitCagrGrowth)) return false;
+        if(financialInsightFilter!=null){
+            if(financialInsights==null){
+                return false;
+            }
+            BigDecimal minNetProfitCagrGrowth = financialInsightFilter.getMinNetProfitCagrGrowth();
+            BigDecimal netProfitCagrGrowth = financialInsights.getNetProfitCagrGrowth();
+            if (!isValid(minNetProfitCagrGrowth, netProfitCagrGrowth)) return false;
 
-              BigDecimal minOperatingProfitCagrGrowth = financialInsightFilter.getMinOperatingProfitCagrGrowth();
-              BigDecimal operatingProfitCagrGrowth = financialInsights.getOperatingProfitCagrGrowth();
-              if (!isValid(minOperatingProfitCagrGrowth, operatingProfitCagrGrowth)) return false;
+            BigDecimal minOperatingProfitCagrGrowth = financialInsightFilter.getMinOperatingProfitCagrGrowth();
+            BigDecimal operatingProfitCagrGrowth = financialInsights.getOperatingProfitCagrGrowth();
+            if (!isValid(minOperatingProfitCagrGrowth, operatingProfitCagrGrowth)) return false;
 
-              BigDecimal minRevenueCagrGrowth = financialInsightFilter.getMinRevenueCagrGrowth();
-              BigDecimal revenueCagrGrowth = financialInsights.getRevenueCagrGrowth();
-              if (!isValid(minRevenueCagrGrowth, revenueCagrGrowth)) return false;
+            BigDecimal minRevenueCagrGrowth = financialInsightFilter.getMinRevenueCagrGrowth();
+            BigDecimal revenueCagrGrowth = financialInsights.getRevenueCagrGrowth();
+            if (!isValid(minRevenueCagrGrowth, revenueCagrGrowth)) return false;
 
-              BigDecimal minPiotroskiScore = financialInsightFilter.getMinPiotroskiScore();
-              BigDecimal piotroskiScore = financialInsights.getPiotroskiScore();
-              if (!isValid(minPiotroskiScore, piotroskiScore)) return false;
+            BigDecimal minPiotroskiScore = financialInsightFilter.getMinPiotroskiScore();
+            BigDecimal piotroskiScore = financialInsights.getPiotroskiScore();
+            if (!isValid(minPiotroskiScore, piotroskiScore)) return false;
 
 
-          }
+        }
         return true;
     }
 
@@ -322,7 +298,7 @@ public class MarketService implements IMarketService {
         try {
             EquityOverview equityOverview = equity.getOverview();
             isValid =  overviewFilter.getMaxPE().compareTo(equityOverview.getStockPE())>=0 &&
-                      overviewFilter.getMinVolume().compareTo(equityOverview.getVolume())<=0
+                    overviewFilter.getMinVolume().compareTo(equityOverview.getVolume())<=0
 
             ;
         } catch (Exception e) {
@@ -337,10 +313,10 @@ public class MarketService implements IMarketService {
         try {
             EquitySwotDetails swotDetails = equity.getSwotDetails();
             isValid = swotDetails.getStrengths().size()>= swotFilter.getMinStrengths() &&
-                      swotDetails.getOpportunities().size()>=swotFilter.getMinOpportunities() &&
-                      swotDetails.getWeaknesses().size()<=swotFilter.getMaxWeaknesses() &&
-                      swotDetails.getThreats().size()<=swotFilter.getMaxThreats()
-                      ;
+                    swotDetails.getOpportunities().size()>=swotFilter.getMinOpportunities() &&
+                    swotDetails.getWeaknesses().size()<=swotFilter.getMaxWeaknesses() &&
+                    swotDetails.getThreats().size()<=swotFilter.getMaxThreats()
+            ;
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
@@ -352,13 +328,12 @@ public class MarketService implements IMarketService {
 
         try {
             isValid = equity.getPerformances().getPerformances().stream()
-                  .filter(performance -> performance.getChangePercent().compareTo(performanceFilter.getMinimumGainPerSession()) >= 0)
-                  .collect(Collectors.toList()).size() == performanceFilter.getMinimumGainSessions();
+                    .filter(performance -> performance.getChangePercent().compareTo(performanceFilter.getMinimumGainPerSession()) >= 0)
+                    .collect(Collectors.toList()).size() >= performanceFilter.getMinimumGainSessions();
         } catch (Exception e) {
-           logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(),e);
         }
         return isValid;
     }
-
 
 }

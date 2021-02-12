@@ -7,11 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Service
 public class DocumentService implements IDocumentService{
     private static final Logger logger = LoggerFactory.getLogger(DocumentService.class);
     @Autowired
@@ -23,9 +24,9 @@ public class DocumentService implements IDocumentService{
 
     @Override
     public Document getDocument(String url) throws Exception {
-        logger.info("getDocument started executing for url {}",url);
+       // logger.info("getDocument started executing for url {}",url);
         Document document = cacheService.getDocument(url,anUrl-> doGetDocument(anUrl));
-        logger.info("getDocument completed executing for url {}",url);
+       // logger.info("getDocument completed executing for url {}",url);
         return document;
     }
 

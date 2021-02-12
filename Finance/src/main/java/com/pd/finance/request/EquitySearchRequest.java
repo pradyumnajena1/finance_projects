@@ -5,12 +5,12 @@ import org.springframework.validation.FieldError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarketGainersRequest {
+public class EquitySearchRequest {
 
     private PerformanceFilter performanceFilter;
     private SwotFilter swotFilter;
     private OverviewFilter overviewFilter;
-    private DebugFilter debugFilter = new DebugFilter();
+
     private TechnicalPeriodFilter technicalPeriodFilter;
     private EquityInsightFilter insightFilter;
 
@@ -22,13 +22,7 @@ public class MarketGainersRequest {
         this.insightFilter = insightFilter;
     }
 
-    public DebugFilter getDebugFilter() {
-        return debugFilter;
-    }
 
-    public void setDebugFilter(DebugFilter debugFilter) {
-        this.debugFilter = debugFilter;
-    }
 
     public OverviewFilter getOverviewFilter() {
         return overviewFilter;

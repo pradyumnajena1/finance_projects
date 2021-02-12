@@ -2,6 +2,7 @@ package com.pd.finance.model;
 
 import com.pd.finance.htmlscrapper.equity.EquityTechnicalDetailsFactory;
 import com.pd.finance.utils.CommonUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class TechAnalysisSummaryValue {
 
     private void translate(){
         try {
-            if(value!=null || !value.isEmpty()){
+            if(StringUtils.isNotBlank(value)){
                 Scanner scanner = new Scanner(value);
                 if(scanner.hasNext()){
                     bullish = CommonUtils.extractIntegerFromText(scanner.next()).intValue();

@@ -1,19 +1,25 @@
 package com.pd.finance.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pd.finance.service.MarketService;
-import org.jsoup.nodes.Node;
+import com.mysema.query.annotations.QueryEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+@QueryEntity
+@Document
 public class Equity {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(Equity.class);
 
+    @Id
+    private String id;
 
     private String name;
     private String nseId;
@@ -33,6 +39,14 @@ public class Equity {
     private EquityEssentials essentials;
     private EquityInsights insights;
     private EquityOverview overview;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public EquityInsights getInsights() {
         return insights;

@@ -1,21 +1,49 @@
 package com.pd.finance.service;
 
+import com.pd.finance.model.CacheStatistics;
 import com.pd.finance.model.Equity;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-@Component
+@Service
 public class CacheService implements ICacheService{
 
     private final ConcurrentHashMap<String,Document> documentCache;
     private final ConcurrentHashMap<Equity,Equity> enrichedEquityCache;
+    private final ConcurrentHashMap<String,Equity> equityCache;
+
+    private final ConcurrentHashMap<String,String> equityBseIdCache;
+    private final ConcurrentHashMap<String,String> equityNseIdCache;
+
+
     public CacheService( ) {
         this.documentCache = new ConcurrentHashMap<>();
         this.enrichedEquityCache = new ConcurrentHashMap<>();
+        this.equityCache = new ConcurrentHashMap<>();
+        this.equityBseIdCache = new ConcurrentHashMap<>();
+        this.equityNseIdCache = new ConcurrentHashMap<>();
     }
-
+    @Override
+    public Optional<String> getEquityIdByNseId(String nseId ) {
+        return  Optional.ofNullable(equityNseIdCache.get(nseId));
+    }
+    @Override
+    public Optional<String> getEquityIdByBseId(String bseId ) {
+        return Optional.ofNullable(equityBseIdCache.get(bseId));
+    }
+    @Override
+    public Equity getEquity(String equityId, Function<String, Equity> function) {
+        Equity equity = equityCache.computeIfAbsent(equityId, function);
+        if(equity!=null){
+            equityBseIdCache.put(equity.getBseId(),equityId);
+            equityNseIdCache.put(equity.getNseId(),equityId);
+        }
+        return equity;
+    }
 
     @Override
     public Document getDocument(String url, Function<String, Document> function) {
@@ -26,6 +54,14 @@ public class CacheService implements ICacheService{
     public Equity getEnrichedEquity(Equity equity, Function<Equity, Equity> function) {
         return enrichedEquityCache.computeIfAbsent(equity,function);
     }
+    @Override
+    public CacheStatistics getCacheStatistics(){
+         CacheStatistics statistics = new CacheStatistics();
+         statistics.getStat().put("documentCache",documentCache.size());
+        statistics.getStat().put("equityCache",equityCache.size());
+        statistics.getStat().put("enrichedEquityCache",enrichedEquityCache.size());
+        return statistics;
+    }
 
     @Override
     public void clearDocumentCache() {
@@ -35,5 +71,10 @@ public class CacheService implements ICacheService{
     @Override
     public void clearEnrichedEquityCache() {
           enrichedEquityCache.clear();
+    }
+
+    @Override
+    public void clearEquityCache() {
+        equityCache.clear();
     }
 }

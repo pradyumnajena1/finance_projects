@@ -1,6 +1,7 @@
 package com.pd.finance.controller;
 
 import com.pd.finance.htmlscrapper.equity.EquityTechnicalDetailsFactory;
+import com.pd.finance.model.CacheStatistics;
 import com.pd.finance.request.ClearCacheRequest;
 import com.pd.finance.response.BaseResponse;
 import com.pd.finance.service.ICacheService;
@@ -20,7 +21,7 @@ public class CacheController {
     @Autowired
     private ICacheService cacheService;
 
-    @RequestMapping(value="/clear_caches", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/caches/clear", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse clearCaches(@RequestBody ClearCacheRequest request) {
 
         try {
@@ -35,7 +36,24 @@ public class CacheController {
                 sb.append("Enriched Equity Cache cleared! ");
             }
 
+            if(request.isClearEquityCache()){
+                cacheService.clearEquityCache();
+                sb.append("Equity Cache cleared! ");
+            }
+
             return new BaseResponse(sb.toString());
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
+    @RequestMapping(value="/cache/stats", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse getCacheStats() {
+
+        try {
+            CacheStatistics cacheStatistics = cacheService.getCacheStatistics();
+            return new BaseResponse(cacheStatistics);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return new BaseResponse(e);
