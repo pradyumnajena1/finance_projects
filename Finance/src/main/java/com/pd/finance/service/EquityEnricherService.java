@@ -37,6 +37,9 @@ public class EquityEnricherService implements IEquityEnricherService {
     @Resource(name = "equitySwotAttributeService")
     private IEquityAttributeService equitySwotAttributeService;
 
+    @Resource(name = "equityCurrentPriceStatsAttributeService")
+    private IEquityAttributeService equityCurrentPriceStatsAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException{
@@ -58,77 +61,77 @@ public class EquityEnricherService implements IEquityEnricherService {
 
     }
 
-    private void addRecentPerformances(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private void addRecentPerformances(EquityIdentifier identifier, Equity equity)  {
         try {
             equityRecentPerformancesAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity)   {
+        try {
+            equityCurrentPriceStatsAttributeService.enrichEquity(identifier,equity);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+
+        }
+    }
+
+    private void addBasicDetails(EquityIdentifier identifier, Equity equity)   {
         try {
             basicDetailsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private void addBasicDetails(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        try {
-            basicDetailsAttributeService.enrichEquity(identifier,equity);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
-        }
-    }
-
-    private void addEquityInsights(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private void addEquityInsights(EquityIdentifier identifier, Equity equity)   {
         try {
            equityInsightsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private void addTechnicalDetails(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private void addTechnicalDetails(EquityIdentifier identifier, Equity equity)   {
         try {
            equityTechnicalDetailsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private   void addEquityOverview(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private   void addEquityOverview(EquityIdentifier identifier, Equity equity)  {
         try {
             equityOverviewAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private   void addEssentialDetails(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private   void addEssentialDetails(EquityIdentifier identifier, Equity equity)   {
         try {
            equityEssentialsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
     }
 
-    private   void addSwotDetails(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    private   void addSwotDetails(EquityIdentifier identifier, Equity equity)   {
 
 
         try {
              equitySwotAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            throw new ServiceException(e);
+
         }
 
 
