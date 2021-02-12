@@ -1,6 +1,7 @@
 package com.pd.finance.service;
 
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
+import com.pd.finance.model.EquityIdentifier;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -28,6 +29,11 @@ public class DocumentService implements IDocumentService{
         Document document = cacheService.getDocument(url,anUrl-> doGetDocument(anUrl));
        // logger.info("getDocument completed executing for url {}",url);
         return document;
+    }
+
+    @Override
+    public Document getDocument(EquityIdentifier identifier) throws Exception {
+        return getDocument((String) identifier.getAdditionalAttribute("url"));
     }
 
     private Document doGetDocument(String anUrl) {

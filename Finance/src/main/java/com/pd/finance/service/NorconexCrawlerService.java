@@ -4,9 +4,12 @@ import com.norconex.collector.http.HttpCollector;
 import com.norconex.collector.http.HttpCollectorConfig;
 import com.norconex.collector.http.crawler.HttpCrawlerConfig;
 import com.pd.finance.config.ApplicationConfig;
+import com.pd.finance.exceptions.PersistenceException;
+import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
 import com.pd.finance.model.CrawlerResponse;
 import com.pd.finance.model.Equity;
+import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.request.MarketGainersWebCrawlRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
@@ -29,6 +32,8 @@ public class NorconexCrawlerService implements ICrawlerService {
     private ApplicationConfig config;
     @Autowired
     private IDocumentService documentService;
+    @Autowired
+    private IEquityEnricherService equityEnricherService;
 
 
 
@@ -70,20 +75,45 @@ public class NorconexCrawlerService implements ICrawlerService {
 
     @Override
     public CrawlerResponse crawlMarketGainers(MarketGainersWebCrawlRequest crawlRequest) throws Exception {
+        logger.info(String.format("crawlMarketGainers exec started"));
         try{
             Document doc = getDocument();
             List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc,crawlRequest.getDebugFilter()!=null?crawlRequest.getDebugFilter().getNumEquities():-1);
+
+            int successfulPersists = 0;
             for (Equity equity : equityCollector){
-                equityService.upsertEquity(equity);
+                boolean success = fetchAndPersistEquity(equity);
+                if(success) successfulPersists++;
             }
 
-            return new CrawlerResponse();
+            CrawlerResponse crawlerResponse = new CrawlerResponse();
+            crawlerResponse.setNumObjectsCreated(equityCollector.size());
+            crawlerResponse.setNumObjectsPersisted(successfulPersists);
+            crawlerResponse.setCompleted(true);
+            return crawlerResponse;
         }catch (Exception ex){
             logger.error("Failed to execute GetGainers",ex);
             throw ex;
         }
 
     }
+
+    private boolean fetchAndPersistEquity(Equity equity) throws ServiceException, PersistenceException {
+        boolean success = false;
+        try {
+            EquityIdentifier identifier = new EquityIdentifier(equity.getName());
+            identifier.putAdditionalAttribute("url",equity.getUrl());
+            equityEnricherService.enrichEquity(identifier,equity);
+            equityService.upsertEquity(equity);
+            success = true;
+        } catch (ServiceException e) {
+           logger.error(e.getMessage(),e);
+        } catch (PersistenceException e) {
+            logger.error(e.getMessage(),e);
+        }
+        return success;
+    }
+
     private Document getDocument() throws Exception {
         String gainersUrl = config.getEnvProperty("GainersUrl");
         return documentService.getDocument(gainersUrl);

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +18,7 @@ public class Equity {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(Equity.class);
 
+
     @Id
     private String id;
 
@@ -28,18 +28,13 @@ public class Equity {
     private String url;
     private String sector;
     private String exchange;
-    private BigDecimal high;
-    private BigDecimal low;
-    private BigDecimal lastPrice;
-    private BigDecimal prevClose;
-    private BigDecimal change;
-    private BigDecimal percentageGain;
     private EquityPerformances performances;
     private EquitySwotDetails swotDetails;
     private TechnicalDetails technicalDetails;
     private EquityEssentials essentials;
     private EquityInsights insights;
     private EquityOverview overview;
+    private EquityCurrentPriceStats equityCurrentPriceStats  ;
     private List<EquityStockExchangeDetails> stockExchangeDetails;
 
     public List<EquityStockExchangeDetails> getStockExchangeDetails() {
@@ -146,52 +141,13 @@ public class Equity {
         this.url = url;
     }
 
-    public BigDecimal getHigh() {
-        return high;
+
+    public EquityCurrentPriceStats getEquityCurrentPriceStats() {
+        return equityCurrentPriceStats;
     }
 
-    public void setHigh(BigDecimal high) {
-        this.high = high;
-    }
-
-    public BigDecimal getLow() {
-        return low;
-    }
-
-    public void setLow(BigDecimal low) {
-        this.low = low;
-    }
-
-    public BigDecimal getLastPrice() {
-        return lastPrice;
-    }
-
-    public void setLastPrice(BigDecimal lastPrice) {
-        this.lastPrice = lastPrice;
-    }
-
-    public BigDecimal getPrevClose() {
-        return prevClose;
-    }
-
-    public void setPrevClose(BigDecimal prevClose) {
-        this.prevClose = prevClose;
-    }
-
-    public BigDecimal getChange() {
-        return change;
-    }
-
-    public void setChange(BigDecimal change) {
-        this.change = change;
-    }
-
-    public BigDecimal getPercentageGain() {
-        return percentageGain;
-    }
-
-    public void setPercentageGain(BigDecimal percentageGain) {
-        this.percentageGain = percentageGain;
+    public void setEquityCurrentPriceStats(EquityCurrentPriceStats equityCurrentPriceStats) {
+        this.equityCurrentPriceStats = equityCurrentPriceStats;
     }
 
     public EquityPerformances getPerformances() {

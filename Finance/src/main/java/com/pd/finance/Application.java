@@ -7,8 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 @PropertySource("classpath:application.properties")
 public class Application {
 
@@ -20,7 +22,7 @@ public class Application {
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
 
-            System.out.println("Let's inspect the beans provided by Spring Boot:");
+            System.out.println("Spring Boot Application started successfully...");
 
             String[] beanNames = ctx.getBeanDefinitionNames();
             Arrays.sort(beanNames);
