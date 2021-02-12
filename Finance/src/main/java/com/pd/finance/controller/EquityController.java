@@ -46,7 +46,7 @@ public class EquityController {
             if (StringUtils.isNotBlank( bseId )){
                 equity = equityService.getEquityByBseId(bseId);
             }else if(StringUtils.isNotBlank(nseId)){
-                equity = equityService.getEquityByBseId(nseId);
+                equity = equityService.getEquityByNseId(nseId);
             }else if(StringUtils.isNotBlank(name )){
                 equity = equityService.getEquityByName(name);
             }

@@ -53,8 +53,7 @@ public class EquityService implements IEquityService {
             optional.orElseGet(()->{
                 Equity equity = providerByAlternateId.apply(alternateId);
                 if(equity!=null){
-
-                    cacheService.getEquity(equity.getId(), id->equity);
+                    equityAtomicReference.set(cacheService.getEquity(equity.getId(), id->equity));
                 }
                return null;
 
@@ -82,7 +81,7 @@ public class EquityService implements IEquityService {
     @Override
     public Equity upsertEquity(Equity equity)throws PersistenceException{
         try {
-            Equity equityFromDb = equityRepository.findByBseIdOrNseId(equity.getBseId(), equity.getNseId());
+            Equity equityFromDb = equityRepository.findByBseIdAndNseId(equity.getBseId(), equity.getNseId());
             if(equityFromDb!=null){
                 equity.setId(equityFromDb.getId());
             }

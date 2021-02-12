@@ -25,8 +25,8 @@ public interface EquityRepository extends MongoRepository<Equity, String>  {
     @Query(value="{'age' : {'$in' : [names…​]}}")
     public List<Equity> findByNameIn(List<String> names);
 
-    @Query(value="{'or':[{ 'bseId' : ?0 },{ 'nseId' : ?1 }]}")
-    public Equity findByBseIdOrNseId(String bseId,String nseId);
+    @Query(value="{'$or':[{ 'bseId' : ?0 },{ 'nseId' : ?1 }]}")
+    public Equity findByBseIdAndNseId(String bseId,String nseId);
 
 
 }
