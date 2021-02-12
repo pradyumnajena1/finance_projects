@@ -26,10 +26,17 @@ public class EquitySearchService implements IEquitySearchService {
     public List<Equity> search(EquitySearchRequest searchRequest){
         List<Equity> equitiesCollector  = new ArrayList<>();
 
-        Page<Equity> page = equityRepository.findAll(PageRequest.of(0, 100));
-        List<Equity> list = page.filter(equity -> isValidEquity(equity, searchRequest)).toList();
+        Pageable  pageRequest = PageRequest.of(0, 200);
+        Page<Equity> page = equityRepository.findAll(pageRequest);
+        while (!page.isEmpty())
+         {
+             List<Equity> list = page.filter(equity -> isValidEquity(equity, searchRequest)).toList();
+             equitiesCollector.addAll(list);
 
-        equitiesCollector.addAll(list);
+             page = equityRepository.findAll(pageRequest.next());
+
+        }
+
         return equitiesCollector;
     }
 
@@ -327,9 +334,15 @@ public class EquitySearchService implements IEquitySearchService {
         boolean isValid = false;
 
         try {
-            isValid = equity.getPerformances().getPerformances().stream()
-                    .filter(performance -> performance.getChangePercent().compareTo(performanceFilter.getMinimumGainPerSession()) >= 0)
-                    .collect(Collectors.toList()).size() >= performanceFilter.getMinimumGainSessions();
+            EquityPerformances performances = equity.getPerformances();
+            if (performances!=null) {
+                List<EquityPerformance> equityPerformanceList = performances.getPerformances();
+                if (equityPerformanceList!=null) {
+                    isValid = equityPerformanceList.stream()
+                            .filter(performance -> performance.getChangePercent().compareTo(performanceFilter.getMinimumGainPerSession()) >= 0)
+                            .collect(Collectors.toList()).size() >= performanceFilter.getMinimumGainSessions();
+                }
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

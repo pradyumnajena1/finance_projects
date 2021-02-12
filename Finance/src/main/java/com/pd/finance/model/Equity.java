@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 @QueryEntity
@@ -39,6 +40,15 @@ public class Equity {
     private EquityEssentials essentials;
     private EquityInsights insights;
     private EquityOverview overview;
+    private List<EquityStockExchangeDetails> stockExchangeDetails;
+
+    public List<EquityStockExchangeDetails> getStockExchangeDetails() {
+        return stockExchangeDetails;
+    }
+
+    public void setStockExchangeDetails(List<EquityStockExchangeDetails> stockExchangeDetails) {
+        this.stockExchangeDetails = stockExchangeDetails;
+    }
 
     public String getId() {
         return id;
