@@ -23,21 +23,25 @@ public class CommonUtils {
             textValue = textValue.trim();
             return new BigDecimal( textValue);
         } catch (NumberFormatException ex) {
-            logger.error("extractDecimalFromPerformanceCell exec failed",ex);
+            logger.error("extractDecimalFromText exec failed",ex);
             return BigDecimal.ZERO;
         }
     }
     public static BigInteger extractIntegerFromText(String textValue) {
         try {
 
-            textValue = textValue.replace(",","");
+            int indexOfComma = textValue.indexOf(',');
+            if(indexOfComma != -1){
+                textValue = textValue.replace(",","");
+            }
             textValue = textValue.trim();
             return new BigInteger( textValue);
         } catch (NumberFormatException ex) {
-            logger.error("extractDecimalFromPerformanceCell exec failed",ex);
+            logger.error("extractIntegerFromText exec failed",ex);
             return BigInteger.ZERO;
         }
     }
+
 
 
 

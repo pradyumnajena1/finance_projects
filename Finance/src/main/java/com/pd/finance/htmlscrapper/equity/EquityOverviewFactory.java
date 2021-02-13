@@ -51,19 +51,38 @@ public class EquityOverviewFactory implements IEquityOverviewFactory {
     }
 
     private   BigDecimal extractPB(Document document) {
-        return null;
+
+        Element overviewDiv = document.select("div#stk_overview").first();
+        Element tableBody = overviewDiv.select("tbody").get(3);
+        Element td = tableBody.select("tr").first().select("td:eq(1)").first();
+        String text = td.childNode(0).attr("text");
+        return CommonUtils.extractDecimalFromText(text);
     }
 
     private   BigInteger extractMarketCap(Document document) {
-        return null;
+        Element overviewDiv = document.select("div#stk_overview").first();
+        Element tableBody = overviewDiv.select("tbody").get(1);
+        Element td = tableBody.select("tr").get(1).select("td:eq(1)").first();
+        String text = td.childNode(0).attr("text");
+        return CommonUtils.extractIntegerFromText(text);
     }
 
     private   BigInteger extractFaceValue(Document document) {
-        return null;
+
+        Element overviewDiv = document.select("div#stk_overview").first();
+        Element tableBody = overviewDiv.select("tbody").get(2);
+        Element td = tableBody.select("tr").get(0).select("td:eq(0)").first();
+        String text = td.childNode(0).attr("text");
+        return CommonUtils.extractIntegerFromText(text);
     }
 
     private   BigInteger extractBookValue(Document document) {
-        return null;
+
+        Element overviewDiv = document.select("div#stk_overview").first();
+        Element tableBody = overviewDiv.select("tbody").get(2);
+        Element td = tableBody.select("tr").get(4).select("td:eq(0)").first();
+        String text = td.childNode(0).attr("text");
+        return CommonUtils.extractIntegerFromText(text);
     }
 
 
