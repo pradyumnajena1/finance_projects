@@ -40,11 +40,15 @@ public class EquityEnricherService implements IEquityEnricherService {
     @Resource(name = "equityCurrentPriceStatsAttributeService")
     private IEquityAttributeService equityCurrentPriceStatsAttributeService;
 
+    @Resource(name = "equityStockExchangeDetailsAttributeService")
+    private IEquityAttributeService equityStockExchangeDetailsAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException{
 
             try {
+                logger.info("enrichEquity exec started for equity:{}",equity.getName());
                 addCurrentPriceDetails(identifier,equity);
                 addRecentPerformances(identifier,equity);
                 addBasicDetails(identifier,equity);
@@ -53,19 +57,31 @@ public class EquityEnricherService implements IEquityEnricherService {
                 addEquityOverview(identifier,equity);
                 addTechnicalDetails(identifier,equity);
                 addEquityInsights(identifier,equity);
+                addEquityStockExchangeDetails(identifier,equity);
+                logger.info("enrichEquity exec completed for equity:{}",equity.getName());
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+
+                logger.error("enrichEquity exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
                 throw new ServiceException(e);
             }
 
 
     }
 
+    private void addEquityStockExchangeDetails(EquityIdentifier identifier, Equity equity) {
+        try {
+            equityStockExchangeDetailsAttributeService.enrichEquity(identifier,equity);
+        } catch (Exception e) {
+            logger.error("addEquityStockExchangeDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
+
+        }
+    }
+
     private void addRecentPerformances(EquityIdentifier identifier, Equity equity)  {
         try {
             equityRecentPerformancesAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addRecentPerformances exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -74,7 +90,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
             equityCurrentPriceStatsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addCurrentPriceDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -83,7 +99,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
             basicDetailsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addBasicDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -92,7 +108,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
            equityInsightsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addEquityInsights exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -101,7 +117,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
            equityTechnicalDetailsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addTechnicalDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -110,7 +126,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
             equityOverviewAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addEquityOverview exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -119,7 +135,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
            equityEssentialsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addEssentialDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
     }
@@ -130,7 +146,7 @@ public class EquityEnricherService implements IEquityEnricherService {
         try {
              equitySwotAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error("addSwotDetails exec failed for equity:{} {}",equity.getName(),e.getMessage(),e);
 
         }
 

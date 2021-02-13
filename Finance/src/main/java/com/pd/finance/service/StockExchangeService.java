@@ -11,9 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.List;
 @Service
-public class StockExchangeService extends AbstractHttpService{
+public class StockExchangeService extends AbstractHttpService implements IStockExchangeService {
     private static final Logger logger = LoggerFactory.getLogger(StockExchangeService.class);
 
     @Autowired
@@ -23,10 +24,11 @@ public class StockExchangeService extends AbstractHttpService{
 
     }
 
+    @Override
     public List<EquityStockExchangeDetails> getStockExchangeDetails(EquityIdentifier equityIdentifier) throws ServiceException {
 
             String searchString  = equityIdentifier.getSearchString();
-            String url =  String.format(config.getEnvProperty("StockExchangeDetailsUrl"),searchString);
+            String url =  MessageFormat.format(config.getEnvProperty("StockExchangeDetailsUrl"),searchString);
             EquitySearchResponse searchResponse=  get(url, EquitySearchResponse.class);
             return  searchResponse.getStockExchangeDetails();
     }
