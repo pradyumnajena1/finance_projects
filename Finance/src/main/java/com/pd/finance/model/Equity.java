@@ -3,12 +3,12 @@ package com.pd.finance.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mysema.query.annotations.QueryEntity;
 
+import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,13 +35,13 @@ public class Equity {
     private EquityInsights insights;
     private EquityOverview overview;
     private EquityCurrentPriceStats equityCurrentPriceStats  ;
-    private List<EquityStockExchangeDetails> stockExchangeDetails;
+    private List<EquityStockExchangeDetailsResponse> stockExchangeDetails;
 
-    public List<EquityStockExchangeDetails> getStockExchangeDetails() {
+    public List<EquityStockExchangeDetailsResponse> getStockExchangeDetails() {
         return stockExchangeDetails;
     }
 
-    public void setStockExchangeDetails(List<EquityStockExchangeDetails> stockExchangeDetails) {
+    public void setStockExchangeDetails(List<EquityStockExchangeDetailsResponse> stockExchangeDetails) {
         this.stockExchangeDetails = stockExchangeDetails;
     }
 

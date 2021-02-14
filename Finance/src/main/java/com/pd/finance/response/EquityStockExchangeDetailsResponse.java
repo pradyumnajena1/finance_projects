@@ -1,57 +1,35 @@
-package com.pd.finance.model;
+package com.pd.finance.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mysema.query.annotations.QueryEntity;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.*;
 
-@QueryEntity
-@Document("stock_exchange")
-public class EquityStockExchangeDetails {
-    @Id
-    private String id;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EquityStockExchangeDetailsResponse {
 
-     @Field("exchange")
+    @JsonProperty("exchange")
     private String exchange;
-
-    @Field("shortName")
+    @JsonProperty("shortname")
     private String shortName;
-
-    @Field("quoteType")
+    @JsonProperty("quoteType")
     private String quoteType;
-
-    @Field("symbol")
+    @JsonProperty("symbol")
     private String symbol;
-
-    @Field("index")
+    @JsonProperty("index")
     private String index;
-
-    @Field("score")
+    @JsonProperty("score")
     private Long score;
-
-    @Field("typeDisplay")
-    private String typeDisplay;
-
-    @Field("longName")
+    @JsonProperty("typeDisp")
+    private String typeDisplayName;
+    @JsonProperty("longname")
     private String longName;
-
-    @Field("isYahooFinance")
+    @JsonProperty("isYahooFinance")
     private Boolean isYahooFinance;
-
-    @Field("previousName")
-    private String previousName;
-
-    @Field("nameChangeDate")
+    @JsonProperty("prevName")
+    private String prevName;
+    @JsonProperty("nameChangeDate")
     private String nameChangeDate;
 
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public EquityStockExchangeDetailsResponse() {
     }
 
     public String getExchange() {
@@ -102,12 +80,12 @@ public class EquityStockExchangeDetails {
         this.score = score;
     }
 
-    public String getTypeDisplay() {
-        return typeDisplay;
+    public String getTypeDisplayName() {
+        return typeDisplayName;
     }
 
-    public void setTypeDisplay(String typeDisplay) {
-        this.typeDisplay = typeDisplay;
+    public void setTypeDisplayName(String typeDisplayName) {
+        this.typeDisplayName = typeDisplayName;
     }
 
     public String getLongName() {
@@ -126,12 +104,12 @@ public class EquityStockExchangeDetails {
         isYahooFinance = yahooFinance;
     }
 
-    public String getPreviousName() {
-        return previousName;
+    public String getPrevName() {
+        return prevName;
     }
 
-    public void setPreviousName(String previousName) {
-        this.previousName = previousName;
+    public void setPrevName(String prevName) {
+        this.prevName = prevName;
     }
 
     public String getNameChangeDate() {

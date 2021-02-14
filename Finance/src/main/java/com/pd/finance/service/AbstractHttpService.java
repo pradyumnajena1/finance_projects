@@ -2,12 +2,15 @@ package com.pd.finance.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pd.finance.exceptions.ServiceException;
+import com.pd.finance.model.EquityStockExchangeDetails;
 import com.pd.finance.utils.JsonUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 
@@ -36,4 +39,6 @@ public abstract class AbstractHttpService {
            throw new ServiceException(e);
         }
     }
+
+
 }

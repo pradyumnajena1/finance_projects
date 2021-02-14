@@ -1,10 +1,9 @@
 package com.pd.finance.model;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.*;
+import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,7 +12,7 @@ public class EquitySearchResponse {
     @JsonProperty("count")
     private Long count;
     @JsonProperty("quotes")
-    private List<EquityStockExchangeDetails> stockExchangeDetails = new ArrayList<EquityStockExchangeDetails>();
+    private List<EquityStockExchangeDetailsResponse> stockExchangeDetails = new ArrayList<EquityStockExchangeDetailsResponse>();
 
 
     public EquitySearchResponse() {
@@ -30,12 +29,12 @@ public class EquitySearchResponse {
     }
 
     @JsonProperty("quotes")
-    public List<EquityStockExchangeDetails> getStockExchangeDetails() {
+    public List<EquityStockExchangeDetailsResponse> getStockExchangeDetails() {
         return stockExchangeDetails;
     }
 
     @JsonProperty("quotes")
-    public void setStockExchangeDetails(List<EquityStockExchangeDetails> quotes) {
+    public void setStockExchangeDetails(List<EquityStockExchangeDetailsResponse> quotes) {
         this.stockExchangeDetails = quotes;
     }
 
