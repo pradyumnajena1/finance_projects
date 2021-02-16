@@ -18,7 +18,7 @@ public class EquityStockExchangeDetailsResponse {
     @JsonProperty("score")
     private Long score;
     @JsonProperty("typeDisp")
-    private String typeDisplayName;
+    private String typeDisplay;
     @JsonProperty("longname")
     private String longName;
     @JsonProperty("isYahooFinance")
@@ -80,12 +80,12 @@ public class EquityStockExchangeDetailsResponse {
         this.score = score;
     }
 
-    public String getTypeDisplayName() {
-        return typeDisplayName;
+    public String getTypeDisplay() {
+        return typeDisplay;
     }
 
-    public void setTypeDisplayName(String typeDisplayName) {
-        this.typeDisplayName = typeDisplayName;
+    public void setTypeDisplay(String typeDisplay) {
+        this.typeDisplay = typeDisplay;
     }
 
     public String getLongName() {

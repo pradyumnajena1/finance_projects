@@ -27,4 +27,10 @@ public interface IStockExchangeService {
     Page<EquityStockExchangeDetails> findByExchange(String exchange, Pageable pageable);
 
     Page<EquityStockExchangeDetails> findAll(Pageable pageable);
+
+    List<EquityStockExchangeDetails> findByLongName(String longName);
+
+    List<EquityStockExchangeDetails> findByShortName(String shortName);
+
+    List<EquityStockExchangeDetails> findByName(String name);
 }

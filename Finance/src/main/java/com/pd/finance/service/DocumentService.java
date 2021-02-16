@@ -2,6 +2,8 @@ package com.pd.finance.service;
 
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerEquityFactory;
 import com.pd.finance.model.EquityIdentifier;
+import okhttp3.Interceptor;
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -10,14 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class DocumentService implements IDocumentService{
+public class DocumentService extends AbstractHttpService implements IDocumentService{
     private static final Logger logger = LoggerFactory.getLogger(DocumentService.class);
     @Autowired
     private ICacheService cacheService;
+
+    @Resource(name="rateLimitInterceptor")
+    private Interceptor rateLimitInterceptor;
 
     public DocumentService() {
 
@@ -37,12 +46,23 @@ public class DocumentService implements IDocumentService{
     }
 
     private Document doGetDocument(String anUrl) {
+        Document document = null;
         try {
             logger.warn("getDocument dint find in cache , fetching from source for url {}",anUrl);
-            return Jsoup.connect(anUrl).get();
+            String responseString = get(anUrl);
+            if(StringUtils.isNotBlank(responseString)){
+                document =  Jsoup.parse(responseString);
+            }
+
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            return null;
+            document = null;
         }
+        return document;
+    }
+
+    @Override
+    protected List<Interceptor> getInterceptors() {
+        return new ArrayList<>(Arrays.asList(rateLimitInterceptor));
     }
 }

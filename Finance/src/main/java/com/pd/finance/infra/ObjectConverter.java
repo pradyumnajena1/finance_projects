@@ -2,6 +2,7 @@ package com.pd.finance.infra;
 
 import com.pd.finance.model.EquityStockExchangeDetails;
 import com.pd.finance.request.CreateStockExchangeDetailsRequest;
+import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -14,6 +15,8 @@ public interface ObjectConverter extends IObjectConverter{
     ObjectConverter MAPPER = Mappers.getMapper(ObjectConverter.class);
 
     @Override
-
     public EquityStockExchangeDetails convert(CreateStockExchangeDetailsRequest exchangeDetailsRequest) ;
+
+    @Override
+    EquityStockExchangeDetails convert(EquityStockExchangeDetailsResponse detailsResponse);
 }
