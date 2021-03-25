@@ -24,11 +24,11 @@ public class EquityOverviewAttributeService extends HtmlScrapperEquityAttributeS
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity completed for equity: "+ equity.getName());
+        logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
         try {
             Document document = getDocument(identifier);
             equity.setOverview(overviewFactory.create(document));
-            logger.info( "enrichEquity completed for equity: "+ equity.getName());
+            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new ServiceException(e);

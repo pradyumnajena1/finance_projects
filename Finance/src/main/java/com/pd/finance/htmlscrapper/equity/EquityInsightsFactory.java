@@ -2,6 +2,7 @@ package com.pd.finance.htmlscrapper.equity;
 
 import com.pd.finance.model.*;
 import com.pd.finance.utils.CommonUtils;
+import com.pd.finance.utils.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class EquityInsightsFactory implements IEquityInsightsFactory{
@@ -32,6 +34,9 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
         equityInsights.setIndustryComparisionInsights(extractIndustryComparisionInsights(document));
         equityInsights.setPriceInsights(extractPriceInsights(document));
         equityInsights.setShareholdingPatternInsights(extractShareholdingPatternInsights(document));
+
+        equityInsights.setSource(Constants.SOURCE_MONEY_CONTROL);
+        equityInsights.setUpdatedDate(new Date());
 
         return equityInsights;
     }

@@ -6,6 +6,8 @@ import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityPerformancesF
 import com.pd.finance.htmlscrapper.marketgainer.MarketGainerPageHelper;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
+import com.pd.finance.model.SourceDetails;
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,12 +37,23 @@ public class EquityRecentPerformancesAttributeService extends HtmlScrapperEquity
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getName());
+        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
         try {
             Document document = getDocument(identifier);
-            Node equityRow =MarketGainerPageHelper.getEquityRow(equity.getName(), document);
-            equity.setPerformances(marketGainerEquityPerformancesFactory.createMarketGainerEquityPerformances(equityRow));
-            logger.info( "enrichEquity completed for equity: "+ equity.getName());
+            SourceDetails sourceDetails = equity.getSourceDetails().getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
+
+            if(sourceDetails!=null){
+                try {
+                    Node equityRow =MarketGainerPageHelper.getEquityRow(sourceDetails.getEquityName(), document);
+                    equity.setPerformances(marketGainerEquityPerformancesFactory.createMarketGainerEquityPerformances(equityRow));
+                } catch (Exception exception) {
+                    logger.error(exception.getMessage(),exception);
+                }
+            }
+
+
+
+            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw   new ServiceException(e);

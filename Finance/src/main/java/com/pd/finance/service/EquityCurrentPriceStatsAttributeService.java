@@ -8,6 +8,9 @@ import com.pd.finance.htmlscrapper.marketgainer.MarketGainerPageHelper;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityCurrentPriceStats;
 import com.pd.finance.model.EquityIdentifier;
+import com.pd.finance.model.SourceDetails;
+import com.pd.finance.utils.CommonUtils;
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -38,15 +42,25 @@ public class EquityCurrentPriceStatsAttributeService extends HtmlScrapperEquityA
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getName());
+        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
         try {
             Document document = getDocument(identifier);
-            Node equityRow = MarketGainerPageHelper.getEquityRow(equity.getName(), document);
-            EquityCurrentPriceStats equityCurrentPriceStats = currentPriceStatsFactory.createEquityCurrentPriceStats(equityRow);
-            equity.setEquityCurrentPriceStats(equityCurrentPriceStats);
-            logger.info( "enrichEquity completed for equity: "+ equity.getName());
+            SourceDetails sourceDetails = equity.getSourceDetails().getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
+            if(sourceDetails!=null){
+
+                try {
+                    Node equityRow = MarketGainerPageHelper.getEquityRow(sourceDetails.getEquityName(), document);
+                    EquityCurrentPriceStats equityCurrentPriceStats = currentPriceStatsFactory.createEquityCurrentPriceStats(equityRow);
+                    equity.setEquityCurrentPriceStats(equityCurrentPriceStats);
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(),ex);
+                }
+            }
+
+
+            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
         } catch (Exception e) {
-            e.printStackTrace();
+           logger.error(e.getMessage(),e);
         }
     }
 

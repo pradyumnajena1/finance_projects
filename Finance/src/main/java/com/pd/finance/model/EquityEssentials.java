@@ -2,7 +2,7 @@ package com.pd.finance.model;
 
 import java.util.Map;
 
-public class EquityEssentials {
+public class EquityEssentials extends EquityAttribute{
 
     private String essentials;
 

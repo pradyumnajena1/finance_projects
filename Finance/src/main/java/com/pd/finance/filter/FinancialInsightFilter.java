@@ -1,8 +1,11 @@
-package com.pd.finance.request;
+package com.pd.finance.filter;
+
+import com.pd.finance.model.Equity;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
 
-public class FinancialInsightFilter {
+public class FinancialInsightFilter  implements  EquityFilter{
     private BigDecimal minPiotroskiScore;
     private BigDecimal minRevenueCagrGrowth;
     private BigDecimal minNetProfitCagrGrowth;
@@ -38,5 +41,20 @@ public class FinancialInsightFilter {
 
     public void setMinOperatingProfitCagrGrowth(BigDecimal minOperatingProfitCagrGrowth) {
         this.minOperatingProfitCagrGrowth = minOperatingProfitCagrGrowth;
+    }
+
+    @Override
+    public FilterType getFilterType() {
+        return null;
+    }
+
+    @Override
+    public Criteria getCriteria(String parentObject) {
+        return null;
+    }
+
+    @Override
+    public boolean apply(Equity obj) {
+        return false;
     }
 }

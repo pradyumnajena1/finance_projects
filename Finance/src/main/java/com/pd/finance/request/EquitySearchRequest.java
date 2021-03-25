@@ -1,5 +1,7 @@
 package com.pd.finance.request;
 
+import com.pd.finance.filter.*;
+
 import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
@@ -10,7 +12,6 @@ public class EquitySearchRequest {
     private PerformanceFilter performanceFilter;
     private SwotFilter swotFilter;
     private OverviewFilter overviewFilter;
-
     private TechnicalPeriodFilter technicalPeriodFilter;
     private EquityInsightFilter insightFilter;
 

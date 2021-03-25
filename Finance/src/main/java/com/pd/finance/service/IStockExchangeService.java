@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IStockExchangeService {
-    List<EquityStockExchangeDetailsResponse> getStockExchangeDetails(EquityIdentifier equityIdentifier) throws ServiceException;
+    EquityStockExchangeDetailsResponse getStockExchangeDetails(EquityIdentifier equityIdentifier) throws ServiceException;
 
 
     EquityStockExchangeDetails create(CreateStockExchangeDetailsRequest createStockExchangeDetailsRequest);

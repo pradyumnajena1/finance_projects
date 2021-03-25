@@ -5,7 +5,10 @@ import com.pd.finance.exceptions.EquityNotFoundException;
 import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.htmlscrapper.equity.EquitySwotFactory;
 import com.pd.finance.model.Equity;
+import com.pd.finance.model.EquityIdentifier;
+import com.pd.finance.model.SourceDetails;
 import com.pd.finance.persistence.EquityRepository;
+import com.pd.finance.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,35 +38,6 @@ public class EquityService implements IEquityService {
         return equity;
     }
 
-    @Override
-    public Equity getEquityByNseId(final String nseId)throws EquityNotFoundException,PersistenceException{
-        return getEquityByAlternateId(nseId , alternateId->equityRepository.findByNseId(alternateId));
-    }
-    @Override
-    public Equity getEquityByBseId(final String bseId)throws EquityNotFoundException,PersistenceException{
-        return getEquityByAlternateId(bseId , alternateId->equityRepository.findByBseId(alternateId));
-    }
-
-    private Equity getEquityByAlternateId(String alternateId, Function<String,Equity> providerByAlternateId) throws EquityNotFoundException {
-        try {
-            AtomicReference<Equity> equityAtomicReference = new AtomicReference<>();
-            Optional<String> optional = cacheService.getEquityIdByBseId(alternateId);
-
-            optional.ifPresent(equityId->equityAtomicReference.set(cacheService.getEquity(equityId, id -> equityRepository.findById(id).get())));
-            optional.orElseGet(()->{
-                Equity equity = providerByAlternateId.apply(alternateId);
-                if(equity!=null){
-                    equityAtomicReference.set(cacheService.getEquity(equity.getId(), id->equity));
-                }
-               return null;
-
-            });
-
-            return equityAtomicReference.get();
-        } catch (NoSuchElementException e) {
-            throw new EquityNotFoundException(e);
-        }
-    }
 
     @Override
     public Equity getEquityByName(final String name)throws EquityNotFoundException,PersistenceException{
@@ -81,7 +55,12 @@ public class EquityService implements IEquityService {
     @Override
     public Equity upsertEquity(Equity equity)throws PersistenceException{
         try {
-            Equity equityFromDb = equityRepository.findByBseIdAndNseId(equity.getBseId(), equity.getNseId());
+
+
+            EquityIdentifier equityIdentifier = equity.getEquityIdentifiers().getEquityIdentifier(Constants.SOURCE_MONEY_CONTROL);
+
+            Equity equityFromDb = equityRepository.findByExchangeAndSymbol(equityIdentifier.getExchange(), equityIdentifier.getSymbol());
+
             if(equityFromDb!=null){
                 equity.setId(equityFromDb.getId());
             }
@@ -119,36 +98,6 @@ public class EquityService implements IEquityService {
         byId.ifPresent(equity -> equityRepository.delete(equity));
         return byId.orElseThrow(()->new PersistenceException(String.format("Equity with id {} not present",id)));
     }
-    @Override
-    public Equity deleteEquityByBseId(String bseId) throws PersistenceException{
 
-            AtomicReference<Equity> equity = new AtomicReference<>();
-            Optional<String> equityIdByBseId = cacheService.getEquityIdByBseId(bseId);
 
-                equityIdByBseId.ifPresent(equityId-> {
-                    try {
-                        equity.set(deleteEquity(equityId));
-                    } catch (PersistenceException e) {
-                       logger.error(e.getMessage(),e);
-                    }
-                });
-
-            return equity.get();
-
-    }
-    @Override
-    public Equity deleteEquityByNseId(String nseId) throws PersistenceException{
-        AtomicReference<Equity> equity = new AtomicReference<>();
-        Optional<String> equityIdByBseId = cacheService.getEquityIdByNseId(nseId);
-
-        equityIdByBseId.ifPresent(equityId-> {
-            try {
-                equity.set(deleteEquity(equityId));
-            } catch (PersistenceException e) {
-                logger.error(e.getMessage(),e);
-            }
-        });
-
-        return equity.get();
-    }
 }

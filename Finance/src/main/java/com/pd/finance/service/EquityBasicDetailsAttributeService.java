@@ -22,21 +22,12 @@ public class EquityBasicDetailsAttributeService extends HtmlScrapperEquityAttrib
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getName());
+        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
         try {
             Document document = getDocument(identifier);
-            String bseId = document.select("input#bseid").first().attr("value");
-            if(StringUtils.isNotBlank(bseId)){
-                equity.setBseId(bseId);
-                identifier.setBseId(bseId);
-            }
 
-            String nseId = document.select("input#nseid").first().attr("value");
-            if(StringUtils.isNotBlank(nseId)){
-                equity.setNseId(nseId);
-                identifier.setNseId(nseId);
-            }
-            logger.info( "enrichEquity completed for equity: "+ equity.getName());
+
+            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new ServiceException(e);

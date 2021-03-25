@@ -1,9 +1,10 @@
 package com.pd.finance.service;
 
+import com.pd.finance.filter.*;
 import com.pd.finance.model.*;
+
 import com.pd.finance.persistence.EquityRepository;
 import com.pd.finance.request.*;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,40 +46,40 @@ public class EquitySearchService implements IEquitySearchService {
 
 
     private boolean isValidEquity(Equity equity, EquitySearchRequest request) {
-        logger.info("isValidEquity exec started for equity {}",equity.getName());
+        logger.info("isValidEquity exec started for equity {}",equity.getEquityIdentifiers());
         try {
             OverviewFilter overviewFilter = request.getOverviewFilter();
             if(overviewFilter!=null){
                 if(!isValidEquity(equity, overviewFilter)){
-                    logger.info("isValidEquity overviewFilter didn't matched for equity {}",equity.getName());
+                    logger.info("isValidEquity overviewFilter didn't matched for equity {}",equity.getEquityIdentifiers());
                     return false;
                 }
             }
             PerformanceFilter performanceFilter = request.getPerformanceFilter();
             if(performanceFilter!=null){
                 if(!isValidEquity(equity, performanceFilter)){
-                    logger.info("isValidEquity performanceFilter didn't matched for equity {}",equity.getName());
+                    logger.info("isValidEquity performanceFilter didn't matched for equity {}",equity.getEquityIdentifiers());
                     return false;
                 }
             }
             SwotFilter swotFilter = request.getSwotFilter();
             if(swotFilter!=null){
                 if(!isValidEquity(equity, swotFilter)){
-                    logger.info("isValidEquity swotFilter didn't matched for equity {}",equity.getName());
+                    logger.info("isValidEquity swotFilter didn't matched for equity {}",equity.getEquityIdentifiers());
                     return false;
                 }
             }
             TechnicalPeriodFilter technicalPeriodFilter = request.getTechnicalPeriodFilter();
             if(technicalPeriodFilter!=null){
                 if(!isValid(equity,technicalPeriodFilter)){
-                    logger.info("isValidEquity technicalPeriodFilter didn't matched for equity {}",equity.getName());
+                    logger.info("isValidEquity technicalPeriodFilter didn't matched for equity {}",equity.getEquityIdentifiers());
                     return false;
                 }
             }
             EquityInsightFilter insightFilter = request.getInsightFilter();
             if(insightFilter!=null){
                 if(!isValid(equity,insightFilter)){
-                    logger.info("isValidEquity insightFilter didn't matched for equity {}",equity.getName());
+                    logger.info("isValidEquity insightFilter didn't matched for equity {}",equity.getEquityIdentifiers());
                     return false;
                 }
             }
@@ -98,19 +99,19 @@ public class EquitySearchService implements IEquitySearchService {
         }
 
         if(!isValid(insightFilter.getFinancialInsightFilter(),insights.getFinancialInsights())){
-            logger.info("isValidEquity FinancialInsightFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity FinancialInsightFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         if(!isValid(insightFilter.getPriceInsightFilter(),insights.getPriceInsights())){
-            logger.info("isValidEquity PriceInsightFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity PriceInsightFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         if(!isValid(insightFilter.getIndustryComparisionFilter(),insights.getIndustryComparisionInsights())){
-            logger.info("isValidEquity IndustryComparisionFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity IndustryComparisionFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         if(!isValid(insightFilter.getShareholdingPatternsFilter(),insights.getShareholdingPatternInsights())){
-            logger.info("isValidEquity ShareholdingPatternsFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity ShareholdingPatternsFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         return true;
@@ -233,15 +234,15 @@ public class EquitySearchService implements IEquitySearchService {
         }
 
         if (!isValid(technicalPeriodFilter.getDailyTechnicalFilter(), technicalDetails.getDaily())){
-            logger.info("isValidEquity DailyTechnicalFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity DailyTechnicalFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         if (!isValid(technicalPeriodFilter.getWeeklyTechnicalFilter(), technicalDetails.getWeekly())){
-            logger.info("isValidEquity WeeklyTechnicalFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity WeeklyTechnicalFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
         if (!isValid(technicalPeriodFilter.getMonthlyTechnicalFilter(), technicalDetails.getMonthly())){
-            logger.info("isValidEquity MonthlyTechnicalFilter didn't matched for equity {}",equity.getName());
+            logger.info("isValidEquity MonthlyTechnicalFilter didn't matched for equity {}",equity.getEquityIdentifiers());
             return false;
         }
 

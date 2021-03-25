@@ -3,6 +3,7 @@ package com.pd.finance.htmlscrapper.marketgainer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquityPerformance;
 import com.pd.finance.model.EquityPerformances;
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 @Component
@@ -30,6 +32,8 @@ public class MarketGainerEquityPerformancesFactory implements IMarketGainerEquit
            performances.add(performanceFactory.create(performanceNode));
        }
         EquityPerformances equityPerformances =new EquityPerformances("Last 5 day performance", performances );
+        equityPerformances.setSource(Constants.SOURCE_MONEY_CONTROL);
+        equityPerformances.setUpdatedDate(new Date());
        return equityPerformances;
     }
 

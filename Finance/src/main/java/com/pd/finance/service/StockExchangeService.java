@@ -3,7 +3,6 @@ package com.pd.finance.service;
 import com.pd.finance.config.ApplicationConfig;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.infra.IObjectConverter;
-import com.pd.finance.model.EquityHistoricalData;
 import com.pd.finance.model.EquitySearchResponse;
 import com.pd.finance.model.EquityStockExchangeDetails;
 import com.pd.finance.persistence.StockExchangeDetailsRepository;
@@ -11,8 +10,6 @@ import com.pd.finance.request.CreateStockExchangeDetailsRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.model.EquityIdentifier;
 import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,17 +43,27 @@ public class StockExchangeService extends AbstractHttpService implements IStockE
 
     }
 
+
+
+
     @Override
-    public List<EquityStockExchangeDetailsResponse> getStockExchangeDetails(EquityIdentifier equityIdentifier) throws ServiceException {
-        List<EquityStockExchangeDetailsResponse> stockExchangeDetails = null;
+    public EquityStockExchangeDetailsResponse getStockExchangeDetails(EquityIdentifier equityIdentifier) throws ServiceException {
+
+         EquityStockExchangeDetailsResponse result = null;
             String searchString  = equityIdentifier.getSearchString();
             String url =  MessageFormat.format(config.getEnvProperty("StockExchangeDetailsUrl"),searchString);
             EquitySearchResponse searchResponse=  get(url, EquitySearchResponse.class);
             if(searchResponse!=null){
-                  stockExchangeDetails = searchResponse.getStockExchangeDetails();
+
+                List<EquityStockExchangeDetailsResponse> stockExchangeDetails1 = searchResponse.getStockExchangeDetails();
+                Optional<EquityStockExchangeDetailsResponse> first = stockExchangeDetails1.stream().filter(detailsResponse -> detailsResponse.getExchange().equals(equityIdentifier.getExchange())).findFirst();
+                if(first.isPresent()){
+                    result = first.get();
+                }
 
             }
-        return stockExchangeDetails;
+
+        return result;
     }
 
     @Override

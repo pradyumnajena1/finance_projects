@@ -1,8 +1,9 @@
-package com.pd.finance.request;
+package com.pd.finance.filter;
 
 import com.pd.finance.model.Equity;
+import org.springframework.data.mongodb.core.query.Criteria;
 
-public class EquityInsightFilter {
+public class EquityInsightFilter  implements  EquityFilter{
 
     private InsightsFilter shareholdingPatternsFilter;
     private InsightsFilter industryComparisionFilter;
@@ -42,5 +43,20 @@ public class EquityInsightFilter {
 
     public void setFinancialInsightFilter(FinancialInsightFilter financialInsightFilter) {
         this.financialInsightFilter = financialInsightFilter;
+    }
+
+    @Override
+    public FilterType getFilterType() {
+        return null;
+    }
+
+    @Override
+    public Criteria getCriteria(String pa) {
+        return null;
+    }
+
+    @Override
+    public boolean apply(Equity obj) {
+        return false;
     }
 }

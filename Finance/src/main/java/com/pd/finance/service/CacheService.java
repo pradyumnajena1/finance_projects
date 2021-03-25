@@ -16,32 +16,20 @@ public class CacheService implements ICacheService{
     private final ConcurrentHashMap<Equity,Equity> enrichedEquityCache;
     private final ConcurrentHashMap<String,Equity> equityCache;
 
-    private final ConcurrentHashMap<String,String> equityBseIdCache;
-    private final ConcurrentHashMap<String,String> equityNseIdCache;
+
 
 
     public CacheService( ) {
         this.documentCache = new ConcurrentHashMap<>();
         this.enrichedEquityCache = new ConcurrentHashMap<>();
         this.equityCache = new ConcurrentHashMap<>();
-        this.equityBseIdCache = new ConcurrentHashMap<>();
-        this.equityNseIdCache = new ConcurrentHashMap<>();
+
     }
-    @Override
-    public Optional<String> getEquityIdByNseId(String nseId ) {
-        return  Optional.ofNullable(equityNseIdCache.get(nseId));
-    }
-    @Override
-    public Optional<String> getEquityIdByBseId(String bseId ) {
-        return Optional.ofNullable(equityBseIdCache.get(bseId));
-    }
+
     @Override
     public Equity getEquity(String equityId, Function<String, Equity> function) {
         Equity equity = equityCache.computeIfAbsent(equityId, function);
-        if(equity!=null){
-            equityBseIdCache.put(equity.getBseId(),equityId);
-            equityNseIdCache.put(equity.getNseId(),equityId);
-        }
+
         return equity;
     }
 

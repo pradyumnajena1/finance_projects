@@ -36,30 +36,6 @@ public class EquityController {
         }
     }
 
-    @RequestMapping(value = "/equities",method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse getEquityByBseId(@RequestParam(value = "bseId",required = false) final String bseId,
-                                         @RequestParam(value = "nseId",required = false) final String nseId,
-                                         @RequestParam(value = "name",required = false) final String name){
-
-        try {
-            Equity equity = null;
-            if (StringUtils.isNotBlank( bseId )){
-                equity = equityService.getEquityByBseId(bseId);
-            }else if(StringUtils.isNotBlank(nseId)){
-                equity = equityService.getEquityByNseId(nseId);
-            }else if(StringUtils.isNotBlank(name )){
-                equity = equityService.getEquityByName(name);
-            }
-
-            return new BaseResponse(equity);
-        } catch (EquityNotFoundException e) {
-            logger.error(e.getMessage(),e);
-            return new BaseResponse(e);
-        } catch (PersistenceException e) {
-            logger.error(e.getMessage(),e);
-            return new BaseResponse(e);
-        }
-    }
 
 
 }

@@ -1,12 +1,16 @@
-package com.pd.finance.request;
+package com.pd.finance.filter;
 
+import com.pd.finance.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TechnicalFilter {
-
+public class TechnicalFilter  implements  IFilter<TechnicalAnalysis> {
+    private static final Logger logger = LoggerFactory.getLogger(TechnicalFilter.class);
     private TechnicalSummaryFilter movingAvgFilter;
     private TechnicalSummaryFilter movingAvgCrossOverFilter;
     private TechnicalSummaryFilter technicalIndicatorFilter;
@@ -94,5 +98,71 @@ public class TechnicalFilter {
             }
 
         }
+    }
+
+    @Override
+    public FilterType getFilterType() {
+        return FilterType.InDb;
+    }
+
+    @Override
+    public Criteria getCriteria(String parentObject) {
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        if(movingAvgFilter!=null){
+            criteriaList.add(movingAvgFilter.getCriteria(parentObject+".movingAverages"));
+        }
+
+        if(movingAvgCrossOverFilter!=null){
+            criteriaList.add(movingAvgCrossOverFilter.getCriteria(parentObject+".movingAveragesCrossOver"));
+        }
+
+        if(technicalIndicatorFilter!=null){
+            criteriaList.add(technicalIndicatorFilter.getCriteria( parentObject+".technicalIndicator"));
+        }
+
+        Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        return criteria;
+    }
+
+    @Override
+    public boolean apply(TechnicalAnalysis technicalAnalysis) {
+
+
+            if(technicalAnalysis==null){
+                return false;
+            }
+
+            TechAnalysisSummary summary = technicalAnalysis.getSummary();
+            if(summary==null){
+                return false;
+            }
+
+            if(movingAvgFilter!=null) {
+                boolean valid = movingAvgFilter.apply(summary.getMovingAverages());
+                if(!valid) {
+                    logger.info("MovingAverages filter not matching returning false");
+                    return false;
+                }
+            }
+
+            if(movingAvgCrossOverFilter!=null) {
+            boolean valid = movingAvgCrossOverFilter.apply(summary.getMovingAveragesCrossOver());
+            if(!valid) {
+                logger.info("movingAvgCrossOverFilter filter not matching returning false");
+                return false;
+            }
+        }
+
+        if(technicalIndicatorFilter!=null) {
+            boolean valid = technicalIndicatorFilter.apply(summary.getTechnicalIndicator());
+            if(!valid) {
+                logger.info("TechnicalIndicator filter not matching returning false");
+                return false;
+            }
+        }
+
+
+        return true;
     }
 }

@@ -3,6 +3,7 @@ package com.pd.finance.htmlscrapper.equity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquitySwotDetails;
 import com.pd.finance.service.IDocumentService;
+import com.pd.finance.utils.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 @Component
@@ -35,6 +37,8 @@ public class EquitySwotFactory implements IEquitySwotFactory {
         swotDetails.setWeaknesses(extractWeaknesses(document));
         swotDetails.setThreats(extractThreats(document));
 
+        swotDetails.setSource(Constants.SOURCE_MONEY_CONTROL);
+        swotDetails.setUpdatedDate(new Date());
 
         return swotDetails;
     }

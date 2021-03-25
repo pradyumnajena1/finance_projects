@@ -3,7 +3,7 @@ package com.pd.finance.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EquitySwotDetails {
+public class EquitySwotDetails extends EquityAttribute{
 
 
     private List<String> strengths = new ArrayList<>();

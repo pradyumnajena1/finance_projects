@@ -4,13 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mysema.query.annotations.QueryEntity;
 
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
+import com.pd.finance.utils.Constants;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @QueryEntity
 @Document
@@ -22,28 +28,37 @@ public class Equity {
     @Id
     private String id;
 
-    private String name;
-    private String nseId;
-    private String bseId;
-    private String url;
+    private EquityStockExchangeDetailsResponse stockExchangeDetails;
+
+    private EquityIdentifiers equityIdentifiers = new EquityIdentifiers();
+
+    private EquitySourceDetails sourceDetails = new EquitySourceDetails();
+
+
     private String sector;
-    private String exchange;
+
+
+
     private EquityPerformances performances;
     private EquitySwotDetails swotDetails;
     private TechnicalDetails technicalDetails;
     private EquityEssentials essentials;
     private EquityInsights insights;
     private EquityOverview overview;
-    private EquityCurrentPriceStats equityCurrentPriceStats  ;
-    private List<EquityStockExchangeDetailsResponse> stockExchangeDetails;
+    private EquityCurrentPriceStats equityCurrentPriceStats;
 
-    public List<EquityStockExchangeDetailsResponse> getStockExchangeDetails() {
+
+
+
+    public EquityStockExchangeDetailsResponse getStockExchangeDetails() {
         return stockExchangeDetails;
     }
 
-    public void setStockExchangeDetails(List<EquityStockExchangeDetailsResponse> stockExchangeDetails) {
+    public void setStockExchangeDetails(EquityStockExchangeDetailsResponse stockExchangeDetails) {
         this.stockExchangeDetails = stockExchangeDetails;
     }
+
+
 
     public String getId() {
         return id;
@@ -51,6 +66,14 @@ public class Equity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public EquityIdentifiers getEquityIdentifiers() {
+        return equityIdentifiers;
+    }
+
+    public void setEquityIdentifiers(EquityIdentifiers equityIdentifiers) {
+        this.equityIdentifiers = equityIdentifiers;
     }
 
     public EquityInsights getInsights() {
@@ -61,21 +84,7 @@ public class Equity {
         this.insights = insights;
     }
 
-    public String getNseId() {
-        return nseId;
-    }
 
-    public void setNseId(String nseId) {
-        this.nseId = nseId;
-    }
-
-    public String getBseId() {
-        return bseId;
-    }
-
-    public void setBseId(String bseId) {
-        this.bseId = bseId;
-    }
 
     public EquityOverview getOverview() {
         return overview;
@@ -117,30 +126,15 @@ public class Equity {
         this.sector = sector;
     }
 
-    public String getExchange() {
-        return exchange;
+
+
+    public EquitySourceDetails getSourceDetails() {
+        return sourceDetails;
     }
 
-    public void setExchange(String exchange) {
-        this.exchange = exchange;
+    public void setSourceDetails(EquitySourceDetails sourceDetails) {
+        this.sourceDetails = sourceDetails;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
 
     public EquityCurrentPriceStats getEquityCurrentPriceStats() {
         return equityCurrentPriceStats;
@@ -158,16 +152,20 @@ public class Equity {
         this.performances = performances;
     }
 
+
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Equity equity = (Equity) o;
-        return name.equals(equity.name);
+        return equityIdentifiers.equals(equity.equityIdentifiers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(equityIdentifiers);
     }
 }

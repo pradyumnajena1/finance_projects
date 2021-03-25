@@ -4,39 +4,37 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class EquityIdentifier {
 
     private String id;
     private String name;
-    private String bseId;
-    private String nseId;
+    private String exchange;
+    private String symbol;
+    private String source;
 
     private Map<String,Object> additionalAttributes = new HashMap<>();
 
-    public EquityIdentifier(String id, String name, String bseId, String nseId) {
+    public EquityIdentifier(String id, String name, String exchange, String symbol, String source) {
         this.id = id;
         this.name = name;
-        this.bseId = bseId;
-        this.nseId = nseId;
+        this.exchange = exchange;
+        this.symbol = symbol;
+        this.source = source;
     }
-    public EquityIdentifier( String name) {
 
+    public EquityIdentifier(String name, String exchange, String source) {
         this.name = name;
-
+        this.exchange = exchange;
+        this.source = source;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getBseId() {
-        return bseId;
-    }
 
-    public String getNseId() {
-        return nseId;
-    }
 
     public String getName() {
         return name;
@@ -50,28 +48,66 @@ public class EquityIdentifier {
         this.name = name;
     }
 
-    public void setBseId(String bseId) {
-        this.bseId = bseId;
+    public String getExchange() {
+        return exchange;
     }
 
-    public void setNseId(String nseId) {
-        this.nseId = nseId;
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public String getSearchString(){
 
-        if(StringUtils.isNotBlank(bseId)&&!StringUtils.isNumeric(bseId)){
-            return bseId;
-        }
-        if(StringUtils.isNotBlank(nseId)&&!StringUtils.isNumeric(nseId)){
-            return nseId;
-        }
+
         return name;
     }
-    public void putAdditionalAttribute(String key,Object value){
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void putAdditionalAttribute(String key, Object value){
         additionalAttributes.put(key,value);
     }
     public Object getAdditionalAttribute(String key){
         return additionalAttributes.get(key);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquityIdentifier that = (EquityIdentifier) o;
+        return id.equals(that.id) &&
+                name.equals(that.name) &&
+                exchange.equals(that.exchange) &&
+                source.equals(that.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, exchange, source);
+    }
+
+    @Override
+    public String toString() {
+        return "EquityIdentifier{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", exchange='" + exchange + '\'' +
+                ", source='" + source + '\'' +
+                '}';
     }
 }

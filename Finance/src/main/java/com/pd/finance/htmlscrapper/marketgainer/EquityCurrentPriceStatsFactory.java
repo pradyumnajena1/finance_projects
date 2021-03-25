@@ -2,12 +2,14 @@ package com.pd.finance.htmlscrapper.marketgainer;
 
 import com.pd.finance.model.EquityCurrentPriceStats;
 import com.pd.finance.model.EquityPerformances;
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.stream.Collectors;
 @Component
 public class EquityCurrentPriceStatsFactory implements IEquityCurrentPriceStatsFactory {
@@ -23,6 +25,9 @@ public class EquityCurrentPriceStatsFactory implements IEquityCurrentPriceStatsF
         currentPriceStats.setPrevClose(extractPrevClose(rowNode));
         currentPriceStats.setChange(extractChange(rowNode));
         currentPriceStats.setPercentageGain(extractPercentageGain(rowNode));
+
+        currentPriceStats.setSource(Constants.SOURCE_MONEY_CONTROL);
+        currentPriceStats.setUpdatedDate(new Date());
         return currentPriceStats;
     }
 

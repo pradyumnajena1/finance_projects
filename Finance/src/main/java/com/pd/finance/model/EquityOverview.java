@@ -3,12 +3,12 @@ package com.pd.finance.model;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class EquityOverview {
+public class EquityOverview extends EquityAttribute{
 
     private BigInteger volume;
     private BigInteger marketCap;
-    private BigInteger faceValue;
-    private BigInteger bookValue;
+    private BigDecimal faceValue;
+    private BigDecimal bookValue;
     private BigDecimal stockPE;
     private  BigDecimal stockPB;
 
@@ -31,19 +31,19 @@ public class EquityOverview {
         this.marketCap = marketCap;
     }
 
-    public BigInteger getFaceValue() {
+    public BigDecimal getFaceValue() {
         return faceValue;
     }
 
-    public void setFaceValue(BigInteger faceValue) {
+    public void setFaceValue(BigDecimal faceValue) {
         this.faceValue = faceValue;
     }
 
-    public BigInteger getBookValue() {
+    public BigDecimal getBookValue() {
         return bookValue;
     }
 
-    public void setBookValue(BigInteger bookValue) {
+    public void setBookValue(BigDecimal bookValue) {
         this.bookValue = bookValue;
     }
 

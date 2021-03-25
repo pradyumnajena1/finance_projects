@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EquityRepository extends MongoRepository<Equity, String>   {
+public interface EquityRepository extends MongoRepository<Equity, String> ,EquityCustomRepository  {
 
     @Query(value="{ 'name' : ?0 }")
     public Equity findByName(String name);
@@ -25,8 +25,8 @@ public interface EquityRepository extends MongoRepository<Equity, String>   {
     @Query(value="{'name' : {'$in' : [names…​]}}")
     public List<Equity> findByNameIn(List<String> names);
 
-    @Query(value="{'$or':[{ 'bseId' : ?0 },{ 'nseId' : ?1 }]}")
-    public Equity findByBseIdAndNseId(String bseId,String nseId);
+    @Query(value="{'$and':[{ 'exchange' : ?0 },{ 'symbol' : ?1 }]}")
+    public Equity findByExchangeAndSymbol(String exchange,String symbol);
 
 
 }

@@ -1,6 +1,8 @@
 package com.pd.finance.model;
 
-public class EquityInsights {
+public class EquityInsights extends EquityAttribute{
+
+
     private EquityInsightLineItem insightHeadline;
     private PriceInsights priceInsights;
     private FinancialInsights financialInsights;

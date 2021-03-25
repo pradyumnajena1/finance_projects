@@ -2,7 +2,7 @@ package com.pd.finance.model;
 
 import java.util.List;
 
-public class EquityPerformances {
+public class EquityPerformances  extends EquityAttribute{
 
     private final String type;
     private final List<EquityPerformance> performances;

@@ -3,9 +3,15 @@ package com.pd.finance.htmlscrapper.marketgainer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.htmlscrapper.equity.*;
 import com.pd.finance.model.*;
+import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.service.ICacheService;
 import com.pd.finance.service.IDocumentService;
+import com.pd.finance.service.IStockExchangeService;
 import com.pd.finance.utils.CommonUtils;
+import com.pd.finance.utils.Constants;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
@@ -14,15 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @Component
 public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(MarketGainerEquityFactory.class);
+
 
     @Autowired
     private IEquityOverviewFactory overviewFactory;
@@ -40,6 +46,9 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     private IDocumentService documentService;
     @Autowired
     private ICacheService cacheService;
+    @Autowired
+    private IStockExchangeService stockExchangeService;
+
 
 
     @Override
@@ -60,28 +69,82 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     private void extractEquity(Queue<Equity> equityCollector, Node rowNode) {
 
         try {
-            Equity equity = createEquityFromMarketGainerPage(rowNode);
+            Equity equity = createEquityFromMarketGainerPageRow(rowNode);
 
-            equityCollector.add(equity);
+            if(equity!=null){
+                equityCollector.add(equity);
+            }
+
         } catch (Exception e) {
           logger.error(e.getMessage(),e);
         }
     }
 
-    private   Equity createEquityFromMarketGainerPage(Node rowNode) {
+    private   Equity createEquityFromMarketGainerPageRow(Node rowNode) {
 
-        Equity equity = new Equity();
+        Equity result = null;
+        String extractedName = null;
         try {
-            equity.setName(MarketGainerPageHelper.extractName(rowNode));
-            logger.info("started creating equity {}",equity.getName());
-            equity.setUrl(extractUrl(rowNode));
-            logger.info("completed creating equity {}",equity.getName());
+            extractedName = MarketGainerPageHelper.extractName(rowNode);
+            logger.info("createEquitiesFromMarketGainerPageRow exec started for equity extractedName {}",extractedName);
+
+            EquityIdentifier equityIdentifier = new EquityIdentifier(extractedName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
+            EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
+
+           if( stockExchangeDetails!=null){
+
+               result =   createEquity(rowNode, stockExchangeDetails);
+           }else {
+
+               logger.info("createEquitiesFromMarketGainerPageRow could not find exchange details  for equity extractedName {}",extractedName);
+           }
+            logger.info("createEquitiesFromMarketGainerPageRow exec completed for equity extractedName {}",extractedName);
         } catch (Exception ex) {
-            logger.error("create exec failed",ex);
+            logger.error("createEquitiesFromMarketGainerPageRow exec failed for equity extractedName {}",extractedName,ex);
         }
+        return result;
+    }
+
+    private Equity createEquity(Node rowNode, EquityStockExchangeDetailsResponse details) {
+        Equity equity = new Equity();
+
+        SourceDetails sourceDetails = getSourceDetails(rowNode);
+        equity.getSourceDetails().addSourceDetails(sourceDetails);
+
+        EquityIdentifiers equityIdentifiers =  getEquityIdentifiers(rowNode,equity,details);
+        equity.setEquityIdentifiers(equityIdentifiers);
+
+        logger.info("createEquity completed creating equity {}",equity.getEquityIdentifiers());
         return equity;
     }
 
+    private EquityIdentifiers getEquityIdentifiers(Node rowNode, Equity equity, EquityStockExchangeDetailsResponse details) {
+
+        EquityIdentifiers equityIdentifiers = new EquityIdentifiers();
+
+        String equityName =MarketGainerPageHelper.extractName(rowNode);
+        if(StringUtils.isBlank(equityName)){
+            equityName =  StringUtils.isNotBlank( details.getShortName())?details.getShortName():details.getLongName();
+        }
+
+        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
+
+
+        logger.info("createEquity started creating equity {}",equityName);
+
+
+        equityIdentifiers.getIdentifiers().add(equityIdentifier);
+        return equityIdentifiers;
+    }
+
+    @NotNull
+    private SourceDetails getSourceDetails(Node rowNode) {
+        SourceDetails sourceDetails = new SourceDetails();
+        sourceDetails.setEquityName(MarketGainerPageHelper.extractName(rowNode));
+        sourceDetails.setSourceUrl(extractUrl(rowNode));
+        sourceDetails.setSourceName(Constants.SOURCE_MONEY_CONTROL);
+        return sourceDetails;
+    }
 
 
     private   String extractUrl(Node rowNode) {

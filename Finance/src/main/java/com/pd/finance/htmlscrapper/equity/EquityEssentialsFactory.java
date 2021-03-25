@@ -3,6 +3,7 @@ package com.pd.finance.htmlscrapper.equity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquityEssentials;
 import com.pd.finance.model.EquitySwotDetails;
+import com.pd.finance.utils.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,8 @@ public class EquityEssentialsFactory implements IEquityEssentialsFactory {
         equityEssentials.setOwnerships(extractOwnerships(document));
         equityEssentials.setOthers(extractOthers(document));
 
-
+        equityEssentials.setSource(Constants.SOURCE_MONEY_CONTROL);
+        equityEssentials.setUpdatedDate(new Date());
         return equityEssentials;
     }
 

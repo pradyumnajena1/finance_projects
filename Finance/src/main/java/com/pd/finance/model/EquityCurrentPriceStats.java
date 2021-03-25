@@ -2,7 +2,9 @@ package com.pd.finance.model;
 
 import java.math.BigDecimal;
 
-public class EquityCurrentPriceStats {
+public class EquityCurrentPriceStats extends EquityAttribute{
+
+
     BigDecimal high;
     BigDecimal low;
     BigDecimal lastPrice;

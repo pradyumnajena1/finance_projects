@@ -1,6 +1,6 @@
 package com.pd.finance.model;
 
-public class TechnicalDetails {
+public class TechnicalDetails extends EquityAttribute{
 
 
     private TechnicalAnalysis daily;

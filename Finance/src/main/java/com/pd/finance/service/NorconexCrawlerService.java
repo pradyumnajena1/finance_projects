@@ -10,14 +10,12 @@ import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.htmlscrapper.listings.ICompanyListingsFactory;
 import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
 import com.pd.finance.infra.IObjectConverter;
-import com.pd.finance.model.CrawlerResponse;
-import com.pd.finance.model.Equity;
-import com.pd.finance.model.EquityIdentifier;
-import com.pd.finance.model.EquityStockExchangeDetails;
+import com.pd.finance.model.*;
 import com.pd.finance.request.CompanyListingWebCrawlRequest;
 import com.pd.finance.request.FinancialSiteWebCrawlRequest;
 import com.pd.finance.request.MarketGainersWebCrawlRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
+import com.pd.finance.utils.Constants;
 import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NorconexCrawlerService implements ICrawlerService {
@@ -106,7 +105,7 @@ public class NorconexCrawlerService implements ICrawlerService {
             crawlerResponse.setCompleted(true);
             return crawlerResponse;
         }catch (Exception ex){
-            logger.error("Failed to execute GetGainers",ex);
+            logger.error("crawlMarketGainers exec failed",ex);
             throw ex;
         }
 
@@ -149,19 +148,18 @@ public class NorconexCrawlerService implements ICrawlerService {
         Set<String> allowedExchanges = new HashSet<>(Arrays.asList("NSI", "BSE"));
 
         try {
-            EquityIdentifier equityIdentifier = new EquityIdentifier(companyName);
-            List<EquityStockExchangeDetailsResponse> stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
-            if(stockExchangeDetails!=null && !stockExchangeDetails.isEmpty()){
+            EquityIdentifier equityIdentifier = new EquityIdentifier(companyName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
 
-                stockExchangeDetails.stream()
-                        .filter(equityStockExchangeDetailsResponse ->allowedExchanges.contains( equityStockExchangeDetailsResponse.getExchange() ))
-                        .forEach(detailsResponse -> {
-                            stockExchangeService.create(objectConverter.convert(detailsResponse));
+            EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
+            if(stockExchangeDetails!=null){
 
-                        });
 
+                stockExchangeService.create(objectConverter.convert(stockExchangeDetails));
                 success=true;
-            }
+            };
+
+
+
 
 
         } catch (Exception e) {
@@ -178,11 +176,22 @@ public class NorconexCrawlerService implements ICrawlerService {
     private boolean fetchAndPersistEquity(Equity equity) throws ServiceException, PersistenceException {
         boolean success = false;
         try {
-            EquityIdentifier identifier = new EquityIdentifier(equity.getName());
-            identifier.putAdditionalAttribute("url",equity.getUrl());
+            logger.info("fetchAndPersistEquity exec started for equity {}",equity.getEquityIdentifiers());
+
+
+            EquityIdentifier identifier = equity.getEquityIdentifiers().getEquityIdentifier(Constants.SOURCE_MONEY_CONTROL);
+
+            SourceDetails sourceDetails = equity.getSourceDetails().getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
+
+            if(sourceDetails!=null){
+
+                identifier.putAdditionalAttribute("url",sourceDetails.getSourceUrl());
+            };
+
             equityEnricherService.enrichEquity(identifier,equity);
             equityService.upsertEquity(equity);
             success = true;
+            logger.info("fetchAndPersistEquity exec completed for equity {}",equity.getEquityIdentifiers());
         } catch (ServiceException e) {
            logger.error(e.getMessage(),e);
         } catch (PersistenceException e) {

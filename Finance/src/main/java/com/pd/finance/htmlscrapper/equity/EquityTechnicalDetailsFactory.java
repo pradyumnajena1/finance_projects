@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.*;
 import com.pd.finance.service.IDocumentService;
 import com.pd.finance.utils.CommonUtils;
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFactory {
@@ -33,6 +35,9 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
             technicalDetails.setDaily(extractTechDetailsDaily(technicalDetailsUrl));
             technicalDetails.setWeekly(extractTechDetailsWeekly(technicalDetailsUrl));
             technicalDetails.setMonthly(extractTechDetailsMonthly(technicalDetailsUrl));
+
+            technicalDetails.setSource(Constants.SOURCE_MONEY_CONTROL);
+            technicalDetails.setUpdatedDate(new Date());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

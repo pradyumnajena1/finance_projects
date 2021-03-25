@@ -10,8 +10,7 @@ import java.util.function.Function;
 
 public interface ICacheService {
 
-    public Optional<String> getEquityIdByNseId(String nseId );
-    public Optional<String> getEquityIdByBseId(String bseId );
+
 
     public Equity getEquity(String equityId, Function<String, Equity> function);
     public  Document getDocument(String url, Function<String,Document> function);

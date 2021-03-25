@@ -9,9 +9,7 @@ import java.util.List;
 public interface IEquityService {
     Equity getEquity(String id) throws EquityNotFoundException;
 
-    Equity getEquityByNseId(String nseId)throws EquityNotFoundException, PersistenceException;
 
-    Equity getEquityByBseId(String nseId)throws EquityNotFoundException,PersistenceException;
 
     Equity getEquityByName(String name)throws EquityNotFoundException,PersistenceException;
 
@@ -25,7 +23,5 @@ public interface IEquityService {
 
     Equity deleteEquity(String id) throws PersistenceException;
 
-    Equity deleteEquityByBseId(String bseId) throws PersistenceException;
 
-    Equity deleteEquityByNseId(String nseId) throws PersistenceException;
 }
