@@ -16,6 +16,9 @@ public class EquityIdentifier {
 
     private Map<String,Object> additionalAttributes = new HashMap<>();
 
+    public EquityIdentifier() {
+    }
+
     public EquityIdentifier(String id, String name, String exchange, String symbol, String source) {
         this.id = id;
         this.name = name;

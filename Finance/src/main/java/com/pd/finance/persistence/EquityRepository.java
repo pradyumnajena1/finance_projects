@@ -25,7 +25,7 @@ public interface EquityRepository extends MongoRepository<Equity, String> ,Equit
     @Query(value="{'name' : {'$in' : [names…​]}}")
     public List<Equity> findByNameIn(List<String> names);
 
-    @Query(value="{'$and':[{ 'exchange' : ?0 },{ 'symbol' : ?1 }]}")
+    @Query(value="{'$and':[{ 'stockExchangeDetails.exchange' : ?0 },{ 'stockExchangeDetails.symbol' : ?1 }]}")
     public Equity findByExchangeAndSymbol(String exchange,String symbol);
 
 

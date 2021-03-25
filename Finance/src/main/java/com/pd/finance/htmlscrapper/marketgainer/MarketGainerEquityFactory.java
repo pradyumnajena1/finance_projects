@@ -128,7 +128,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
         }
 
         EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
-
+        equityIdentifier.setSymbol(details.getSymbol());
 
         logger.info("createEquity started creating equity {}",equityName);
 
