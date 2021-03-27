@@ -1,5 +1,7 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.db;
 
+import com.pd.finance.filter.FilterType;
+import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +11,7 @@ import org.springframework.validation.FieldError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TechnicalFilter  implements  IFilter<TechnicalAnalysis> {
+public class TechnicalFilter  implements IFilter<TechnicalAnalysis> {
     private static final Logger logger = LoggerFactory.getLogger(TechnicalFilter.class);
     private TechnicalSummaryFilter movingAvgFilter;
     private TechnicalSummaryFilter movingAvgCrossOverFilter;

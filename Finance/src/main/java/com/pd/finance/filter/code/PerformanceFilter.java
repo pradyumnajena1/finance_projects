@@ -1,5 +1,7 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.code;
 
+import com.pd.finance.filter.EquityFilter;
+import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityPerformance;
 import com.pd.finance.model.EquityPerformances;
@@ -11,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PerformanceFilter  implements  EquityFilter{
+public class PerformanceFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(PerformanceFilter.class);
 
 

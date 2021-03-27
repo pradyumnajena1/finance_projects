@@ -1,5 +1,7 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.db;
 
+import com.pd.finance.filter.FilterType;
+import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.TechAnalysisSummaryValue;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -7,7 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TechnicalSummaryFilter  implements  IFilter<TechAnalysisSummaryValue>{
+public class TechnicalSummaryFilter  implements IFilter<TechAnalysisSummaryValue> {
     private Integer minBullish;
     private Integer maxBearish;
 

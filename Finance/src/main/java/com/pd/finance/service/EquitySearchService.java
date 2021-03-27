@@ -1,6 +1,10 @@
 package com.pd.finance.service;
 
 import com.pd.finance.filter.*;
+import com.pd.finance.filter.code.PerformanceFilter;
+import com.pd.finance.filter.db.OverviewFilter;
+import com.pd.finance.filter.db.SwotFilter;
+import com.pd.finance.filter.db.TechnicalPeriodFilter;
 import com.pd.finance.model.*;
 
 import com.pd.finance.persistence.EquityRepository;
@@ -15,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

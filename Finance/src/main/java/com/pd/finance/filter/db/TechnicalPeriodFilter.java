@@ -1,7 +1,8 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.db;
 
+import com.pd.finance.filter.EquityFilter;
+import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
-import com.pd.finance.model.TechnicalAnalysis;
 import com.pd.finance.model.TechnicalDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TechnicalPeriodFilter  implements  EquityFilter{
+public class TechnicalPeriodFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(TechnicalPeriodFilter.class);
 
 

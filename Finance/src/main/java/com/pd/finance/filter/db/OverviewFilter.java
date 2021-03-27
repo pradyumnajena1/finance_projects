@@ -1,5 +1,8 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.db;
 
+import com.pd.finance.filter.EquityFilter;
+import com.pd.finance.filter.FilterType;
+import com.pd.finance.filter.db.SwotFilter;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityOverview;
 import org.slf4j.Logger;
@@ -11,7 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OverviewFilter  implements  EquityFilter{
+public class OverviewFilter  implements EquityFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 

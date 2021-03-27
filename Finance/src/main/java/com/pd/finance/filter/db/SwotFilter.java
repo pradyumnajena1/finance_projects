@@ -1,8 +1,9 @@
-package com.pd.finance.filter;
+package com.pd.finance.filter.db;
 
+import com.pd.finance.filter.EquityFilter;
+import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquitySwotDetails;
-import com.pd.finance.service.EquityEnricherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -10,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwotFilter  implements  EquityFilter{
+public class SwotFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 
 
