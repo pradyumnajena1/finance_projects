@@ -57,7 +57,7 @@ public class EquityService implements IEquityService {
         try {
 
 
-            EquityIdentifier equityIdentifier = equity.getEquityIdentifiers().getEquityIdentifier(Constants.SOURCE_MONEY_CONTROL);
+            EquityIdentifier equityIdentifier = equity.getDefaultEquityIdentifier();
 
             Equity equityFromDb = equityRepository.findByExchangeAndSymbol(equityIdentifier.getExchange(), equityIdentifier.getSymbol());
 

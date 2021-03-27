@@ -76,6 +76,13 @@ public class Equity {
         this.equityIdentifiers = equityIdentifiers;
     }
 
+    public EquityIdentifier getEquityIdentifier(String source){
+      return   getEquityIdentifiers().getEquityIdentifier(source);
+    }
+
+    public EquityIdentifier getDefaultEquityIdentifier( ){
+        return   getEquityIdentifier(Constants.SOURCE_MONEY_CONTROL);
+    }
     public EquityInsights getInsights() {
         return insights;
     }
@@ -130,6 +137,14 @@ public class Equity {
 
     public EquitySourceDetails getSourceDetails() {
         return sourceDetails;
+    }
+
+    public SourceDetails getSourceDetails(String source){
+        return getSourceDetails().getSourceDetails(source);
+    }
+
+    public SourceDetails getDefaultSourceDetails( ){
+        return getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
     }
 
     public void setSourceDetails(EquitySourceDetails sourceDetails) {

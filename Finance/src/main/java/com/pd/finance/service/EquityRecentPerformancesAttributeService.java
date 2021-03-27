@@ -40,7 +40,7 @@ public class EquityRecentPerformancesAttributeService extends HtmlScrapperEquity
         logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
         try {
             Document document = getDocument(identifier);
-            SourceDetails sourceDetails = equity.getSourceDetails().getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
+            SourceDetails sourceDetails = equity.getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
 
             if(sourceDetails!=null){
                 try {

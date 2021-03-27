@@ -179,9 +179,9 @@ public class NorconexCrawlerService implements ICrawlerService {
             logger.info("fetchAndPersistEquity exec started for equity {}",equity.getEquityIdentifiers());
 
 
-            EquityIdentifier identifier = equity.getEquityIdentifiers().getEquityIdentifier(Constants.SOURCE_MONEY_CONTROL);
+            EquityIdentifier identifier = equity.getDefaultEquityIdentifier();
 
-            SourceDetails sourceDetails = equity.getSourceDetails().getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
+            SourceDetails sourceDetails = equity.getDefaultSourceDetails();
 
             if(sourceDetails!=null){
 

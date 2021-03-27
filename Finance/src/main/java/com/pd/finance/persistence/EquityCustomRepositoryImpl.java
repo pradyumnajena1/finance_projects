@@ -1,7 +1,17 @@
 package com.pd.finance.persistence;
 
+import com.pd.finance.model.Equity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.support.PageableExecutionUtils;
+
+import java.util.List;
+import java.util.function.LongSupplier;
+
 
 public class EquityCustomRepositoryImpl implements EquityCustomRepository{
 
@@ -10,5 +20,16 @@ public class EquityCustomRepositoryImpl implements EquityCustomRepository{
     @Autowired
     public EquityCustomRepositoryImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
+    }
+
+    public Page<Equity> searchEquity(Criteria criteria , Pageable pageable) {
+
+        final Query query = new Query(criteria).with(pageable);
+
+
+        List<Equity> list = mongoTemplate.find(query, Equity.class);
+        LongSupplier totalSupplier = () -> mongoTemplate.count((Query.of(query).limit(-1).skip(-1)), Equity.class);
+        Page<Equity> page = PageableExecutionUtils.getPage(list, pageable, totalSupplier);
+        return page;
     }
 }
