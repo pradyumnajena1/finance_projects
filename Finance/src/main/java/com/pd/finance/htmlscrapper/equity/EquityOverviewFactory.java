@@ -38,13 +38,13 @@ public class EquityOverviewFactory implements IEquityOverviewFactory {
         return equityOverview;
     }
 
-    private   BigInteger extractVolume(Document document) {
+    private   BigDecimal extractVolume(Document document) {
         try {
             String volumeText = document.select("div#nse_vol").first().childNode(0).attr("text");
-            return CommonUtils.extractIntegerFromText(volumeText);
+            return CommonUtils.extractDecimalFromText(volumeText);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            return BigInteger.ZERO;
+            return BigDecimal.valueOf(0);
         }
     }
 
@@ -65,12 +65,12 @@ public class EquityOverviewFactory implements IEquityOverviewFactory {
         return CommonUtils.extractDecimalFromText(text);
     }
 
-    private   BigInteger extractMarketCap(Document document) {
+    private   BigDecimal extractMarketCap(Document document) {
         Element overviewDiv = document.select("div#stk_overview").first();
         Element marketCap = overviewDiv.select("div > div > div:nth-child(2) > table > tbody > tr:nth-child(2) > td.nsemktcap.bsemktcap").first();
 
         String text = marketCap.text();
-        return CommonUtils.extractIntegerFromText(text);
+        return CommonUtils.extractDecimalFromText(text);
     }
 
     private   BigDecimal extractFaceValue(Document document) {

@@ -20,7 +20,10 @@ public class OverviewFilter  implements EquityFilter {
 
 
     private BigDecimal maxPE = BigDecimal.valueOf(100000);
-    private BigInteger minVolume = BigInteger.ZERO;
+    private BigDecimal minMarketCap = BigDecimal.valueOf(0);
+    private BigDecimal minVolume = BigDecimal.valueOf(0);
+
+
 
     public BigDecimal getMaxPE() {
         return maxPE;
@@ -30,11 +33,19 @@ public class OverviewFilter  implements EquityFilter {
         this.maxPE = maxPE;
     }
 
-    public BigInteger getMinVolume() {
+    public BigDecimal getMinMarketCap() {
+        return minMarketCap;
+    }
+
+    public void setMinMarketCap(BigDecimal minMarketCap) {
+        this.minMarketCap = minMarketCap;
+    }
+
+    public BigDecimal getMinVolume() {
         return minVolume;
     }
 
-    public void setMinVolume(BigInteger minVolume) {
+    public void setMinVolume(BigDecimal minVolume) {
         this.minVolume = minVolume;
     }
 
@@ -49,6 +60,7 @@ public class OverviewFilter  implements EquityFilter {
 
         criteriaList.add(Criteria.where("overview.stockPE").lte(getMaxPE()));
         criteriaList.add(Criteria.where("overview.volume").gte(getMinVolume()));
+        criteriaList.add(Criteria.where("overview.marketCap").gte(getMinMarketCap()));
 
         Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
         return criteria;
@@ -61,7 +73,8 @@ public class OverviewFilter  implements EquityFilter {
         try {
             EquityOverview equityOverview = equity.getOverview();
             isValid =   getMaxPE().compareTo(equityOverview.getStockPE())>=0 &&
-                     getMinVolume().compareTo(equityOverview.getVolume())<=0
+                        getMinVolume().compareTo(equityOverview.getVolume())<=0 &&
+                        getMinMarketCap().compareTo(equityOverview.getMarketCap())<=0;
 
             ;
         } catch (Exception e) {

@@ -1,33 +1,42 @@
 package com.pd.finance.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class EquityOverview extends EquityAttribute{
 
-    private BigInteger volume;
-    private BigInteger marketCap;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal volume;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal marketCap;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal faceValue;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal bookValue;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal stockPE;
+    @Field(targetType = FieldType.DECIMAL128)
     private  BigDecimal stockPB;
 
     public EquityOverview() {
     }
 
-    public BigInteger getVolume() {
+    public BigDecimal getVolume() {
         return volume;
     }
 
-    public void setVolume(BigInteger volume) {
+    public void setVolume(BigDecimal volume) {
         this.volume = volume;
     }
 
-    public BigInteger getMarketCap() {
+    public BigDecimal getMarketCap() {
         return marketCap;
     }
 
-    public void setMarketCap(BigInteger marketCap) {
+    public void setMarketCap(BigDecimal marketCap) {
         this.marketCap = marketCap;
     }
 
