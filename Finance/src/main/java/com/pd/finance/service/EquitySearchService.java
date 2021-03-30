@@ -1,6 +1,7 @@
 package com.pd.finance.service;
 
 import com.pd.finance.filter.*;
+import com.pd.finance.filter.code.EquityInsightFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
 import com.pd.finance.filter.db.OverviewFilter;
 import com.pd.finance.filter.db.SwotFilter;
@@ -42,20 +43,28 @@ public class EquitySearchService implements IEquitySearchService {
         final CompositeIncodeFilter<Equity> compositeIncodeFilter = getEquityCompositeIncodeFilter(inCodeFilters, partialFilters);
 
 
-        Pageable  pageRequest = PageRequest.of(0, 200);
+        Pageable  pageRequest = PageRequest.of(0, 500);
 
-        Page<Equity> page = equityRepository.searchEquity(dbFilterCriteria, pageRequest);
+        Page<Equity> page = getPage(dbFilterCriteria, pageRequest);
 
         while (!page.isEmpty())
          {
              List<Equity> list = page.filter(equity -> compositeIncodeFilter.apply(equity)).toList();
-             equitiesCollector.addAll(list);
 
-             page = equityRepository.searchEquity(dbFilterCriteria,pageRequest.next());
+             equitiesCollector.addAll(list);
+             pageRequest = pageRequest.next();
+
+             page = getPage(dbFilterCriteria,  pageRequest);
 
         }
 
         return equitiesCollector;
+    }
+
+    protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
+
+
+        return dbFilterCriteria != null ? equityRepository.searchEquity(dbFilterCriteria, pageRequest) : equityRepository.findAll(pageRequest);
     }
 
     @NotNull
@@ -72,7 +81,7 @@ public class EquitySearchService implements IEquitySearchService {
         return new CompositeIncodeFilter<Equity>(cumulatedIncodeFilters,"And");
     }
 
-    @NotNull
+
     protected Criteria getCriteria(List<IFilter<Equity>> dbFilters, List<IFilter<Equity>> partialFilters) {
         List<Criteria> criteriaList = new ArrayList<>();
 
@@ -85,7 +94,14 @@ public class EquitySearchService implements IEquitySearchService {
             Criteria criteria = partialFilter.getCriteria("");
             criteriaList.add(criteria);
         });
-        Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        Criteria criteria = null;
+        if(criteriaList.size()>1){
+              criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        }else if(criteriaList.size()==1){
+              criteria =  criteriaList.get(0);
+        }
+
+
         return criteria;
     }
 

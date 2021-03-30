@@ -9,7 +9,6 @@ import com.pd.finance.service.IDocumentService;
 import com.pd.finance.service.IStockExchangeService;
 import com.pd.finance.utils.CommonUtils;
 import com.pd.finance.utils.Constants;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 @Component
 public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
@@ -52,24 +50,26 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
 
 
     @Override
-    public   List<Equity> fetchMarketGainerEquities(Document document,int maxEquitiesToFetch) throws IOException {
+    public   List<Equity> fetchMarketGainerEquities(Document document, int maxEquitiesToFetch, String exchange) throws IOException {
         Queue<Equity> equityCollector = new ConcurrentLinkedQueue<>();
-        Node histTable =MarketGainerPageHelper.extractMarketGainersTableNode(document);
+        Node histTable =MarketGainerPageHelper.extractMarketGainersTableNode(document,exchange);
         List<Node> rows =MarketGainerPageHelper.extractMarketGainerRows(histTable);
 
         if(maxEquitiesToFetch!= CommonUtils.FetchAllEquities){
             rows = rows.subList(0,Math.max(0, Math.min(rows.size(),maxEquitiesToFetch)));
         }
 
-        rows.stream().forEach(rowNode-> extractEquity(equityCollector, rowNode));
+        rows.stream().forEach(rowNode-> extractEquity(equityCollector, rowNode, exchange));
+
 
         return new ArrayList<>(equityCollector);
     }
 
-    private void extractEquity(Queue<Equity> equityCollector, Node rowNode) {
+    private void extractEquity(Queue<Equity> equityCollector, Node rowNode, String exchange) {
 
         try {
-            Equity equity = createEquityFromMarketGainerPageRow(rowNode);
+            String extractedName = MarketGainerPageHelper.extractName(rowNode);
+            Equity equity = createEquityFromMarketGainerPageRow(rowNode, new EquityIdentifier(extractedName, exchange, Constants.SOURCE_MONEY_CONTROL));
 
             if(equity!=null){
                 equityCollector.add(equity);
@@ -80,7 +80,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
         }
     }
 
-    private   Equity createEquityFromMarketGainerPageRow(Node rowNode) {
+    private   Equity createEquityFromMarketGainerPageRow(Node rowNode, EquityIdentifier equityIdentifier) {
 
         Equity result = null;
         String extractedName = null;
@@ -88,7 +88,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             extractedName = MarketGainerPageHelper.extractName(rowNode);
             logger.info("createEquitiesFromMarketGainerPageRow exec started for equity extractedName {}",extractedName);
 
-            EquityIdentifier equityIdentifier = new EquityIdentifier(extractedName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
+
             EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
 
            if( stockExchangeDetails!=null){
@@ -127,7 +127,8 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             equityName =  StringUtils.isNotBlank( details.getShortName())?details.getShortName():details.getLongName();
         }
 
-        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
+
+        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,details.getExchange(),Constants.SOURCE_MONEY_CONTROL);
         equityIdentifier.setSymbol(details.getSymbol());
 
         logger.info("createEquity started creating equity {}",equityName);

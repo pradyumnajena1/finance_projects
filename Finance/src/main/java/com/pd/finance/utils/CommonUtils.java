@@ -56,5 +56,16 @@ public class CommonUtils {
         }
     }
 
+    public static Date extractDateFromText(String textValue,SimpleDateFormat dateFormat) {
+        try {
+
+            textValue = textValue.trim();
+            return dateFormat.parse( textValue);
+        } catch (ParseException ex) {
+            logger.error("extractDateFromPerformanceCell exec failed",ex);
+            return null;
+        }
+    }
+
 
 }

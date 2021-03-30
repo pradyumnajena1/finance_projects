@@ -36,6 +36,7 @@ public class Equity {
 
 
     private String sector;
+    private EquityHistoricalData historicalData;
 
 
 
@@ -133,7 +134,13 @@ public class Equity {
         this.sector = sector;
     }
 
+    public EquityHistoricalData getHistoricalData() {
+        return historicalData;
+    }
 
+    public void setHistoricalData(EquityHistoricalData historicalData) {
+        this.historicalData = historicalData;
+    }
 
     public EquitySourceDetails getSourceDetails() {
         return sourceDetails;

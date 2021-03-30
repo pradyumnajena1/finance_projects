@@ -3,7 +3,6 @@ package com.pd.finance.service;
 import com.norconex.collector.http.HttpCollector;
 import com.norconex.collector.http.HttpCollectorConfig;
 import com.norconex.collector.http.crawler.HttpCrawlerConfig;
-import com.norconex.collector.http.crawler.URLCrawlScopeStrategy;
 import com.pd.finance.config.ApplicationConfig;
 import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.exceptions.ServiceException;
@@ -17,16 +16,13 @@ import com.pd.finance.request.MarketGainersWebCrawlRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.utils.Constants;
 import org.apache.commons.collections.CollectionUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class NorconexCrawlerService implements ICrawlerService {
@@ -90,17 +86,24 @@ public class NorconexCrawlerService implements ICrawlerService {
     public CrawlerResponse crawlMarketGainers(MarketGainersWebCrawlRequest crawlRequest) throws Exception {
         logger.info(String.format("crawlMarketGainers exec started"));
         try{
-            Document doc = getDocument();
-            List<Equity> equityCollector = marketGainerEquityFactory.fetchMarketGainerEquities(doc,crawlRequest.getDebugFilter()!=null?crawlRequest.getDebugFilter().getNumEquities():-1);
-
+            Document doc = getDocument(crawlRequest);
+            int maxEquitiesToFetch = crawlRequest.getDebugFilter() != null ? crawlRequest.getDebugFilter().getNumEquities() : -1;
+            List<Equity> equities = marketGainerEquityFactory.fetchMarketGainerEquities(doc, maxEquitiesToFetch,crawlRequest.getExchange());
+            int numObjectsCreated = equities.size();
             int successfulPersists = 0;
-            for (Equity equity : equityCollector){
-                boolean success = fetchAndPersistEquity(equity);
+
+            Equity[] equitiesAr = equities.toArray(new Equity[numObjectsCreated]);
+
+            for(int i=0;i<numObjectsCreated;i++){
+
+                boolean success = fetchAndPersistEquity(equitiesAr[i]);
                 if(success) successfulPersists++;
+                equitiesAr[i] = null;
             }
 
+
             CrawlerResponse crawlerResponse = new CrawlerResponse();
-            crawlerResponse.setNumObjectsCreated(equityCollector.size());
+            crawlerResponse.setNumObjectsCreated(numObjectsCreated);
             crawlerResponse.setNumObjectsPersisted(successfulPersists);
             crawlerResponse.setCompleted(true);
             return crawlerResponse;
@@ -116,6 +119,7 @@ public class NorconexCrawlerService implements ICrawlerService {
         logger.info(String.format("crawlCompanyListing exec started"));
         try{
             Document doc = getCompanyListingDocument();
+
             List<String> companyNames = companyListingsFactory.getCompanyNames(doc,crawlRequest.getDebugFilter()!=null?crawlRequest.getDebugFilter().getNumEquities():-1);
             Collections.reverse(companyNames);
             int successfulPersists = 0;
@@ -124,7 +128,8 @@ public class NorconexCrawlerService implements ICrawlerService {
 
                 if(CollectionUtils.isEmpty(existingDetails)){
 
-                        boolean success = fetchAndPersistStockExchangeDetails(companyName);
+                    EquityIdentifier equityIdentifier = new EquityIdentifier(companyName, Constants.EXCHANGE_NSI, Constants.SOURCE_MONEY_CONTROL);
+                    boolean success = fetchAndPersistStockExchangeDetails(equityIdentifier);
                         if(success) successfulPersists++;
                 }
 
@@ -143,12 +148,10 @@ public class NorconexCrawlerService implements ICrawlerService {
         }
     }
 
-    private boolean fetchAndPersistStockExchangeDetails(String companyName) {
+    private boolean fetchAndPersistStockExchangeDetails(EquityIdentifier equityIdentifier) {
         boolean success = false;
-        Set<String> allowedExchanges = new HashSet<>(Arrays.asList("NSI", "BSE"));
-
         try {
-            EquityIdentifier equityIdentifier = new EquityIdentifier(companyName,Constants.EXCHANGE_NSI,Constants.SOURCE_MONEY_CONTROL);
+
 
             EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
             if(stockExchangeDetails!=null){
@@ -157,10 +160,6 @@ public class NorconexCrawlerService implements ICrawlerService {
                 stockExchangeService.create(objectConverter.convert(stockExchangeDetails));
                 success=true;
             };
-
-
-
-
 
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
@@ -200,8 +199,14 @@ public class NorconexCrawlerService implements ICrawlerService {
         return success;
     }
 
-    private Document getDocument() throws Exception {
-        String gainersUrl = config.getEnvProperty("GainersUrl");
+    private Document getDocument(MarketGainersWebCrawlRequest crawlRequest) throws Exception {
+        String gainersUrl = config.getEnvProperty("NSEGainersUrl");
+
+        if(Constants.EXCHANGE_BSE.equalsIgnoreCase(crawlRequest.getExchange())){
+
+              gainersUrl = config.getEnvProperty("BSEGainersUrl");
+        }
+
         return documentService.getDocument(gainersUrl);
     }
 }

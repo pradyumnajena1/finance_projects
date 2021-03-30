@@ -1,7 +1,6 @@
 package com.pd.finance.request;
 
-import com.pd.finance.filter.*;
-
+import com.pd.finance.filter.code.EquityInsightFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
 import com.pd.finance.filter.db.OverviewFilter;
 import com.pd.finance.filter.db.SwotFilter;

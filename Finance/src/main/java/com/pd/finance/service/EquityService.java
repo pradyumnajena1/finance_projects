@@ -12,6 +12,7 @@ import com.pd.finance.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,20 @@ public class EquityService implements IEquityService {
     public Equity getEquity(final String id) throws EquityNotFoundException {
 
         Equity equity = cacheService.getEquity(id, equityId -> equityRepository.findById(equityId).orElse(null));
+
+        return equity;
+    }
+
+    @Override
+    public List<Equity> getEquities() throws PersistenceException {
+        List<Equity> equities = equityRepository.findAll(Sort.by(Sort.Direction.ASC, "stockExchangeDetails.longName"));
+        return equities;
+    }
+
+    @Override
+    public Equity getEquity(final EquityIdentifier equityIdentifier) throws EquityNotFoundException {
+
+        Equity equity = equityRepository.findByExchangeAndSymbol(equityIdentifier.getExchange(), equityIdentifier.getSymbol());
 
         return equity;
     }

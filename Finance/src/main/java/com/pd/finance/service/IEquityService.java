@@ -3,13 +3,15 @@ package com.pd.finance.service;
 import com.pd.finance.exceptions.EquityNotFoundException;
 import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.model.Equity;
+import com.pd.finance.model.EquityIdentifier;
 
 import java.util.List;
 
 public interface IEquityService {
     Equity getEquity(String id) throws EquityNotFoundException;
+    List<Equity> getEquities() throws PersistenceException;
 
-
+    Equity getEquity(EquityIdentifier equityIdentifier) throws EquityNotFoundException;
 
     Equity getEquityByName(String name)throws EquityNotFoundException,PersistenceException;
 

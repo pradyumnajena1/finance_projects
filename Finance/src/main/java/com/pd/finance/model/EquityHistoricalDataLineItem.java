@@ -1,11 +1,14 @@
 package com.pd.finance.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Objects;
 
-public class EquityHistoricalDataLineItem {
+public class EquityHistoricalDataLineItem  implements Comparable<EquityHistoricalDataLineItem>{
 
     @Nonnull
     private Date date;
@@ -86,5 +89,26 @@ public class EquityHistoricalDataLineItem {
 
     public void setVolume(BigInteger volume) {
         this.volume = volume;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquityHistoricalDataLineItem lineItem = (EquityHistoricalDataLineItem) o;
+        return date.equals(lineItem.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date);
+    }
+
+    @Override
+    public int compareTo(@NotNull EquityHistoricalDataLineItem other) {
+       if(other==null) return 1;
+
+        final boolean f1, f2;
+        return (f1 = this.date == null) ^ (f2 = other.date == null) ? (f1 ? -1 : 1 ): (f1 && f2 ? 0 : this.date.compareTo(other.date) );
     }
 }

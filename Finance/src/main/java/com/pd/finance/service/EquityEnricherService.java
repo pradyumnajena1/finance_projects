@@ -43,6 +43,9 @@ public class EquityEnricherService implements IEquityEnricherService {
     @Resource(name = "equityStockExchangeDetailsAttributeService")
     private IEquityAttributeService equityStockExchangeDetailsAttributeService;
 
+    @Resource(name = "equityHistoricalStockPriceAttributeService")
+    private IEquityAttributeService historicalStockPriceAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException{
@@ -58,6 +61,7 @@ public class EquityEnricherService implements IEquityEnricherService {
                 addTechnicalDetails(identifier,equity);
                 addEquityInsights(identifier,equity);
                 addEquityStockExchangeDetails(identifier,equity);
+                addHistoricalStockPrice(identifier,equity);
                 logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
             } catch (Exception e) {
 
@@ -66,6 +70,15 @@ public class EquityEnricherService implements IEquityEnricherService {
             }
 
 
+    }
+
+    private void addHistoricalStockPrice(EquityIdentifier identifier, Equity equity) {
+        try {
+            historicalStockPriceAttributeService.enrichEquity(identifier,equity);
+        } catch (Exception e) {
+            logger.error("addEquityStockExchangeDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
+        }
     }
 
     private void addEquityStockExchangeDetails(EquityIdentifier identifier, Equity equity) {

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractHttpService {
     private static final Logger logger = LoggerFactory.getLogger(AbstractHttpService.class);
@@ -42,6 +43,10 @@ public abstract class AbstractHttpService {
         for(Interceptor anInterceptor:interceptors){
             builder.addInterceptor(anInterceptor);
         }
+         builder.connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(180, TimeUnit.SECONDS);
+
        return builder.build();
     }
 
@@ -68,6 +73,7 @@ public abstract class AbstractHttpService {
             String responseString = null;
             Request request = new Request.Builder()
                     .url(url)
+
                     .build();
 
             try (Response response = getHttpClient().newCall(request).execute()) {

@@ -37,14 +37,14 @@ public class EquityRecentPerformancesAttributeService extends HtmlScrapperEquity
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
+        logger.info( "enrichEquity started for equity: "+ equity.getDefaultEquityIdentifier());
         try {
             Document document = getDocument(identifier);
             SourceDetails sourceDetails = equity.getSourceDetails(Constants.SOURCE_MONEY_CONTROL);
 
             if(sourceDetails!=null){
                 try {
-                    Node equityRow =MarketGainerPageHelper.getEquityRow(sourceDetails.getEquityName(), document);
+                    Node equityRow =MarketGainerPageHelper.getEquityRow(sourceDetails.getEquityName(), document,equity.getDefaultEquityIdentifier().getExchange());
                     equity.setPerformances(marketGainerEquityPerformancesFactory.createMarketGainerEquityPerformances(equityRow));
                 } catch (Exception exception) {
                     logger.error(exception.getMessage(),exception);
@@ -61,7 +61,13 @@ public class EquityRecentPerformancesAttributeService extends HtmlScrapperEquity
     }
 
     protected Document getDocument(EquityIdentifier identifier) throws Exception {
-        String gainersUrl = config.getEnvProperty("GainersUrl");
+        String gainersUrl = null;
+        if(Constants.EXCHANGE_NSI.equalsIgnoreCase( identifier.getExchange())){
+              gainersUrl = config.getEnvProperty("NSEGainersUrl");
+        }else{
+            gainersUrl = config.getEnvProperty("BSEGainersUrl");
+        }
+
         return documentService.getDocument(gainersUrl);
     }
 

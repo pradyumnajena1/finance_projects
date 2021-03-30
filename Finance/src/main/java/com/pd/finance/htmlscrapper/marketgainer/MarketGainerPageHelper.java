@@ -1,5 +1,6 @@
 package com.pd.finance.htmlscrapper.marketgainer;
 
+import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -15,14 +16,24 @@ public class MarketGainerPageHelper {
     private static final Logger logger = LoggerFactory.getLogger(MarketGainerPageHelper.class);
 
 
-    public static Node extractMarketGainersTableNode(Document document) throws IOException {
+    public static Node extractMarketGainersTableNode(Document document, String exchange)   {
+        Element histTableContainerDiv = null;
+        Node result = null;
+        if(Constants.EXCHANGE_NSI.equalsIgnoreCase(exchange)){
+             histTableContainerDiv = document.select("#mc_content > section > section > div.clearfix.stat_container > div.columnst.FR.wbg.brdwht > div > div > div.bsr_table.hist_tbl_hm").first();
 
-        Element histTableContainerDiv = document.select("div.bsr_table.hist_tbl_hm").get(0);
-        return histTableContainerDiv.childNode(3);
+       }else{
+            histTableContainerDiv = document.select("#mc_content > section > section > div.clearfix.stat_container > div.columnst.FR.wbg.brdwht > div > div > div.bsr_table.hist_tbl_hm").first();
+
+       }
+        if(histTableContainerDiv!=null){
+            result = histTableContainerDiv.childNode(3);
+        }
+        return result;
     }
 
-    public static  Node getEquityRow(String equityName, Document document) throws IOException {
-        Node histTable = MarketGainerPageHelper.extractMarketGainersTableNode(document);
+    public static  Node getEquityRow(String equityName, Document document,String exchange)  {
+        Node histTable = MarketGainerPageHelper.extractMarketGainersTableNode(document, exchange);
         List<Node> rows = MarketGainerPageHelper.extractMarketGainerRows(histTable);
         List<Node> collect = rows.stream().filter(aRow ->MarketGainerPageHelper.extractName(aRow).equalsIgnoreCase(equityName)).collect(Collectors.toList());
         return collect.get(0);

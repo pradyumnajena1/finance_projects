@@ -24,7 +24,7 @@ public class WebCrawlerController {
     private ICrawlerService crawlerService;
 
 
-    @RequestMapping(value = "crawl/market/nse/gainers",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "crawl/market/gainers",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse crawlMarketGainers(@RequestBody MarketGainersWebCrawlRequest request) {
 
         try {
@@ -37,6 +37,8 @@ public class WebCrawlerController {
         }
 
     }
+
+
 
 
     @RequestMapping(value = "crawl/financesites",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
