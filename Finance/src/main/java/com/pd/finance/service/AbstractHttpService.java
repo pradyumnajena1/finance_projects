@@ -1,5 +1,6 @@
 package com.pd.finance.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.model.EquityStockExchangeDetails;
@@ -65,6 +66,20 @@ public abstract class AbstractHttpService {
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
            throw new ServiceException(e);
+        }
+    }
+
+    protected <T> List<T> get(String url, TypeReference<List<T>> type) throws ServiceException {
+        try {
+            List<T> value = null;
+            String responseString = get(url);
+            if(StringUtils.isNotBlank(responseString)){
+                value  = JsonUtils.deserialize(responseString,type);
+            }
+            return value;
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+            throw new ServiceException(e);
         }
     }
 

@@ -43,7 +43,7 @@ public class CompanyListingsFactory implements ICompanyListingsFactory {
             if(StringUtils.isBlank(nextPage)){
                 return document;
             }
-            document =  documentService.getDocument(nextPage);
+            document =  documentService.getDocument(nextPage,null);
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
         }

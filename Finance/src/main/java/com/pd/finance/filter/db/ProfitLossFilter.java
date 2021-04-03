@@ -1,0 +1,87 @@
+package com.pd.finance.filter.db;
+
+import com.pd.finance.filter.EquityFilter;
+import com.pd.finance.filter.FilterType;
+import com.pd.finance.model.Equity;
+import org.springframework.data.mongodb.core.query.Criteria;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProfitLossFilter implements EquityFilter {
+
+    private SalesGrowthFilter salesGrowthFilter;
+    private ProfitGrowthFilter profitGrowthFilter;
+    private StockPriceCagrFilter stockPriceCagrFilter;
+    private ReturnOnEquityFilter returnOnEquityFilter;
+
+    public SalesGrowthFilter getSalesGrowthFilter() {
+        return salesGrowthFilter;
+    }
+
+    public void setSalesGrowthFilter(SalesGrowthFilter salesGrowthFilter) {
+        this.salesGrowthFilter = salesGrowthFilter;
+    }
+
+    public ProfitGrowthFilter getProfitGrowthFilter() {
+        return profitGrowthFilter;
+    }
+
+    public void setProfitGrowthFilter(ProfitGrowthFilter profitGrowthFilter) {
+        this.profitGrowthFilter = profitGrowthFilter;
+    }
+
+    public StockPriceCagrFilter getStockPriceCagrFilter() {
+        return stockPriceCagrFilter;
+    }
+
+    public void setStockPriceCagrFilter(StockPriceCagrFilter stockPriceCagrFilter) {
+        this.stockPriceCagrFilter = stockPriceCagrFilter;
+    }
+
+    public ReturnOnEquityFilter getReturnOnEquityFilter() {
+        return returnOnEquityFilter;
+    }
+
+    public void setReturnOnEquityFilter(ReturnOnEquityFilter returnOnEquityFilter) {
+        this.returnOnEquityFilter = returnOnEquityFilter;
+    }
+
+    @Override
+    public FilterType getFilterType() {
+        return FilterType.InDb;
+    }
+
+    @Override
+    public Criteria getCriteria(String parentObject) {
+
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(getProfitGrowthFilter()!=null){
+            criteriaList.add(getProfitGrowthFilter().getCriteria("profitLossDetails"));
+        }
+        if(getReturnOnEquityFilter()!=null){
+            criteriaList.add(getReturnOnEquityFilter().getCriteria("profitLossDetails"));
+        }
+        if(getSalesGrowthFilter()!=null){
+            criteriaList.add(getSalesGrowthFilter().getCriteria("profitLossDetails"));
+        }
+        if(getStockPriceCagrFilter()!=null){
+            criteriaList.add(getSalesGrowthFilter().getCriteria("profitLossDetails"));
+        }
+        return getFinalCriteria(criteriaList);
+    }
+    private Criteria getFinalCriteria(List<Criteria> criteriaList) {
+        Criteria criteria = null;
+        if(criteriaList.size()>1){
+
+            criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        }else{
+            criteria = criteriaList.get(0);
+        }
+        return criteria;
+    }
+    @Override
+    public boolean apply(Equity obj) {
+        return false;
+    }
+}

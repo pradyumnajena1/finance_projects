@@ -13,12 +13,12 @@ public interface ICacheService {
 
 
     public Equity getEquity(String equityId, Function<String, Equity> function);
-    public  Document getDocument(String url, Function<String,Document> function);
+
     public  Equity getEnrichedEquity(Equity equity, Function<Equity,Equity> function);
 
     CacheStatistics getCacheStatistics();
 
-    public void clearDocumentCache();
+
     public void clearEnrichedEquityCache();
 
     void clearEquityCache();

@@ -1,6 +1,8 @@
 package com.pd.finance.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -12,16 +14,27 @@ public class EquityHistoricalDataLineItem  implements Comparable<EquityHistorica
 
     @Nonnull
     private Date date;
+
     @Nonnull
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal open;
+
+
     @Nonnull
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal close;
+
+
     @Nonnull
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal low;
+
+
     @Nonnull
     private BigDecimal high;
-
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal adjustedClose;
+
     @Nonnull
     private BigInteger volume;
 

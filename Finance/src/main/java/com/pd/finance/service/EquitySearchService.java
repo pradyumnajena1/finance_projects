@@ -4,6 +4,7 @@ import com.pd.finance.filter.*;
 import com.pd.finance.filter.code.EquityInsightFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
 import com.pd.finance.filter.db.OverviewFilter;
+import com.pd.finance.filter.db.ProfitLossFilter;
 import com.pd.finance.filter.db.SwotFilter;
 import com.pd.finance.filter.db.TechnicalPeriodFilter;
 import com.pd.finance.model.*;
@@ -128,6 +129,10 @@ public class EquitySearchService implements IEquitySearchService {
         EquityInsightFilter insightFilter = searchRequest.getInsightFilter();
         if(insightFilter!=null){
             filters.add(insightFilter);
+        }
+        ProfitLossFilter profitLossFilter = searchRequest.getProfitLossFilter();
+        if(profitLossFilter!=null){
+            filters.add(profitLossFilter);
         }
         return filters;
     }

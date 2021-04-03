@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +69,7 @@ public class EquitySwotFactory implements IEquitySwotFactory {
         try {
             Element swotLi = document.select("li#swot_ls").first();
             String url = getSwotUrl(swotLi);
-            Document swotDocument = documentService.getDocument(url);
+            Document swotDocument = documentService.getDocument(url, Period.ofDays(1));
             Element swotDiv = swotDocument.select(divSelector).first();
 
             points = getSwotPoints(swotDiv);

@@ -1,9 +1,10 @@
 package com.pd.finance.response;
 
 import com.fasterxml.jackson.annotation.*;
+import com.pd.finance.model.EquityAttribute;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EquityStockExchangeDetailsResponse {
+public class EquityStockExchangeDetailsResponse extends EquityAttribute {
 
     @JsonProperty("exchange")
     private String exchange;

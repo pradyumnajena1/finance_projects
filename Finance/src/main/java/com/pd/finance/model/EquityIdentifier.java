@@ -93,7 +93,7 @@ public class EquityIdentifier {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EquityIdentifier that = (EquityIdentifier) o;
-        return id.equals(that.id) &&
+        return
                 name.equals(that.name) &&
                 exchange.equals(that.exchange) &&
                 source.equals(that.source);
@@ -101,7 +101,7 @@ public class EquityIdentifier {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, exchange, source);
+        return Objects.hash(  name, exchange, source);
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -65,7 +66,7 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
         TechnicalAnalysis technicalAnalysis = new TechnicalAnalysis();
         try {
             String technicalDetailsPeriodUrl = getTechnicalDetailsUrl(technicalDetailsTemplateUrl, technicalAnalysisPeriodCssSelectors.getPeriod());
-            Document document = documentService.getDocument(technicalDetailsPeriodUrl);
+            Document document = documentService.getDocument(technicalDetailsPeriodUrl, Period.ofDays(1));
             technicalAnalysis.setSummary(extractSummary(document, technicalAnalysisPeriodCssSelectors.getSummaryCssQuery()));
 
             technicalAnalysis.setMovingAverages(extractMovingAverages(document, technicalAnalysisPeriodCssSelectors.getMovingAvgCssQuery()));

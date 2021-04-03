@@ -3,6 +3,7 @@ package com.pd.finance.request;
 import com.pd.finance.filter.code.EquityInsightFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
 import com.pd.finance.filter.db.OverviewFilter;
+import com.pd.finance.filter.db.ProfitLossFilter;
 import com.pd.finance.filter.db.SwotFilter;
 import com.pd.finance.filter.db.TechnicalPeriodFilter;
 import org.springframework.validation.FieldError;
@@ -17,6 +18,8 @@ public class EquitySearchRequest {
     private OverviewFilter overviewFilter;
     private TechnicalPeriodFilter technicalPeriodFilter;
     private EquityInsightFilter insightFilter;
+
+    private ProfitLossFilter profitLossFilter;
 
     public EquityInsightFilter getInsightFilter() {
         return insightFilter;
@@ -58,6 +61,14 @@ public class EquitySearchRequest {
 
     public void setTechnicalPeriodFilter(TechnicalPeriodFilter technicalPeriodFilter) {
         this.technicalPeriodFilter = technicalPeriodFilter;
+    }
+
+    public ProfitLossFilter getProfitLossFilter() {
+        return profitLossFilter;
+    }
+
+    public void setProfitLossFilter(ProfitLossFilter profitLossFilter) {
+        this.profitLossFilter = profitLossFilter;
     }
 
     public List<FieldError> validate(){

@@ -1,52 +1,47 @@
 package com.pd.finance.model;
 
-import javax.annotation.Nonnull;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.pd.finance.service.HistoricalDataInterval;
 
-public class EquityHistoricalData {
+public class EquityHistoricalData extends EquityAttribute{
+
+    private EquityHistoricalIntervalData dailyHistoricalData;
+    private EquityHistoricalIntervalData weeklyHistoricalIntervalData;
+    private EquityHistoricalIntervalData monthlyEquityHistoricalIntervalData;
 
 
-
-    @Nonnull
-    private Date startDate;
-    @Nonnull
-    private Date endDate;
-    @Nonnull
-    private List<EquityHistoricalDataLineItem> lineItems;
-
-    public EquityHistoricalData(@Nonnull Date startDate,@Nonnull Date endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        lineItems = new ArrayList<>();
+    public EquityHistoricalIntervalData getDailyHistoricalData() {
+        return dailyHistoricalData;
     }
 
-
-    public List<EquityHistoricalDataLineItem> getLineItems() {
-        return new ArrayList<>(lineItems);
+    public void setDailyHistoricalData(EquityHistoricalIntervalData dailyHistoricalData) {
+        this.dailyHistoricalData = dailyHistoricalData;
     }
 
-    public void addLineItems(@Nonnull List<EquityHistoricalDataLineItem> lineItems) {
-        for (EquityHistoricalDataLineItem lineItem:lineItems){
-            addLineItem(lineItem);
+    public EquityHistoricalIntervalData getWeeklyHistoricalIntervalData() {
+        return weeklyHistoricalIntervalData;
+    }
+
+    public void setWeeklyHistoricalIntervalData(EquityHistoricalIntervalData weeklyHistoricalIntervalData) {
+        this.weeklyHistoricalIntervalData = weeklyHistoricalIntervalData;
+    }
+
+    public EquityHistoricalIntervalData getMonthlyEquityHistoricalIntervalData() {
+        return monthlyEquityHistoricalIntervalData;
+    }
+
+    public void setMonthlyEquityHistoricalIntervalData(EquityHistoricalIntervalData monthlyEquityHistoricalIntervalData) {
+        this.monthlyEquityHistoricalIntervalData = monthlyEquityHistoricalIntervalData;
+    }
+
+    public EquityHistoricalIntervalData getIntervalData(HistoricalDataInterval interval){
+        if(interval.equals(HistoricalDataInterval.OneDay)){
+            return dailyHistoricalData;
+        }else if(interval.equals(HistoricalDataInterval.OneWeek)){
+            return weeklyHistoricalIntervalData;
+        }else if (interval.equals(HistoricalDataInterval.OneMonth)){
+            return monthlyEquityHistoricalIntervalData;
+        }else {
+            throw new IllegalArgumentException(interval.getIntervalString() + "not yet supported");
         }
-
     }
-
-    public void addLineItem(@Nonnull EquityHistoricalDataLineItem lineItem){
-        Date lineItemDate = lineItem.getDate();
-
-        if(startDate.after(lineItemDate)){
-            throw new IllegalArgumentException(MessageFormat.format("line items must be between {} and {}",startDate,endDate));
-        }
-        if(endDate.before(lineItemDate)){
-            throw new IllegalArgumentException(MessageFormat.format("line items must be between {} and {}",startDate,endDate));
-        }
-        lineItems.add(lineItem);
-
-    }
-
-
 }

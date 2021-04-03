@@ -4,7 +4,7 @@ import com.pd.finance.infra.IObjectConverter;
 import com.pd.finance.model.EquityStockExchangeDetails;
 import com.pd.finance.request.CreateStockExchangeDetailsRequest;
 import com.pd.finance.response.BaseResponse;
-import com.pd.finance.service.IStockExchangeService;
+import com.pd.finance.service.IYahooService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class ExchangeController {
     Logger logger = LoggerFactory.getLogger(ExchangeController.class);
 
     @Autowired
-    private IStockExchangeService stockExchangeService;
+    private IYahooService stockExchangeService;
 
     @Autowired
     private IObjectConverter objectConverter;

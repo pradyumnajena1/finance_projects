@@ -6,7 +6,7 @@ import com.pd.finance.model.*;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.service.ICacheService;
 import com.pd.finance.service.IDocumentService;
-import com.pd.finance.service.IStockExchangeService;
+import com.pd.finance.service.IYahooService;
 import com.pd.finance.utils.CommonUtils;
 import com.pd.finance.utils.Constants;
 import org.apache.commons.lang.StringUtils;
@@ -36,8 +36,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     private IEquitySwotFactory swotFactory;
     @Autowired
     private IEquityTechnicalDetailsFactory technicalDetailsFactory;
-    @Autowired
-    private IMarketGainerEquityPerformancesFactory performancesFactory;
+
     @Autowired
     private IEquityInsightsFactory insightsFactory;
     @Autowired
@@ -45,7 +44,7 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
     @Autowired
     private ICacheService cacheService;
     @Autowired
-    private IStockExchangeService stockExchangeService;
+    private IYahooService stockExchangeService;
 
 
 
@@ -59,7 +58,14 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
             rows = rows.subList(0,Math.max(0, Math.min(rows.size(),maxEquitiesToFetch)));
         }
 
-        rows.stream().forEach(rowNode-> extractEquity(equityCollector, rowNode, exchange));
+        rows.stream().forEach(rowNode-> {
+            try {
+                extractEquity(equityCollector, rowNode, exchange);
+                Thread.sleep(2*1000);
+            } catch (InterruptedException e) {
+               logger.error(e.getMessage(),e);
+            }
+        });
 
 
         return new ArrayList<>(equityCollector);
@@ -113,6 +119,8 @@ public class MarketGainerEquityFactory implements IMarketGainerEquityFactory {
 
         EquityIdentifiers equityIdentifiers =  getEquityIdentifiers(rowNode,equity,details);
         equity.setEquityIdentifiers(equityIdentifiers);
+
+        equity.setStockExchangeDetails(details);
 
         logger.info("createEquity completed creating equity {}",equity.getEquityIdentifiers());
         return equity;

@@ -1,12 +1,9 @@
 package com.pd.finance.controller;
 
 import com.pd.finance.exceptions.EquityNotFoundException;
-import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.model.Equity;
-import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.response.BaseResponse;
-import com.pd.finance.service.EquityHistoricalStockPriceAttributeService;
 import com.pd.finance.service.IEquityService;
 import com.pd.finance.service.IHistoricalStockPriceService;
 import org.slf4j.Logger;
@@ -45,11 +42,11 @@ public class HistoricalStockPriceController {
         }
     }
 
-    @RequestMapping(value = "/equities/stock_price_history",method = RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse updateAllEquityHistoricalStockPrices(){
+    @RequestMapping(value = "/equities/stock_price_history/exchange/{exchange}",method = RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse updateAllEquityHistoricalStockPrices(@PathVariable("exchange") String exchange){
 
         try {
-            historicalStockPriceService.updateAllEquityHistoricalStockPrice();
+            historicalStockPriceService.updateAllEquityHistoricalStockPrice(exchange);
             return new BaseResponse("Successfully updated all equities historical stock price");
 
         } catch ( ServiceException  e) {

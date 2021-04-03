@@ -27,10 +27,7 @@ public class CacheController {
         try {
             StringBuilder sb  = new StringBuilder();
 
-            if(request.isClearDocumentCache()){
-                cacheService.clearDocumentCache();
-                sb.append("Document Cache cleared! ");
-            }
+
             if(request.isClearEnrichedEquityCache()){
                 cacheService.clearEnrichedEquityCache();
                 sb.append("Enriched Equity Cache cleared! ");

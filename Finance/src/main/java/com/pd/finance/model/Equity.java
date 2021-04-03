@@ -5,18 +5,12 @@ import com.mysema.query.annotations.QueryEntity;
 
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.utils.Constants;
-import org.apache.cxf.common.util.ReflectionUtil;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @QueryEntity
 @Document
@@ -40,6 +34,7 @@ public class Equity {
 
 
 
+
     private EquityPerformances performances;
     private EquitySwotDetails swotDetails;
     private TechnicalDetails technicalDetails;
@@ -49,7 +44,15 @@ public class Equity {
     private EquityCurrentPriceStats equityCurrentPriceStats;
 
 
+    private EquityProfitLossDetails profitLossDetails;
 
+    public EquityProfitLossDetails getProfitLossDetails() {
+        return profitLossDetails;
+    }
+
+    public void setProfitLossDetails(EquityProfitLossDetails profitLossDetails) {
+        this.profitLossDetails = profitLossDetails;
+    }
 
     public EquityStockExchangeDetailsResponse getStockExchangeDetails() {
         return stockExchangeDetails;
@@ -76,6 +79,7 @@ public class Equity {
     public void setEquityIdentifiers(EquityIdentifiers equityIdentifiers) {
         this.equityIdentifiers = equityIdentifiers;
     }
+
 
     public EquityIdentifier getEquityIdentifier(String source){
       return   getEquityIdentifiers().getEquityIdentifier(source);
