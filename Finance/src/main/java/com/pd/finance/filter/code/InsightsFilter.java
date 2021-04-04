@@ -38,7 +38,7 @@ public class InsightsFilter  implements IFilter<List<EquityInsightLineItem>> {
 
     @Override
     public Criteria getCriteria(String parentObject) {
-        return null;
+        throw new UnsupportedOperationException()  ;
     }
 
     @Override

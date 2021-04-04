@@ -2,19 +2,17 @@ package com.pd.finance.model;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class EquitySourceDetails {
 
-    private List<SourceDetails> sourceDetails = new ArrayList<>();
+    private Set<SourceDetails> sourceDetails = new HashSet<>();
 
-    public List<SourceDetails> getSourceDetails() {
+    public Set<SourceDetails> getSourceDetails() {
         return sourceDetails;
     }
 
-    public void setSourceDetails(List<SourceDetails> sourceDetails) {
+    public void setSourceDetails(Set<SourceDetails> sourceDetails) {
         this.sourceDetails = sourceDetails;
     }
 

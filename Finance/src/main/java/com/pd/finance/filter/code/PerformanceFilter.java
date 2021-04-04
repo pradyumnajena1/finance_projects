@@ -43,7 +43,7 @@ public class PerformanceFilter  implements EquityFilter {
 
     @Override
     public Criteria getCriteria(String parentObject) {
-        return null;
+        throw new UnsupportedOperationException()  ;
     }
 
     @Override

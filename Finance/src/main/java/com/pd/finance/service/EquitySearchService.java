@@ -2,11 +2,9 @@ package com.pd.finance.service;
 
 import com.pd.finance.filter.*;
 import com.pd.finance.filter.code.EquityInsightFilter;
+import com.pd.finance.filter.code.EquityNamesFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
-import com.pd.finance.filter.db.OverviewFilter;
-import com.pd.finance.filter.db.ProfitLossFilter;
-import com.pd.finance.filter.db.SwotFilter;
-import com.pd.finance.filter.db.TechnicalPeriodFilter;
+import com.pd.finance.filter.db.*;
 import com.pd.finance.model.*;
 
 import com.pd.finance.persistence.EquityRepository;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,34 +31,50 @@ public class EquitySearchService implements IEquitySearchService {
 
     @Override
     public List<Equity> search(EquitySearchRequest searchRequest){
+        logger.info("search exec started for searchRequest "+searchRequest);
         List<Equity> equitiesCollector  = new ArrayList<>();
 
-        List<IFilter<Equity>> filters = getFilters(searchRequest);
+        List<IFilter<Equity>> filters = searchRequest.getFilters();
         List<IFilter<Equity>> dbFilters = getFilters(filters, FilterType.InDb);
         List<IFilter<Equity>> inCodeFilters = getFilters(filters, FilterType.InCode);
         List<IFilter<Equity>> partialFilters = getFilters(filters, FilterType.Partial);
 
 
         Criteria dbFilterCriteria = getCriteria(dbFilters, partialFilters);
-        final CompositeIncodeFilter<Equity> compositeIncodeFilter = getEquityCompositeIncodeFilter(inCodeFilters, partialFilters);
+        final CompositeIncodeFilter<Equity> compositeFilter = getEquityCompositeIncodeFilter(inCodeFilters, partialFilters);
 
 
         Pageable  pageRequest = PageRequest.of(0, 500);
 
         Page<Equity> page = getPage(dbFilterCriteria, pageRequest);
+        logger.info("Search No of equities after applying db_filters {} ",page.getTotalElements());
 
         while (!page.isEmpty())
          {
-             List<Equity> list = page.filter(equity -> compositeIncodeFilter.apply(equity)).toList();
+             int currentPageNumber = page.getNumber();
+             logger.info("search process started pageNumber {} ", currentPageNumber);
 
-             equitiesCollector.addAll(list);
+             List<Equity> equities = page.toList();
+             logger.info("search  pageNumber {} numEquities {} ", currentPageNumber, equities.size());
+
+             List<Equity> filteredEquities = filterEquities(compositeFilter, equities);
+             equitiesCollector.addAll(filteredEquities);
+
+             logger.info("search pageNumber {} numEquities {} after in_code filters", currentPageNumber, equitiesCollector.size());
+
+
+             logger.info("search process completed pageNumber {}", currentPageNumber);
              pageRequest = pageRequest.next();
-
              page = getPage(dbFilterCriteria,  pageRequest);
 
         }
-
+        logger.info("search exec completed for searchRequest "+searchRequest);
         return equitiesCollector;
+    }
+
+    @NotNull
+    protected List<Equity> filterEquities(CompositeIncodeFilter<Equity> compositeFilter, List<Equity> equities) {
+        return equities.parallelStream().filter(equity -> compositeFilter.apply(equity)).collect(Collectors.toList());
     }
 
     protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
@@ -106,36 +121,7 @@ public class EquitySearchService implements IEquitySearchService {
         return criteria;
     }
 
-    private List<IFilter<Equity>> getFilters(EquitySearchRequest searchRequest) {
-        List<IFilter<Equity>> filters = new ArrayList<>();
-        OverviewFilter overviewFilter = searchRequest.getOverviewFilter();
-        if(overviewFilter!=null){
-            filters.add(overviewFilter);
-        }
-        PerformanceFilter performanceFilter = searchRequest.getPerformanceFilter();
-        if(performanceFilter!=null){
-            filters.add(performanceFilter);
-        }
 
-        SwotFilter swotFilter = searchRequest.getSwotFilter();
-        if(swotFilter!=null){
-            filters.add(swotFilter);
-        }
-
-        TechnicalPeriodFilter technicalPeriodFilter = searchRequest.getTechnicalPeriodFilter();
-        if(technicalPeriodFilter!=null){
-            filters.add(technicalPeriodFilter);
-        }
-        EquityInsightFilter insightFilter = searchRequest.getInsightFilter();
-        if(insightFilter!=null){
-            filters.add(insightFilter);
-        }
-        ProfitLossFilter profitLossFilter = searchRequest.getProfitLossFilter();
-        if(profitLossFilter!=null){
-            filters.add(profitLossFilter);
-        }
-        return filters;
-    }
 
 
 }

@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CompositeIncodeFilter<T> implements IFilter<T>{
 
@@ -35,20 +37,15 @@ public class CompositeIncodeFilter<T> implements IFilter<T>{
     public boolean apply(T obj) {
 
         if("And".equalsIgnoreCase(operator)){
-
-             for(IFilter<T> aFilter:filters){
-                 if(!aFilter.apply(obj)){
-                     return false;
-                 }
-             }
-             return true;
+            Optional<IFilter<T>> first = filters.parallelStream().filter(filter -> !filter.apply(obj)).findFirst();
+            if(first.isPresent()){
+                return false;
+            }
+            return true;
         }else {
             boolean result = false;
-
-            for(IFilter<T> aFilter:filters){
-                 result = result || aFilter.apply(obj);
-            }
-            return result;
+            List<IFilter<T>> successfulFilters = filters.parallelStream().filter(filter -> filter.apply(obj)).collect(Collectors.toList());
+            return successfulFilters.size()!=0;
         }
 
 

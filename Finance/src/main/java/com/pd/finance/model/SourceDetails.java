@@ -2,6 +2,7 @@ package com.pd.finance.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SourceDetails {
 
@@ -38,5 +39,20 @@ public class SourceDetails {
 
     public Map<String, String> getAdditionalAttributes() {
         return additionalAttributes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SourceDetails that = (SourceDetails) o;
+        return sourceName.equals(that.sourceName) &&
+                EquityName.equals(that.EquityName) &&
+                sourceUrl.equals(that.sourceUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sourceName, EquityName, sourceUrl);
     }
 }

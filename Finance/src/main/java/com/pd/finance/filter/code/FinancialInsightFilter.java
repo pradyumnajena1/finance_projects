@@ -56,7 +56,7 @@ public class FinancialInsightFilter  implements IFilter<FinancialInsights> {
 
     @Override
     public Criteria getCriteria(String parentObject) {
-        return null;
+        throw new UnsupportedOperationException()  ;
     }
 
     @Override
