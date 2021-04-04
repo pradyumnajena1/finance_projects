@@ -31,7 +31,10 @@ public class EquityHistoricalDataLineItem  implements Comparable<EquityHistorica
 
 
     @Nonnull
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal high;
+
+    @Nonnull
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal adjustedClose;
 
