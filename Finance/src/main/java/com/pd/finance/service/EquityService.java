@@ -3,6 +3,8 @@ package com.pd.finance.service;
 
 import com.pd.finance.exceptions.EquityNotFoundException;
 import com.pd.finance.exceptions.PersistenceException;
+import com.pd.finance.filter.code.EquityNamesFilter;
+import com.pd.finance.filter.db.EquityExchangeFilter;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.model.SourceDetails;
@@ -17,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,12 +129,18 @@ public class EquityService implements IEquityService {
         int numEquitiesToUpdate = 0;
 
         try {
-
+            Criteria criteria = getBulkUpdateFilterCriteria(request);
             Pageable pageRequest = PageRequest.of(0, 100);
-            Page<Equity> equitiesPage = equityRepository.findAll(pageRequest);
+            Page<Equity> equitiesPage = getPage(criteria,pageRequest);
+            logger.info("updateEquities No of equities after applying db_filters {} ",equitiesPage.getTotalElements());
             while (!equitiesPage.isEmpty())
             {
+                int currentPageNumber = equitiesPage.getNumber();
+                logger.info("updateEquities process started pageNumber {} ", currentPageNumber);
+
                 List<Equity> equities = equitiesPage.getContent();
+                logger.info("updateEquities  pageNumber {} numEquities {} ", currentPageNumber, equities.size());
+
                 numEquitiesToUpdate+=equities.size();
                 for(Equity anEquity:equities){
 
@@ -139,8 +149,11 @@ public class EquityService implements IEquityService {
 
 
                 }
+                logger.info("updateEquities  pageNumber {} numEquitiesToUpdate {} successfulUpdates {} ", currentPageNumber, numEquitiesToUpdate,successfulUpdates);
+
+                logger.info("updateEquities process completed pageNumber {}", currentPageNumber);
                 pageRequest = pageRequest.next();
-                equitiesPage = equityRepository.findAll(pageRequest);
+                equitiesPage = getPage(criteria,pageRequest);
             }
             result = getEquityBulkUpdateResponse(numEquitiesToUpdate, successfulUpdates);
         } catch (Exception exception) {
@@ -149,6 +162,35 @@ public class EquityService implements IEquityService {
         }
 
         return result;
+    }
+
+    private Criteria getBulkUpdateFilterCriteria(EquityBulkUpdateRequest request) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        EquityExchangeFilter exchangeFilter = request.getExchangeFilter();
+        if(exchangeFilter !=null){
+
+            criteriaList.add(exchangeFilter.getCriteria(""));
+        }
+        EquityNamesFilter namesFilter = request.getNamesFilter();
+        if(namesFilter !=null){
+            criteriaList.add(namesFilter.getCriteria(""));
+        }
+
+        Criteria criteria = null;
+        if(criteriaList.size()>1){
+            criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        }else if(criteriaList.size()==1){
+            criteria =  criteriaList.get(0);
+        }
+
+
+        return criteria;
+    }
+
+    protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
+
+
+        return dbFilterCriteria != null ? equityRepository.searchEquity(dbFilterCriteria, pageRequest) : equityRepository.findAll(pageRequest);
     }
     @NotNull
     protected EquityBulkUpdateResponse getEquityBulkUpdateResponse(int numObjectsCreated, int successfulPersists) {
@@ -175,7 +217,7 @@ public class EquityService implements IEquityService {
 
             equityEnricherService.enrichEquity(identifier,equity);
             upsertEquity(equity);
-            Thread.sleep(2*1000);
+            //Thread.sleep(500);
             success = true;
             logger.info("fetchAndPersistEquity exec completed for equity {}",equity.getDefaultEquityIdentifier());
 

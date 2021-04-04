@@ -72,7 +72,7 @@ public class YahooService extends AbstractHttpService implements IYahooService {
                 String historicalDataString = getHistoricalPriceCsvString(amountToSubtract, stockExchangeDetails.getSymbol(), existinghistoricalData, interval);
                 if (StringUtils.isNotBlank(historicalDataString)) {
 
-                    List<EquityHistoricalDataLineItem> lineItemsCollector = new ArrayList<>();
+                    Set<EquityHistoricalDataLineItem> lineItemsCollector = new HashSet<>();
 
                     collectExistingLineItems(existinghistoricalData, lineItemsCollector,interval);
 
@@ -91,8 +91,9 @@ public class YahooService extends AbstractHttpService implements IYahooService {
     }
 
     @NotNull
-    private EquityHistoricalIntervalData getHistoricalData(List<EquityHistoricalDataLineItem> lineItems, HistoricalDataInterval interval) {
+    private EquityHistoricalIntervalData getHistoricalData(Set<EquityHistoricalDataLineItem> itemsSet, HistoricalDataInterval interval) {
         EquityHistoricalIntervalData historicalData;
+        List<EquityHistoricalDataLineItem> lineItems = new ArrayList<>(itemsSet);
         Collections.sort(lineItems);
         EquityHistoricalDataLineItem first = lineItems.get(0);
         EquityHistoricalDataLineItem last = lineItems.get(lineItems.size() - 1);
@@ -101,24 +102,24 @@ public class YahooService extends AbstractHttpService implements IYahooService {
         return historicalData;
     }
 
-    private void collectExistingLineItems(EquityHistoricalData existinghistoricalData, List<EquityHistoricalDataLineItem> lineItems, HistoricalDataInterval interval) {
+    private void collectExistingLineItems(EquityHistoricalData existinghistoricalData, Set<EquityHistoricalDataLineItem> lineItemsCollector, HistoricalDataInterval interval) {
 
         if (existinghistoricalData != null) {
             EquityHistoricalIntervalData intervalData = existinghistoricalData.getIntervalData(interval);
             if(intervalData!=null){
-                lineItems.addAll(intervalData.getLineItems());
+                lineItemsCollector.addAll(intervalData.getLineItems());
             }
 
         }
     }
 
-    private void collectNewLineItems(String historicalDataString, List<EquityHistoricalDataLineItem> lineItems) throws IOException {
+    private void collectNewLineItems(String historicalDataString, Set<EquityHistoricalDataLineItem> lineItemsCollector) throws IOException {
         try (Reader reader = new StringReader(historicalDataString);
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
             for (CSVRecord record : csvParser) {
 
                 EquityHistoricalDataLineItem equityHistoricalDataLineItem = getEquityHistoricalDataLineItem(record);
-                lineItems.add(equityHistoricalDataLineItem);
+                lineItemsCollector.add(equityHistoricalDataLineItem);
 
             }
         }

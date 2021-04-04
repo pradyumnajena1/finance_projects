@@ -32,8 +32,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     @Resource(name = "equityOverviewAttributeService")
     private IEquityAttributeService equityOverviewAttributeService;
 
-    @Resource(name = "equityPerformancesAttributeService")
-    private IEquityAttributeService equityPerformancesAttributeService;
+
 
     @Resource(name = "equityTechnicalDetailsAttributeService")
     private IEquityAttributeService equityTechnicalDetailsAttributeService;
@@ -52,7 +51,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             Equity equityFromDb = equityService.getEquity(identifier);
 
             addCurrentPriceDetails(identifier,equity,equityFromDb);
-            addRecentPerformances(identifier,equity,equityFromDb);
+
             addBasicDetails(identifier,equity);
             addSwotDetails(identifier,equity,equityFromDb);
             addEssentialDetails(identifier,equity,equityFromDb);
@@ -69,17 +68,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
 
     }
 
-    private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
-        try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances())){
-                equityPerformancesAttributeService.enrichEquity(identifier,equity);
-            }
 
-        } catch (Exception e) {
-            logger.error("addRecentPerformances exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
-
-        }
-    }
 
     private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
         try {

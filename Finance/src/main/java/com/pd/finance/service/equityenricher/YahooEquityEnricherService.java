@@ -31,6 +31,9 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
     @Resource(name = "equityHistoricalStockPriceAttributeService")
     private IEquityAttributeService historicalStockPriceAttributeService;
 
+    @Resource(name = "equityPerformancesAttributeService")
+    private IEquityAttributeService equityPerformancesAttributeService;
+
     @Autowired
     private IEquityService equityService;
 
@@ -40,11 +43,12 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
             logger.info("enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
             Equity equityFromDb = equityService.getEquity(defaultEquityIdentifier);
             addEquityStockExchangeDetails(defaultEquityIdentifier,equity,equityFromDb);
-
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
 
-
             addHistoricalStockPrice(defaultEquityIdentifier,equity,equityFromDb);
+
+            addRecentPerformances(defaultEquityIdentifier,equity,equityFromDb);
+
             logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
         } catch (Exception e) {
 
@@ -52,7 +56,18 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
             throw new ServiceException(e);
         }
     }
+    private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
+        try {
+            boolean isUpdateRequired = true;//equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+            if(isUpdateRequired){
+                equityPerformancesAttributeService.enrichEquity(identifier,equity);
+            }
 
+        } catch (Exception e) {
+            logger.error("addRecentPerformances exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
+        }
+    }
     private void addHistoricalStockPrice(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
         try {
             if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb)) {

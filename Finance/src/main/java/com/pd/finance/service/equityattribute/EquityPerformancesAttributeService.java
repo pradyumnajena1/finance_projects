@@ -35,9 +35,20 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
             List<EquityPerformance> performances = new ArrayList<>();
             List<EquityHistoricalDataLineItem> lineItems = equityHistoricalIntervalData.getLineItems();
             Collections.sort(lineItems);
-            for(int i= Math.max(lineItems.size()-5,0);i<=lineItems.size()-1;i++){
 
-                EquityPerformance performance = getPerformance(lineItems.get(i));
+            int startIndex = Math.max(lineItems.size() - 5, 0);
+            int endIndex = lineItems.size() - 1;
+
+            for(int i = startIndex; i<= endIndex; i++){
+
+                EquityHistoricalDataLineItem currentLineItem = lineItems.get(i);
+                EquityHistoricalDataLineItem previousLineItem = null;
+                if(i>0){
+
+                      previousLineItem = lineItems.get(i - 1);
+                }
+
+                EquityPerformance performance = getPerformance(currentLineItem, previousLineItem);
 
                 performances.add(performance);
             }
@@ -54,31 +65,38 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
         }
     }
 
-    private EquityPerformance getPerformance(EquityHistoricalDataLineItem currentLineItem ) {
+    private EquityPerformance getPerformance( EquityHistoricalDataLineItem currentLineItem,EquityHistoricalDataLineItem previousLineItem) {
         EquityPerformance performance = new EquityPerformance();
         performance.setDate(currentLineItem.getDate());
         performance.setPrice(currentLineItem.getClose());
 
-        BigDecimal change = getChange(currentLineItem);
+        BigDecimal change = getChange(currentLineItem,previousLineItem);
         performance.setChange(change);
+        BigDecimal prevClose = BigDecimal.ZERO;
+         if(previousLineItem!=null){
 
-        BigDecimal open = currentLineItem.getOpen();
+               prevClose = previousLineItem.getClose();
+         }
         BigDecimal changePercent = null;
 
         if(change!=null){
 
-              changePercent = performance.getChange().divide(open, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100.00));
+              changePercent = performance.getChange().divide(prevClose, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100.00));
         }
         performance.setChangePercent(changePercent);
         return performance;
     }
 
-    private BigDecimal getChange(EquityHistoricalDataLineItem currentLineItem) {
+    private BigDecimal getChange(EquityHistoricalDataLineItem currentLineItem, EquityHistoricalDataLineItem previousLineItem) {
         BigDecimal change = null;
         BigDecimal close = currentLineItem.getClose();
-        BigDecimal open = currentLineItem.getOpen();
-        if(open!=null && close!=null){
-           change = close.subtract(open);
+        BigDecimal prevClose = BigDecimal.ZERO;
+        if(previousLineItem!=null){
+
+              prevClose = previousLineItem.getOpen();
+        }
+        if(prevClose!=null && close!=null){
+           change = close.subtract(prevClose);
         }
         return change;
     }

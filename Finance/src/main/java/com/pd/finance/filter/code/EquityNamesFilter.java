@@ -20,12 +20,15 @@ public class EquityNamesFilter implements EquityFilter {
 
     @Override
     public FilterType getFilterType() {
-        return FilterType.InCode;
+        return FilterType.InDb;
     }
 
     @Override
     public Criteria getCriteria(String parentObject) {
-        throw new UnsupportedOperationException()  ;
+        Criteria elemMatchCriteria =  Criteria.where("EquityName").in(names).andOperator(Criteria.where("sourceName").is(source));
+        Criteria criteria = Criteria.where("sourceDetails.sourceDetails").elemMatch(elemMatchCriteria);
+
+        return criteria;
     }
 
     @Override
