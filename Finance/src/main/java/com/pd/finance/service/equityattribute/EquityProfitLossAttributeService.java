@@ -2,16 +2,12 @@ package com.pd.finance.service.equityattribute;
 
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.htmlscrapper.equity.IEquityProfitLossDetailsFactory;
-import com.pd.finance.htmlscrapper.equity.IEquitySwotFactory;
-import com.pd.finance.htmlscrapper.marketgainer.MarketGainerPageHelper;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.model.EquityProfitLossDetails;
-import com.pd.finance.model.SourceDetails;
 import com.pd.finance.service.IDocumentService;
 import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +18,7 @@ import java.time.Period;
 @Service
 public class EquityProfitLossAttributeService extends HtmlScrapperEquityAttributeService{
     private static final Logger logger = LoggerFactory.getLogger(EquityProfitLossAttributeService.class);
+    public static final int NUM_DAYS_TO_CACHE = 5;
 
     @Autowired
     private IEquityProfitLossDetailsFactory profitLossDetailsFactory;
@@ -53,6 +50,6 @@ public class EquityProfitLossAttributeService extends HtmlScrapperEquityAttribut
 
     protected Document getDocument(EquityIdentifier identifier) throws Exception {
 
-        return documentService.getDocument(identifier, Period.ofDays(1));
+        return documentService.getDocument(identifier, Period.ofDays(NUM_DAYS_TO_CACHE));
     }
 }

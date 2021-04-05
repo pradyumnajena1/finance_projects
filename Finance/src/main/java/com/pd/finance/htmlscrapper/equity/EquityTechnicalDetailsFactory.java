@@ -22,6 +22,7 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
 
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(EquityTechnicalDetailsFactory.class);
+    public static final int NUM_DAYS_TO_CACHE = 5;
     @Autowired
     private IDocumentService documentService;
 
@@ -66,7 +67,7 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
         TechnicalAnalysis technicalAnalysis = new TechnicalAnalysis();
         try {
             String technicalDetailsPeriodUrl = getTechnicalDetailsUrl(technicalDetailsTemplateUrl, technicalAnalysisPeriodCssSelectors.getPeriod());
-            Document document = documentService.getDocument(technicalDetailsPeriodUrl, Period.ofDays(1));
+            Document document = documentService.getDocument(technicalDetailsPeriodUrl, Period.ofDays(NUM_DAYS_TO_CACHE));
             technicalAnalysis.setSummary(extractSummary(document, technicalAnalysisPeriodCssSelectors.getSummaryCssQuery()));
 
             technicalAnalysis.setMovingAverages(extractMovingAverages(document, technicalAnalysisPeriodCssSelectors.getMovingAvgCssQuery()));

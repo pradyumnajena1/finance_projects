@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.model.EquitySwotDetails;
 import com.pd.finance.service.IDocumentService;
 import com.pd.finance.utils.Constants;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +23,7 @@ public class EquitySwotFactory implements IEquitySwotFactory {
 
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(EquitySwotFactory.class);
+    public static final int NUM_DAYS_To_CACHE = 5;
     @Autowired
     private IDocumentService documentService;
     @Override
@@ -69,7 +68,7 @@ public class EquitySwotFactory implements IEquitySwotFactory {
         try {
             Element swotLi = document.select("li#swot_ls").first();
             String url = getSwotUrl(swotLi);
-            Document swotDocument = documentService.getDocument(url, Period.ofDays(1));
+            Document swotDocument = documentService.getDocument(url, Period.ofDays(NUM_DAYS_To_CACHE));
             Element swotDiv = swotDocument.select(divSelector).first();
 
             points = getSwotPoints(swotDiv);

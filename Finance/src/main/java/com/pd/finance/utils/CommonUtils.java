@@ -17,7 +17,9 @@ public class CommonUtils {
 
     public static BigDecimal extractDecimalFromText(String textValue) {
         try {
-
+            if(textValue==null || textValue.equalsIgnoreCase("null")){
+                return BigDecimal.ZERO;
+            }
             textValue = textValue.replace(",","");
             textValue = textValue.replace("%","");
             textValue = textValue.trim();
@@ -30,6 +32,9 @@ public class CommonUtils {
     public static BigInteger extractIntegerFromText(String textValue) {
         try {
 
+            if(textValue==null || textValue.equalsIgnoreCase("null")){
+                return BigInteger.ZERO;
+            }
             int indexOfComma = textValue.indexOf(',');
             if(indexOfComma != -1){
                 textValue = textValue.replace(",","");
