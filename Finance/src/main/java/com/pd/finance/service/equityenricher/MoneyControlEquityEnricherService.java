@@ -47,7 +47,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
         try {
-            logger.info("enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             Equity equityFromDb = equityService.getEquity(identifier);
 
             addCurrentPriceDetails(identifier,equity,equityFromDb);
@@ -59,10 +59,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             addTechnicalDetails(identifier,equity,equityFromDb);
             addEquityInsights(identifier,equity,equityFromDb);
 
-            logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
 
-            logger.error("enrichEquity exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("enrichEquity exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
             throw new ServiceException(e);
         }
 

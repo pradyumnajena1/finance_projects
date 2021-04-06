@@ -53,7 +53,7 @@ public class EquityCurrentPriceStatsAttributeService extends HttpGatewayEquityAt
             equity.setEquityCurrentPriceStats(currentPriceStats);
 
 
-            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
+            logger.info( "enrichEquity completed for equity: "+ equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
         }

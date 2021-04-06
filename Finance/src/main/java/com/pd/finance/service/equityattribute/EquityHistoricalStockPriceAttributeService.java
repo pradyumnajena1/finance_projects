@@ -28,7 +28,7 @@ public class EquityHistoricalStockPriceAttributeService extends HttpGatewayEquit
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
         try {
-            logger.info( "enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
+            logger.info( "enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             EquityHistoricalData historicalData = new EquityHistoricalData();
 
             EquityHistoricalIntervalData dailyHistoricalIntervalData = getEquityHistoricalIntervalData(identifier, HistoricalDataInterval.OneDay);
@@ -44,7 +44,7 @@ public class EquityHistoricalStockPriceAttributeService extends HttpGatewayEquit
             historicalData.setSource(Constants.SOURCE_YAHOO_FINANCE);
             historicalData.setUpdatedDate(new Date());
             equity.setHistoricalData(historicalData);
-            logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
             logger.error( "enrichEquity exec failed for equity:{}",e.getMessage(),e);
             throw new ServiceException(e);

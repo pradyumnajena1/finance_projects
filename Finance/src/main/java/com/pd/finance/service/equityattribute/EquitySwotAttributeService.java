@@ -25,11 +25,11 @@ public class EquitySwotAttributeService extends HtmlScrapperEquityAttributeServi
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
+        logger.info( "enrichEquity started for equity: "+ equity.getDefaultEquityIdentifier());
         try {
             Document document = getDocument(identifier);
             equity.setSwotDetails(equitySwotFactory.create(document));
-            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
+            logger.info( "enrichEquity completed for equity: "+ equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new ServiceException(e);

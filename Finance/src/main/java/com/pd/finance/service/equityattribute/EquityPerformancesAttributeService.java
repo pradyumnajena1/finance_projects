@@ -29,7 +29,7 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
         try {
-            logger.info( "enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
+            logger.info( "enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
 
             EquityHistoricalIntervalData equityHistoricalIntervalData = yahooService.getHistoricalStockPrice(identifier, Period.ofDays(20), HistoricalDataInterval.OneDay);
             List<EquityPerformance> performances = new ArrayList<>();
@@ -58,7 +58,7 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
 
             equity.setPerformances(equityPerformances);
 
-            logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
             logger.error( "enrichEquity exec failed for equity:{}",e.getMessage(),e);
             throw new ServiceException(e);

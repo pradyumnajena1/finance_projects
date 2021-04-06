@@ -7,6 +7,7 @@ import com.pd.finance.utils.CommonUtils;
 import com.pd.finance.utils.Constants;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,13 +40,24 @@ public class EquityOverviewFactory implements IEquityOverviewFactory {
     }
 
     private   BigDecimal extractVolume(Document document) {
+        BigDecimal volume = BigDecimal.valueOf(0);
         try {
-            String volumeText = document.select("div#nse_vol").first().childNode(0).attr("text");
-            return CommonUtils.extractDecimalFromText(volumeText);
+            Element first = document.select("div#nse_vol").first();
+            if(first!=null){
+
+                Node childNode = first.childNode(0);
+                if(childNode!=null){
+
+                    String volumeText = childNode.attr("text");
+                    volume = CommonUtils.extractDecimalFromText(volumeText);
+                }
+            }
+
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            return BigDecimal.valueOf(0);
+            volume = BigDecimal.valueOf(0);
         }
+        return volume;
     }
 
     private   BigDecimal extractPE(Document document) {

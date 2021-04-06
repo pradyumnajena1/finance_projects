@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +47,10 @@ public class ChartResponse {
     public BigDecimal getPercentageGain() {
         BigDecimal percentageGain = null;
         BigDecimal prevClose = getPrevClose();
-        if(prevClose!=null){
+        BigDecimal change = getChange();
+        if(prevClose!=null && change !=null){
 
-            percentageGain = getChange().divide(prevClose).multiply(new BigDecimal(100));
+            percentageGain = change.divide(prevClose, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
         }
         return percentageGain;
     }

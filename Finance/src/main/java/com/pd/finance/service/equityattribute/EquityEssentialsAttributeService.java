@@ -27,12 +27,12 @@ public class EquityEssentialsAttributeService extends HtmlScrapperEquityAttribut
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
-        logger.info( "enrichEquity started for equity: "+ equity.getEquityIdentifiers());
+        logger.info( "enrichEquity started for equity: "+ equity.getDefaultEquityIdentifier());
         try {
             Document document = getDocument(identifier);
             EquityEssentials equityEssentials = equityEssentialsFactory.create(document);
             equity.setEssentials(equityEssentials);
-            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
+            logger.info( "enrichEquity completed for equity: "+ equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new ServiceException(e);

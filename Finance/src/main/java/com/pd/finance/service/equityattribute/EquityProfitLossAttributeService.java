@@ -41,7 +41,7 @@ public class EquityProfitLossAttributeService extends HtmlScrapperEquityAttribut
             EquityProfitLossDetails profitLossDetails = profitLossDetailsFactory.create(document);
             equity.setProfitLossDetails(profitLossDetails);
 
-            logger.info( "enrichEquity completed for equity: "+ equity.getEquityIdentifiers());
+            logger.info( "enrichEquity completed for equity: "+ equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw   new ServiceException(e);

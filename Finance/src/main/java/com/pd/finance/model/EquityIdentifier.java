@@ -106,11 +106,10 @@ public class EquityIdentifier {
 
     @Override
     public String toString() {
-        return "EquityIdentifier{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", exchange='" + exchange + '\'' +
-                ", source='" + source + '\'' +
-                '}';
+        return new StringBuilder().append("EquityIdentifier{")
+                                  .append("name='").append(name)
+                                  .append("', exchange='").append(exchange)
+                                  .append("', source='").append(source)
+                                  .append("' }").toString();
     }
 }

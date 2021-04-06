@@ -169,6 +169,7 @@ public class NorconexCrawlerService implements ICrawlerService {
             };
             Equity equityFromDb = equityService.getEquity(identifier);
             if(equityFromDb==null){
+                equity.setCreatedDate(new Date());
                 equityService.upsertEquity(equity);
                 success = true;
             }

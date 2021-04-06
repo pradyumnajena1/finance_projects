@@ -8,6 +8,8 @@ public abstract class EquityAttribute {
 
     private Date updatedDate;
 
+    private Date createdDate;
+
 
     public String getSource() {
         return source;
@@ -25,5 +27,13 @@ public abstract class EquityAttribute {
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 }

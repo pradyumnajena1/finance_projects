@@ -37,17 +37,17 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
     @Override
     public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity) throws ServiceException {
         try {
-            logger.info("enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             Equity equityFromDb = equityService.getEquity(defaultEquityIdentifier);
 
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
             addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb);
 
 
-            logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
 
-            logger.error("enrichEquity exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("enrichEquity exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
             throw new ServiceException(e);
         }
     }

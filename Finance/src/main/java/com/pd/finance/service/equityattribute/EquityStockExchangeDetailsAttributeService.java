@@ -23,13 +23,13 @@ public class EquityStockExchangeDetailsAttributeService extends HttpGatewayEquit
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
         try {
-            logger.info( "enrichEquity exec started for equity:{}",equity.getEquityIdentifiers());
+            logger.info( "enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
 
             EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(identifier);
             stockExchangeDetails.setSource(Constants.SOURCE_YAHOO_FINANCE);
             stockExchangeDetails.setUpdatedDate(new Date());
             equity.setStockExchangeDetails(stockExchangeDetails);
-            logger.info("enrichEquity exec completed for equity:{}",equity.getEquityIdentifiers());
+            logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (ServiceException e) {
            logger.error( "enrichEquity exec failed for equity:{}",e.getMessage(),e);
            throw new ServiceException(e);

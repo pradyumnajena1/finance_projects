@@ -135,7 +135,9 @@ public class EquityService implements IEquityService {
             Criteria criteria = getBulkUpdateFilterCriteria(request);
             Pageable pageRequest = PageRequest.of(0, 100);
             Page<Equity> equitiesPage = getPage(criteria,pageRequest);
-            logger.info("updateEquities No of equities after applying db_filters {} ",equitiesPage.getTotalElements());
+            numEquitiesToUpdate = (int) equitiesPage.getTotalElements();
+
+            logger.info("updateEquities No of equities after applying db_filters {} ", numEquitiesToUpdate);
             while (!equitiesPage.isEmpty())
             {
                 int currentPageNumber = equitiesPage.getNumber();
@@ -144,13 +146,17 @@ public class EquityService implements IEquityService {
                 List<Equity> equities = equitiesPage.getContent();
                 logger.info("updateEquities  pageNumber {} numEquities {} ", currentPageNumber, equities.size());
 
-                numEquitiesToUpdate+=equities.size();
+
+
                 for(Equity anEquity:equities){
 
                     boolean success = fetchAndPersistEquity(anEquity);
-                    if(success) successfulUpdates++;
+                    if(success){
+                        successfulUpdates++;
 
-                    logger.info("updateEquities  pageNumber {} numEquitiesToUpdate {} successfulUpdates {} ", currentPageNumber, numEquitiesToUpdate,successfulUpdates);
+                        logger.info("updateEquities successfully updated {} equities out of {} numEquitiesToUpdate {}",successfulUpdates,numEquitiesToUpdate);
+                    }
+
 
                 }
 
