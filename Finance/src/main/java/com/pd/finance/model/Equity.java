@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @QueryEntity
 @Document
-public class Equity {
+public class Equity extends EquityAttribute{
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(Equity.class);
 

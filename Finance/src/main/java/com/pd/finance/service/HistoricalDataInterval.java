@@ -30,5 +30,5 @@ public enum HistoricalDataInterval {
         return intervalString;
     }
 
-    public   TemporalAmount getTtl(){return ttl;}
+    public   TemporalAmount getTtl(){return ttl;  }
 }

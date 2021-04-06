@@ -7,6 +7,7 @@ import com.pd.finance.filter.IFilter;
 import com.pd.finance.filter.code.EquityInsightFilter;
 import com.pd.finance.filter.code.EquityNamesFilter;
 import com.pd.finance.filter.code.PerformanceFilter;
+import com.pd.finance.filter.code.RecentGainersFilter;
 import com.pd.finance.filter.db.*;
 import com.pd.finance.model.Equity;
 import com.pd.finance.utils.JsonUtils;
@@ -21,6 +22,7 @@ public class EquitySearchRequest {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(EquitySearchRequest.class);
 
+    private RecentGainersFilter  recentGainersFilter;
     private EquityExchangeFilter exchangeFilter;
     private EquityNamesFilter namesFilter;
     private PerformanceFilter performanceFilter;
@@ -30,6 +32,14 @@ public class EquitySearchRequest {
     private EquityInsightFilter insightFilter;
 
     private ProfitLossFilter profitLossFilter;
+
+    public RecentGainersFilter getRecentGainersFilter() {
+        return recentGainersFilter;
+    }
+
+    public void setRecentGainersFilter(RecentGainersFilter recentGainersFilter) {
+        this.recentGainersFilter = recentGainersFilter;
+    }
 
     public EquityInsightFilter getInsightFilter() {
         return insightFilter;
@@ -126,6 +136,7 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getTechnicalPeriodFilter());
         CollectFilters(filters,  getInsightFilter());
         CollectFilters(filters,  getProfitLossFilter());
+        CollectFilters(filters,  getRecentGainersFilter());
 
         return filters;
     }

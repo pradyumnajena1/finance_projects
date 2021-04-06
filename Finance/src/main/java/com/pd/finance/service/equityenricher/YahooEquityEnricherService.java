@@ -58,7 +58,8 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
     }
     private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
         try {
-            boolean isUpdateRequired = true;//equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+
             if(isUpdateRequired){
                 equityPerformancesAttributeService.enrichEquity(identifier,equity);
             }

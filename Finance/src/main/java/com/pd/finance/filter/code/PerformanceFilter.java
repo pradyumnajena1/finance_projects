@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,16 @@ public class PerformanceFilter  implements EquityFilter {
 
     @Override
     public Criteria getCriteria(String parentObject) {
-        throw new UnsupportedOperationException()  ;
+
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        criteriaList.add(Criteria.where("performances.sortedGainPercentages."+(this.minimumGainSessions-1)).exists(true));
+        criteriaList.add(Criteria.where("performances.sortedGainPercentages."+(this.minimumGainSessions-1)).gte(this.minimumGainPerSession));
+
+        Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
+        return criteria;
+
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.pd.finance.model;
 
+import com.pd.finance.utils.CommonUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -127,4 +128,25 @@ public class EquityHistoricalDataLineItem  implements Comparable<EquityHistorica
         final boolean f1, f2;
         return (f1 = this.date == null) ^ (f2 = other.date == null) ? (f1 ? -1 : 1 ): (f1 && f2 ? 0 : this.date.compareTo(other.date) );
     }
+    public boolean isAllFieldsAvailable() {
+        return  getClose()!= null &&  getOpen() != null && getHigh() != null && getLow() != null;
+    }
+
+    public boolean isWithinRange(EquityHistoricalDataLineItem otherLineItem, BigDecimal percentage) {
+        if(!CommonUtils.isWithinRange( getOpen(), otherLineItem.getOpen(),percentage)){
+            return false;
+        }
+        if(!CommonUtils.isWithinRange( getClose(), otherLineItem.getClose(),percentage)){
+            return false;
+        }
+        if(!CommonUtils.isWithinRange( getLow(), otherLineItem.getLow(),percentage)){
+            return false;
+        }
+        if(!CommonUtils.isWithinRange( getHigh(), otherLineItem.getHigh(),percentage)){
+            return false;
+        }
+        return true;
+    }
+
+
 }

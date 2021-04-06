@@ -19,16 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EquityService implements IEquityService {
     private static final Logger logger = LoggerFactory.getLogger(EquityService.class);
+
     @Autowired
     private EquityRepository equityRepository;
     @Autowired
@@ -147,9 +150,9 @@ public class EquityService implements IEquityService {
                     boolean success = fetchAndPersistEquity(anEquity);
                     if(success) successfulUpdates++;
 
+                    logger.info("updateEquities  pageNumber {} numEquitiesToUpdate {} successfulUpdates {} ", currentPageNumber, numEquitiesToUpdate,successfulUpdates);
 
                 }
-                logger.info("updateEquities  pageNumber {} numEquitiesToUpdate {} successfulUpdates {} ", currentPageNumber, numEquitiesToUpdate,successfulUpdates);
 
                 logger.info("updateEquities process completed pageNumber {}", currentPageNumber);
                 pageRequest = pageRequest.next();
@@ -189,6 +192,7 @@ public class EquityService implements IEquityService {
 
     protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
 
+        Sort sort = Sort.by(Sort.Direction.ASC,"updatedDate");
 
         return dbFilterCriteria != null ? equityRepository.searchEquity(dbFilterCriteria, pageRequest) : equityRepository.findAll(pageRequest);
     }
@@ -216,6 +220,7 @@ public class EquityService implements IEquityService {
             };
 
             equityEnricherService.enrichEquity(identifier,equity);
+            equity.setUpdatedDate(new Date());
             upsertEquity(equity);
             //Thread.sleep(500);
             success = true;

@@ -8,11 +8,13 @@ import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.htmlscrapper.listings.ICompanyListingsFactory;
 import com.pd.finance.htmlscrapper.marketgainer.IMarketGainerEquityFactory;
+import com.pd.finance.htmlscrapper.marketloser.IMarketLoserEquityFactory;
 import com.pd.finance.infra.IObjectConverter;
 import com.pd.finance.model.*;
 import com.pd.finance.request.CompanyListingWebCrawlRequest;
 import com.pd.finance.request.FinancialSiteWebCrawlRequest;
 import com.pd.finance.request.MarketGainersWebCrawlRequest;
+import com.pd.finance.request.MarketLosersWebCrawlRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.service.equityenricher.IEquityEnricherService;
 import com.pd.finance.utils.Constants;
@@ -32,6 +34,9 @@ public class NorconexCrawlerService implements ICrawlerService {
     private static final Logger logger = LoggerFactory.getLogger(NorconexCrawlerService.class);
     @Autowired
     private IMarketGainerEquityFactory marketGainerEquityFactory;
+
+    @Autowired
+    private IMarketLoserEquityFactory marketLoserEquityFactory;
 
     @Autowired
     private ICompanyListingsFactory companyListingsFactory;
@@ -100,11 +105,14 @@ public class NorconexCrawlerService implements ICrawlerService {
             for(int i=0;i<numObjectsCreated;i++){
 
                 boolean success = fetchAndPersistEquity(equities[i]);
-                if(success) successfulPersists++;
+                if(success){
+                    successfulPersists++;
+                    logger.info("crawlMarketGainers successfully fetch And Persisted {} Equities out of {} equities ",successfulPersists,numObjectsCreated);
+                }
                 equities[i] = null;
-
             }
             CrawlerResponse crawlerResponse = getCrawlerResponse(numObjectsCreated, successfulPersists);
+            logger.info(String.format("crawlMarketGainers exec completed"));
             return crawlerResponse;
         }catch (Exception ex){
             logger.error("crawlMarketGainers exec failed",ex);
@@ -112,6 +120,43 @@ public class NorconexCrawlerService implements ICrawlerService {
         }
 
     }
+
+    @Override
+    public CrawlerResponse crawlMarketLosers(MarketLosersWebCrawlRequest crawlRequest) throws Exception {
+        logger.info(String.format("crawlMarketLosers exec started"));
+        try{
+            Document doc = getDocument(crawlRequest);
+            int maxEquitiesToFetch = crawlRequest.getDebugFilter() != null ? crawlRequest.getDebugFilter().getNumEquities() : -1;
+
+            List<Equity> marketLoserEquities = marketLoserEquityFactory.fetchMarketLoserEquities(doc, maxEquitiesToFetch,crawlRequest.getExchange());
+
+            int numObjectsCreated = marketLoserEquities.size();
+            int successfulPersists = 0;
+
+            Equity[] equities = marketLoserEquities.toArray(new Equity[numObjectsCreated]);
+
+            for(int i=0;i<numObjectsCreated;i++){
+
+                boolean success = fetchAndPersistEquity(equities[i]);
+                if(success){
+
+                    successfulPersists++;
+                    logger.info("crawlMarketLosers successfully fetch And Persisted {} Equities out of {} equities ",successfulPersists,numObjectsCreated);
+                }
+                equities[i] = null;
+            }
+            CrawlerResponse crawlerResponse = getCrawlerResponse(numObjectsCreated, successfulPersists);
+            logger.info(String.format("crawlMarketLosers exec completed"));
+            return crawlerResponse;
+        }catch (Exception ex){
+            logger.error("crawlMarketLosers exec failed",ex);
+            throw ex;
+        }
+
+    }
+
+
+
     private boolean fetchAndPersistEquity(Equity equity) throws ServiceException, PersistenceException {
         boolean success = false;
         try {
@@ -210,6 +255,16 @@ public class NorconexCrawlerService implements ICrawlerService {
         if(Constants.EXCHANGE_BSE.equalsIgnoreCase(crawlRequest.getExchange())){
 
               gainersUrl = config.getEnvProperty("BSEGainersUrl");
+        }
+
+        return documentService.getDocument(gainersUrl,null);
+    }
+    private Document getDocument(MarketLosersWebCrawlRequest crawlRequest) throws Exception {
+        String gainersUrl = config.getEnvProperty("NSELosersUrl");
+
+        if(Constants.EXCHANGE_BSE.equalsIgnoreCase(crawlRequest.getExchange())){
+
+            gainersUrl = config.getEnvProperty("BSELosersUrl");
         }
 
         return documentService.getDocument(gainersUrl,null);

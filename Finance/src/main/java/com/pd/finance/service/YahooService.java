@@ -143,8 +143,8 @@ public class YahooService extends AbstractHttpService implements IYahooService {
         Instant startTime = getStartTime(amountToSubtract, existinghistoricalData, interval);
         Instant endTime = Instant.now();
 
-        long period1 = startTime.getEpochSecond();
-        long period2 = endTime.getEpochSecond();
+        long period1 = CommonUtils.atStartOfDay(startTime).getEpochSecond();
+        long period2 =  CommonUtils.atStartOfDay(endTime).getEpochSecond();
 
         String historicalPriceCsvString = getHistoricalPriceCsvString(equitySymbol, period1, period2, interval);
         if (historicalPriceCsvString == null) {
@@ -194,7 +194,7 @@ public class YahooService extends AbstractHttpService implements IYahooService {
     public ChartResponse getEquityChart(EquityIdentifier equityIdentifier) throws ServiceException {
         ChartResponse chartResponse = null;
         try {
-            String url = MessageFormat.format(config.getEnvProperty("StockExchangeDetailsUrl"), equityIdentifier.getSymbol());
+            String url = MessageFormat.format(config.getEnvProperty("StockChartUrl"), equityIdentifier.getSymbol());
             chartResponse = get(url, ChartResponse.class);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

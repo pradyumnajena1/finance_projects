@@ -4,6 +4,7 @@ import com.pd.finance.model.CrawlerResponse;
 import com.pd.finance.request.CompanyListingWebCrawlRequest;
 import com.pd.finance.request.FinancialSiteWebCrawlRequest;
 import com.pd.finance.request.MarketGainersWebCrawlRequest;
+import com.pd.finance.request.MarketLosersWebCrawlRequest;
 import com.pd.finance.response.BaseResponse;
 import com.pd.finance.service.ICrawlerService;
 import org.slf4j.Logger;
@@ -31,6 +32,20 @@ public class WebCrawlerController {
 
           CrawlerResponse crawlerResponse =  crawlerService.crawlMarketGainers(request);
            return new BaseResponse(crawlerResponse);
+        } catch (Exception e) {
+            logger.error("Failed to process Gainers",e);
+            return  new BaseResponse(e);
+        }
+
+    }
+
+    @RequestMapping(value = "crawl/market/losers",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse crawlMarketLosers(@RequestBody MarketLosersWebCrawlRequest request) {
+
+        try {
+
+            CrawlerResponse crawlerResponse =  crawlerService.crawlMarketLosers(request);
+            return new BaseResponse(crawlerResponse);
         } catch (Exception e) {
             logger.error("Failed to process Gainers",e);
             return  new BaseResponse(e);
