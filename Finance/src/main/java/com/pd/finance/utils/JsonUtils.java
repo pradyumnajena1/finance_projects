@@ -2,6 +2,7 @@ package com.pd.finance.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class JsonUtils {
 
     public  static <T> T deserialize(String jsonString,Class<T> type) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         T  value = objectMapper.readValue(jsonString,type);
         return value;
     }

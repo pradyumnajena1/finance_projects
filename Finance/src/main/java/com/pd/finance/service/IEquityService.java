@@ -7,6 +7,9 @@ import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.request.EquityBulkUpdateRequest;
 import com.pd.finance.response.chart.EquityBulkUpdateResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -14,7 +17,7 @@ public interface IEquityService {
 
 
     Equity getEquity(String id) throws EquityNotFoundException;
-    List<Equity> getEquities(String exchange) throws PersistenceException;
+    Page<Equity> getEquities(String exchange, Pageable pageRequest) throws PersistenceException;
 
     Equity getEquity(EquityIdentifier equityIdentifier) throws EquityNotFoundException;
 
@@ -32,4 +35,8 @@ public interface IEquityService {
 
 
     EquityBulkUpdateResponse updateEquities(EquityBulkUpdateRequest request) throws ServiceException;
+
+    boolean fetchAndPersistEquityAttributes(Equity equity);
+
+    Equity createEquityWithMandatoryAttributes(String extractedName, String equitySourceUrl, String exchange, String source);
 }

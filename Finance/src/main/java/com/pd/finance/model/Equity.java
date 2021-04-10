@@ -3,6 +3,7 @@ package com.pd.finance.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mysema.query.annotations.QueryEntity;
 
+import com.pd.finance.model.equity.summary.EquitySummary;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.utils.Constants;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class Equity extends EquityAttribute{
 
     private String sector;
     private EquityHistoricalData historicalData;
-
+    private EquitySummary equitySummary;
 
 
 
@@ -62,7 +63,13 @@ public class Equity extends EquityAttribute{
         this.stockExchangeDetails = stockExchangeDetails;
     }
 
+    public EquitySummary getEquitySummary() {
+        return equitySummary;
+    }
 
+    public void setEquitySummary(EquitySummary equitySummary) {
+        this.equitySummary = equitySummary;
+    }
 
     public String getId() {
         return id;

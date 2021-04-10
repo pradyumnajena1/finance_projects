@@ -72,4 +72,9 @@ public class MarketGainerPageHelper {
         return nameCell.childNode(0).childNode(0).childNode(0).attr("text");
     }
 
+    public  static String extractUrl(Node rowNode) {
+        Node nameCell = MarketGainerPageHelper.getAttributeCell(rowNode, 0);
+        return nameCell.childNode(0).childNode(0).attr("href");
+    }
+
 }

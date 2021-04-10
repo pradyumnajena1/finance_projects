@@ -7,11 +7,15 @@ import com.pd.finance.filter.code.EquityNamesFilter;
 import com.pd.finance.filter.db.EquityExchangeFilter;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
+import com.pd.finance.model.EquityIdentifiers;
 import com.pd.finance.model.SourceDetails;
 import com.pd.finance.persistence.EquityRepository;
 import com.pd.finance.request.EquityBulkUpdateRequest;
+import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.response.chart.EquityBulkUpdateResponse;
 import com.pd.finance.service.equityenricher.IEquityEnricherService;
+import com.pd.finance.utils.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EquityService implements IEquityService {
@@ -40,6 +41,9 @@ public class EquityService implements IEquityService {
     @Autowired
     private ICacheService cacheService;
 
+    @Autowired
+    private IYahooService stockExchangeService;
+
     @Override
     public Equity getEquity(final String id) throws EquityNotFoundException {
 
@@ -49,9 +53,9 @@ public class EquityService implements IEquityService {
     }
 
     @Override
-    public List<Equity> getEquities(final String exchange) throws PersistenceException {
+    public Page<Equity> getEquities(final String exchange,Pageable pageRequest) throws PersistenceException {
 
-        List<Equity> equities = equityRepository.findByExchange( exchange);
+        Page<Equity> equities = equityRepository.findByExchange( exchange,pageRequest);
         return equities;
     }
 
@@ -150,7 +154,7 @@ public class EquityService implements IEquityService {
 
                 for(Equity anEquity:equities){
 
-                    boolean success = fetchAndPersistEquity(anEquity);
+                    boolean success = fetchAndPersistEquityAttributes(anEquity);
                     if(success){
                         successfulUpdates++;
 
@@ -210,7 +214,8 @@ public class EquityService implements IEquityService {
         bulkUpdateResponse.setCompleted(true);
         return bulkUpdateResponse;
     }
-    private boolean fetchAndPersistEquity(Equity equity) {
+    @Override
+    public boolean fetchAndPersistEquityAttributes(Equity equity) {
         boolean success = false;
         try {
             logger.info("fetchAndPersistEquity exec started for equity {}",equity.getDefaultEquityIdentifier());
@@ -237,6 +242,72 @@ public class EquityService implements IEquityService {
         }
         return success;
     }
+
+
+    @Override
+    public Equity createEquityWithMandatoryAttributes(String extractedName, String equitySourceUrl, String exchange, String source) {
+
+        Equity result = null;
+
+        try {
+
+            logger.info("createEquityWithMandatoryAttributes exec started for equity extractedName {}", extractedName);
+
+            EquityIdentifier equityIdentifier = new EquityIdentifier(extractedName, exchange, source);
+
+            EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
+
+            if( stockExchangeDetails!=null){
+
+                SourceDetails sourceDetails = getSourceDetails(extractedName, equitySourceUrl);
+                EquityIdentifiers equityIdentifiers =  getEquityIdentifiers(extractedName, stockExchangeDetails);
+
+                Equity equity = new Equity();
+                equity.getSourceDetails().addSourceDetails(sourceDetails);
+                equity.setEquityIdentifiers(equityIdentifiers);
+                equity.setStockExchangeDetails(stockExchangeDetails);
+
+                logger.info("createEquity completed creating equity {}",equity.getEquityIdentifiers());
+                result = equity;
+            }else {
+
+                logger.info("createEquityWithMandatoryAttributes could not find exchange details  for equity extractedName {}", extractedName);
+            }
+            logger.info("createEquityWithMandatoryAttributes exec completed for equity extractedName {}", extractedName);
+        } catch (Exception ex) {
+            logger.error("createEquityWithMandatoryAttributes exec failed for equity extractedName {}", extractedName,ex);
+        }
+        return result;
+    }
+
+    @NotNull
+    private EquityIdentifiers getEquityIdentifiers(String equityName,EquityStockExchangeDetailsResponse details) {
+        EquityIdentifiers equityIdentifiers = new EquityIdentifiers();
+
+        if(StringUtils.isBlank(equityName)){
+            equityName =  StringUtils.isNotBlank( details.getShortName())?details.getShortName():details.getLongName();
+        }
+
+
+        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,details.getExchange(), Constants.SOURCE_MONEY_CONTROL);
+        equityIdentifier.setSymbol(details.getSymbol());
+
+        logger.info("createEquity started creating equity {}",equityName);
+
+
+        equityIdentifiers.getIdentifiers().add(equityIdentifier);
+        return equityIdentifiers;
+    }
+
+    @NotNull
+    private SourceDetails getSourceDetails(String equityName, String sourceUrl) {
+        SourceDetails sourceDetails = new SourceDetails();
+        sourceDetails.setEquityName(equityName);
+        sourceDetails.setSourceUrl(sourceUrl);
+        sourceDetails.setSourceName(Constants.SOURCE_MONEY_CONTROL);
+        return sourceDetails;
+    }
+
 
 
 }

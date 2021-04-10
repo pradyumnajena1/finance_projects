@@ -8,6 +8,7 @@ import com.pd.finance.persistence.StockExchangeDetailsRepository;
 import com.pd.finance.request.CreateStockExchangeDetailsRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.response.chart.ChartResponse;
+import com.pd.finance.response.summary.EquitySummaryResponse;
 import com.pd.finance.utils.CommonUtils;
 import com.pd.finance.utils.JsonUtils;
 import okhttp3.Interceptor;
@@ -189,6 +190,25 @@ public class YahooService extends AbstractHttpService implements IYahooService {
         return csvString;
     }
 
+
+    @Override
+    public EquitySummaryResponse getEquitySummary(EquityIdentifier identifier) throws ServiceException {
+        EquitySummaryResponse summaryResponse = null;
+        String summaryUrl = MessageFormat.format(config.getEnvProperty("YahooQuoteSummary"), identifier.getSymbol());
+        try {
+
+            WebDocument webDocument = documentService.getWebDocument(summaryUrl, Period.ofDays(15));
+            String responseString = webDocument.getContent();
+            if(StringUtils.isNotBlank(responseString)){
+
+                summaryResponse = JsonUtils.deserialize(responseString,EquitySummaryResponse.class);
+            }
+
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+        }
+        return summaryResponse;
+    }
 
     @Override
     public ChartResponse getEquityChart(EquityIdentifier equityIdentifier) throws ServiceException {

@@ -34,6 +34,9 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
     @Resource(name = "equityPerformancesAttributeService")
     private IEquityAttributeService equityPerformancesAttributeService;
 
+    @Resource(name = "equitySummaryAttributeService")
+    private IEquityAttributeService equitySummaryAttributeService;
+
     @Autowired
     private IEquityService equityService;
 
@@ -49,6 +52,8 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
 
             addRecentPerformances(defaultEquityIdentifier,equity,equityFromDb);
 
+            addSummary(defaultEquityIdentifier,equity,equityFromDb);
+
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
 
@@ -56,6 +61,21 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
             throw new ServiceException(e);
         }
     }
+
+    private void addSummary(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+        try {
+            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+
+            if(isUpdateRequired){
+                equitySummaryAttributeService.enrichEquity(identifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addRecentPerformances exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
+
+        }
+    }
+
     private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
         try {
             boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());

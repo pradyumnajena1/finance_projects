@@ -7,6 +7,7 @@ import com.pd.finance.model.EquityStockExchangeDetails;
 import com.pd.finance.request.CreateStockExchangeDetailsRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.response.chart.ChartResponse;
+import com.pd.finance.response.summary.EquitySummaryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +15,7 @@ import java.time.temporal.TemporalAmount;
 import java.util.List;
 
 public interface IYahooService {
+    EquitySummaryResponse getEquitySummary(EquityIdentifier identifier)throws ServiceException;
     ChartResponse getEquityChart(EquityIdentifier equityIdentifier) throws ServiceException;
 
     EquityHistoricalIntervalData getHistoricalStockPrice(EquityIdentifier identifier, TemporalAmount amountToSubtract, HistoricalDataInterval interval) throws ServiceException;

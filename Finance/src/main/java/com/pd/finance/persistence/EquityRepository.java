@@ -1,6 +1,7 @@
 package com.pd.finance.persistence;
 
 import com.pd.finance.model.Equity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -16,17 +17,12 @@ public interface EquityRepository extends MongoRepository<Equity, String> ,Equit
     @Query(value="{ 'name' : ?0 }")
     public Equity findByName(String name);
 
-    @Query(value="{ 'nseId' : ?0 }")
-    public Equity findByNseId(String nseId);
-
-    @Query(value="{ 'bseId' : ?0 }")
-    public Equity findByBseId(String bseId);
 
     @Query(value="{'name' : {'$in' : [names…​]}}")
     public List<Equity> findByNameIn(List<String> names);
 
     @Query(value="{ 'stockExchangeDetails.exchange' : ?0 }")
-    public List<Equity> findByExchange(String exchange);
+    public Page<Equity> findByExchange(String exchange,Pageable pageable);
 
     @Query(value="{'$and':[{ 'stockExchangeDetails.exchange' : ?0 },{ 'stockExchangeDetails.symbol' : ?1 }]}")
     public Equity findByExchangeAndSymbol(String exchange,String symbol);
