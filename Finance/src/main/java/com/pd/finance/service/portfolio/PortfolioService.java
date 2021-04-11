@@ -41,26 +41,61 @@ public class PortfolioService implements IPortfolioService{
 
     @Override
     public Portfolio getPortfolio(String id) throws ServiceException {
-        Portfolio portfolio = null;
-        Optional<Portfolio> byId = portfolioRepository.findById(id);
-        if(byId.isPresent()){
-            portfolio = byId.get();
+        try {
+            Portfolio portfolio = null;
+            Optional<Portfolio> byId = portfolioRepository.findById(id);
+            if(byId.isPresent()){
+                portfolio = byId.get();
+            }
+            return portfolio;
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new ServiceException(exception);
         }
-        return portfolio;
     }
 
     @Override
     public Portfolio updatePortfolio(String id,UpdatePortfolioRequest request) throws ServiceException {
-        Portfolio portfolio = null;
-        Optional<Portfolio> byId = portfolioRepository.findById(id);
-        if(byId.isPresent()){
-            portfolio = byId.get();
+        try {
+            Portfolio portfolio = null;
+            Optional<Portfolio> byId = portfolioRepository.findById(id);
+            if(byId.isPresent()){
+                portfolio = byId.get();
+            }
+            if(portfolio!=null){
+                portfolio.setName(request.getPortfolioName());
+                portfolioRepository.save(portfolio);
+            }else{
+                throw new ServiceException("Equity with id "+id+" not found");
+            }
+            return portfolio;
+        } catch (ServiceException e) {
+            throw e;
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            throw new ServiceException(e);
         }
-        return portfolio;
     }
 
     @Override
     public Portfolio deletePortfolio(String id) throws ServiceException {
-        return null;
+        try {
+            Portfolio portfolio = null;
+            Optional<Portfolio> byId = portfolioRepository.findById(id);
+            if(byId.isPresent()){
+                portfolio = byId.get();
+            }
+            if(portfolio!=null){
+                 portfolioRepository.deleteById(id);
+            }else{
+                throw new ServiceException("Equity with id "+id+" not found");
+            }
+            return portfolio;
+        } catch (ServiceException e) {
+            throw e;
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            throw new ServiceException(e);
+        }
     }
 }
