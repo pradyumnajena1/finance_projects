@@ -1,15 +1,21 @@
 package com.pd.finance.htmlscrapper.listings;
 
-import com.pd.finance.controller.WebCrawlerController;
+import com.pd.finance.config.ApplicationConfig;
+import com.pd.finance.model.Equity;
 import com.pd.finance.service.IDocumentService;
-import org.apache.commons.lang.StringUtils;
+import com.pd.finance.service.IEquityService;
+import com.pd.finance.utils.Constants;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,58 +23,107 @@ import java.util.List;
 @Component
 public class CompanyListingsFactory implements ICompanyListingsFactory {
     private Logger logger = LoggerFactory.getLogger(CompanyListingsFactory.class);
+
     @Autowired
     private IDocumentService documentService;
 
+    @Autowired
+    private ApplicationConfig config;
+
+    @Autowired
+    private IEquityService equityService;
+
     @Override
-    public List<String> getCompanyNames(Document document,int numCompanies){
-        List<String> namesCollector  = new ArrayList<>();
-        String nextPage = document.location();
-       while(document !=null) {
-           document.select("#leftcontainer > table:nth-child(4) > tbody > tr > td:nth-child(1) > table > tbody > tr").stream().forEach(element -> extractNames(element, namesCollector));
-           document.select("#leftcontainer > table:nth-child(4) > tbody > tr > td:nth-child(2) > table > tbody > tr").stream().forEach(element -> extractNames(element, namesCollector));
+    public List<Equity> getEquities(int numEquitiesToAdd) {
+        logger.info("getEquities exec started numEquitiesToAdd {}",numEquitiesToAdd);
 
-         nextPage = getNextPageLink(document);
+        List<Equity> equityCollector = new ArrayList<>();
+        try {
+            List<String> equityNamePrefixes = getEquityNamePrefixes();
+           outer: for (String prefix : equityNamePrefixes) {
+                logger.info("getEquities processing equities with prefix {}",prefix);
+                String listingPageUrl = MessageFormat.format(config.getEnvProperty("MCCompanyNamesUrl"), prefix);
+                Document document = getListingPageDocument(listingPageUrl);
+                if (document != null) {
+                    Elements tds = document.select(getCssQuery());
+                    if (tds != null) {
 
-         document = getNextPageDocument(nextPage);
+                        for(Element td:tds){
+                            List<Equity> equities = extractEquities(td);
+                            equityCollector.addAll(equities);
+                            int numEquitiesCollected = equityCollector.size();
 
-       }
+                            logger.info("getEquities num equities collected {}", numEquitiesCollected);
+                            if(numEquitiesToAdd!=-1 && numEquitiesCollected >numEquitiesToAdd){
+                                break outer;
+                            }
+                        }
 
-          return namesCollector;
+
+                    }
+
+                }
+
+               logger.info("getEquities completed processing equities with prefix {}",prefix);
+            }
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(), exception);
+        }
+
+        return equityCollector;
     }
 
-    private Document getNextPageDocument(String nextPage)   {
+    @NotNull
+    protected String getCssQuery() {
+        return "#mc_mainWrapper > div.PA10 > div.FL > div.PT15 > table > tbody > tr  > td";
+    }
+
+    private List<Equity> extractEquities(Element td) {
+        List<Equity> equitiesCollector = new ArrayList<>();
+        try {
+            String equityName = td.text();
+            String equitySourceUrl = td.select("a").attr("href");
+
+            extractEquity(equitiesCollector, equityName, equitySourceUrl, Constants.EXCHANGE_NSI);
+            extractEquity(equitiesCollector, equityName, equitySourceUrl, Constants.EXCHANGE_BSE);
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(), exception);
+        }
+        return equitiesCollector;
+    }
+
+    private void extractEquity(List<Equity> equitiesCollector, String equityName, String equitySourceUrl, String exchange) {
+        try {
+            Equity equity;
+            equity = equityService.createEquityWithMandatoryAttributes(equityName, equitySourceUrl, exchange, Constants.SOURCE_MONEY_CONTROL);
+            if (equity != null) {
+                equitiesCollector.add(equity);
+            }
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(), exception);
+        }
+    }
+
+    @NotNull
+    protected List<String> getEquityNamePrefixes() {
+        List<String> equityNamePrefixes = new ArrayList<>();
+        for (char prefix = 'A'; prefix < 'Z'; prefix++) {
+            equityNamePrefixes.add(String.valueOf(prefix));
+        }
+        equityNamePrefixes.add("others");
+        return equityNamePrefixes;
+    }
+
+    private Document getListingPageDocument(String listingPageUrl) {
         Document document = null;
         try {
-            if(StringUtils.isBlank(nextPage)){
-                return document;
-            }
-            document =  documentService.getDocument(nextPage,null);
+
+            document = documentService.getDocument(listingPageUrl, Period.ofDays(15));
         } catch (Exception e) {
-           logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return document;
     }
 
-    private void extractNames(Element row, List<String> namesCollector) {
-        String companyName = row.select(" td:nth-child(1)").first().text();
-        namesCollector.add(companyName);
-    }
 
-    private String getNextPageLink(Document document){
-        String nextPage = null;
-        Element first = document.select("#leftcontainer > table.pagination-container-company > tbody > tr > td > a:nth-child(1)").first();
-
-        if(first != null && "Next".equalsIgnoreCase(first.text().trim())){
-            nextPage= first.attr("href");
-        }
-        Element second = document.select("#leftcontainer > table.pagination-container-company > tbody > tr > td > a:nth-child(2)").first();
-        if(second!=null && "Next".equalsIgnoreCase(second.text().trim())){
-            nextPage =  second.attr("href");
-        }
-        if(StringUtils.isNotBlank(nextPage)){
-           nextPage =  nextPage.startsWith("https:")?nextPage:"https:"+nextPage;
-        }
-        return nextPage ;
-    }
 }

@@ -39,7 +39,7 @@ public class PerformanceFilter  implements EquityFilter {
 
     @Override
     public FilterType getFilterType() {
-        return FilterType.InCode;
+        return FilterType.Partial;
     }
 
     @Override

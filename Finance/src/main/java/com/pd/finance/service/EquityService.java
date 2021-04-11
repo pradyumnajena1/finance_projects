@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class EquityService implements IEquityService {
@@ -53,9 +54,9 @@ public class EquityService implements IEquityService {
     }
 
     @Override
-    public Page<Equity> getEquities(final String exchange,Pageable pageRequest) throws PersistenceException {
+    public Page<Equity> getEquities(final String exchange, Pageable pageRequest) throws PersistenceException {
 
-        Page<Equity> equities = equityRepository.findByExchange( exchange,pageRequest);
+        Page<Equity> equities = equityRepository.findByExchange(exchange, pageRequest);
         return equities;
     }
 
@@ -69,20 +70,21 @@ public class EquityService implements IEquityService {
 
 
     @Override
-    public Equity getEquityByName(final String name)throws EquityNotFoundException,PersistenceException{
+    public Equity getEquityByName(final String name) throws EquityNotFoundException, PersistenceException {
 
-        return  equityRepository.findByName(name);
+        return equityRepository.findByName(name);
 
     }
 
     @Override
-    public List<Equity> getEquitiesByNames(final List<String> names)throws EquityNotFoundException,PersistenceException{
+    public List<Equity> getEquitiesByNames(final List<String> names) throws EquityNotFoundException, PersistenceException {
 
-        return  equityRepository.findByNameIn(names);
+        return equityRepository.findByNameIn(names);
 
     }
+
     @Override
-    public Equity upsertEquity(Equity equity)throws PersistenceException{
+    public Equity upsertEquity(Equity equity) throws PersistenceException {
         try {
 
 
@@ -90,12 +92,12 @@ public class EquityService implements IEquityService {
 
             Equity equityFromDb = equityRepository.findByExchangeAndSymbol(equityIdentifier.getExchange(), equityIdentifier.getSymbol());
 
-            if(equityFromDb!=null){
+            if (equityFromDb != null) {
                 equity.setId(equityFromDb.getId());
             }
-           return equityRepository.save(equity);
+            return equityRepository.save(equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new PersistenceException(e);
         }
     }
@@ -106,71 +108,75 @@ public class EquityService implements IEquityService {
 
             return equityRepository.save(equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new PersistenceException(e);
         }
     }
 
     @Override
-    public Equity updateEquity(Equity equity) throws PersistenceException{
+    public Equity updateEquity(Equity equity) throws PersistenceException {
 
         try {
             return equityRepository.save(equity);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new PersistenceException(e);
         }
     }
+
     @Override
-    public Equity deleteEquity(final String id) throws PersistenceException{
+    public Equity deleteEquity(final String id) throws PersistenceException {
         Optional<Equity> byId = equityRepository.findById(id);
         byId.ifPresent(equity -> equityRepository.delete(equity));
-        return byId.orElseThrow(()->new PersistenceException(String.format("Equity with id {} not present",id)));
+        return byId.orElseThrow(() -> new PersistenceException(String.format("Equity with id {} not present", id)));
     }
 
     @Override
     public EquityBulkUpdateResponse updateEquities(EquityBulkUpdateRequest request) {
         EquityBulkUpdateResponse result = new EquityBulkUpdateResponse();
         result.setCompleted(false);
-        int successfulUpdates = 0;
-        int numEquitiesToUpdate = 0;
+        AtomicInteger successfulUpdates = new AtomicInteger(0);
+        AtomicInteger currentEquityNumber = new AtomicInteger(0);
+
 
         try {
             Criteria criteria = getBulkUpdateFilterCriteria(request);
             Pageable pageRequest = PageRequest.of(0, 100);
-            Page<Equity> equitiesPage = getPage(criteria,pageRequest);
-            numEquitiesToUpdate = (int) equitiesPage.getTotalElements();
+            Page<Equity> equitiesPage = getPage(criteria, pageRequest);
+            final int numEquitiesToUpdate = (int) equitiesPage.getTotalElements();
+            final int totalPages = equitiesPage.getTotalPages();
 
-            logger.info("updateEquities No of equities after applying db_filters {} ", numEquitiesToUpdate);
-            while (!equitiesPage.isEmpty())
-            {
+            logger.info("updateEquities No of equities to update {} no of pages {}", numEquitiesToUpdate, totalPages);
+            while (!equitiesPage.isEmpty()) {
                 int currentPageNumber = equitiesPage.getNumber();
-                logger.info("updateEquities process started pageNumber {} ", currentPageNumber);
+                logger.info("updateEquities process started pageNumber {} out of {} pages  ", currentPageNumber, totalPages);
 
                 List<Equity> equities = equitiesPage.getContent();
                 logger.info("updateEquities  pageNumber {} numEquities {} ", currentPageNumber, equities.size());
+                equities.parallelStream().forEach(anEquity -> {
 
-
-
-                for(Equity anEquity:equities){
-
+                    currentEquityNumber.incrementAndGet();
                     boolean success = fetchAndPersistEquityAttributes(anEquity);
-                    if(success){
-                        successfulUpdates++;
+                    if (success) {
+                        successfulUpdates.incrementAndGet();
 
-                        logger.info("updateEquities successfully updated {} equities out of {} numEquitiesToUpdate {}",successfulUpdates,numEquitiesToUpdate);
+                        logger.info("successfully updated  attributes of  equity {}", anEquity.getDefaultEquityIdentifier());
+                        logger.info("updateEquities numSuccessfulUpdates:{}", successfulUpdates);
+
                     }
+                    logger.info("updateEquities currentEquityNumber:{} numEquitiesToUpdate:{} pageNumber:{} totalPages:{}", currentEquityNumber , numEquitiesToUpdate, currentPageNumber, totalPages);
 
 
-                }
+                });
+
 
                 logger.info("updateEquities process completed pageNumber {}", currentPageNumber);
                 pageRequest = pageRequest.next();
-                equitiesPage = getPage(criteria,pageRequest);
+                equitiesPage = getPage(criteria, pageRequest);
             }
-            result = getEquityBulkUpdateResponse(numEquitiesToUpdate, successfulUpdates);
+            result = getEquityBulkUpdateResponse(numEquitiesToUpdate, successfulUpdates.get());
         } catch (Exception exception) {
-            logger.error(exception.getMessage(),exception);
+            logger.error(exception.getMessage(), exception);
             result.setCompleted(false);
         }
 
@@ -180,20 +186,20 @@ public class EquityService implements IEquityService {
     private Criteria getBulkUpdateFilterCriteria(EquityBulkUpdateRequest request) {
         List<Criteria> criteriaList = new ArrayList<>();
         EquityExchangeFilter exchangeFilter = request.getExchangeFilter();
-        if(exchangeFilter !=null){
+        if (exchangeFilter != null) {
 
             criteriaList.add(exchangeFilter.getCriteria(""));
         }
         EquityNamesFilter namesFilter = request.getNamesFilter();
-        if(namesFilter !=null){
+        if (namesFilter != null) {
             criteriaList.add(namesFilter.getCriteria(""));
         }
 
         Criteria criteria = null;
-        if(criteriaList.size()>1){
-            criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
-        }else if(criteriaList.size()==1){
-            criteria =  criteriaList.get(0);
+        if (criteriaList.size() > 1) {
+            criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[criteriaList.size()]));
+        } else if (criteriaList.size() == 1) {
+            criteria = criteriaList.get(0);
         }
 
 
@@ -202,10 +208,11 @@ public class EquityService implements IEquityService {
 
     protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
 
-        Sort sort = Sort.by(Sort.Direction.ASC,"updatedDate");
+        Sort sort = Sort.by(Sort.Direction.ASC, "updatedDate");
 
         return dbFilterCriteria != null ? equityRepository.searchEquity(dbFilterCriteria, pageRequest) : equityRepository.findAll(pageRequest);
     }
+
     @NotNull
     protected EquityBulkUpdateResponse getEquityBulkUpdateResponse(int numObjectsCreated, int successfulPersists) {
         EquityBulkUpdateResponse bulkUpdateResponse = new EquityBulkUpdateResponse();
@@ -214,31 +221,33 @@ public class EquityService implements IEquityService {
         bulkUpdateResponse.setCompleted(true);
         return bulkUpdateResponse;
     }
+
     @Override
     public boolean fetchAndPersistEquityAttributes(Equity equity) {
         boolean success = false;
         try {
-            logger.info("fetchAndPersistEquity exec started for equity {}",equity.getDefaultEquityIdentifier());
+            logger.info("fetchAndPersistEquity exec started for equity {}", equity.getDefaultEquityIdentifier());
 
 
             EquityIdentifier identifier = equity.getDefaultEquityIdentifier();
 
             SourceDetails sourceDetails = equity.getDefaultSourceDetails();
 
-            if(sourceDetails!=null){
+            if (sourceDetails != null) {
 
-                identifier.putAdditionalAttribute("url",sourceDetails.getSourceUrl());
-            };
+                identifier.putAdditionalAttribute("url", sourceDetails.getSourceUrl());
+            }
+            ;
 
-            equityEnricherService.enrichEquity(identifier,equity);
+            equityEnricherService.enrichEquity(identifier, equity);
             equity.setUpdatedDate(new Date());
             upsertEquity(equity);
             //Thread.sleep(500);
             success = true;
-            logger.info("fetchAndPersistEquity exec completed for equity {}",equity.getDefaultEquityIdentifier());
+            logger.info("fetchAndPersistEquity exec completed for equity {}", equity.getDefaultEquityIdentifier());
 
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return success;
     }
@@ -257,42 +266,42 @@ public class EquityService implements IEquityService {
 
             EquityStockExchangeDetailsResponse stockExchangeDetails = stockExchangeService.getStockExchangeDetails(equityIdentifier);
 
-            if( stockExchangeDetails!=null){
+            if (stockExchangeDetails != null) {
 
                 SourceDetails sourceDetails = getSourceDetails(extractedName, equitySourceUrl);
-                EquityIdentifiers equityIdentifiers =  getEquityIdentifiers(extractedName, stockExchangeDetails);
+                EquityIdentifiers equityIdentifiers = getEquityIdentifiers(extractedName, stockExchangeDetails);
 
                 Equity equity = new Equity();
                 equity.getSourceDetails().addSourceDetails(sourceDetails);
                 equity.setEquityIdentifiers(equityIdentifiers);
                 equity.setStockExchangeDetails(stockExchangeDetails);
 
-                logger.info("createEquity completed creating equity {}",equity.getEquityIdentifiers());
+                logger.info("createEquity completed creating equity {}", equity.getEquityIdentifiers());
                 result = equity;
-            }else {
+            } else {
 
                 logger.info("createEquityWithMandatoryAttributes could not find exchange details  for equity extractedName {}", extractedName);
             }
             logger.info("createEquityWithMandatoryAttributes exec completed for equity extractedName {}", extractedName);
         } catch (Exception ex) {
-            logger.error("createEquityWithMandatoryAttributes exec failed for equity extractedName {}", extractedName,ex);
+            logger.error("createEquityWithMandatoryAttributes exec failed for equity extractedName {}", extractedName, ex);
         }
         return result;
     }
 
     @NotNull
-    private EquityIdentifiers getEquityIdentifiers(String equityName,EquityStockExchangeDetailsResponse details) {
+    private EquityIdentifiers getEquityIdentifiers(String equityName, EquityStockExchangeDetailsResponse details) {
         EquityIdentifiers equityIdentifiers = new EquityIdentifiers();
 
-        if(StringUtils.isBlank(equityName)){
-            equityName =  StringUtils.isNotBlank( details.getShortName())?details.getShortName():details.getLongName();
+        if (StringUtils.isBlank(equityName)) {
+            equityName = StringUtils.isNotBlank(details.getShortName()) ? details.getShortName() : details.getLongName();
         }
 
 
-        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName,details.getExchange(), Constants.SOURCE_MONEY_CONTROL);
+        EquityIdentifier equityIdentifier = new EquityIdentifier(equityName, details.getExchange(), Constants.SOURCE_MONEY_CONTROL);
         equityIdentifier.setSymbol(details.getSymbol());
 
-        logger.info("createEquity started creating equity {}",equityName);
+        logger.info("createEquity started creating equity {}", equityName);
 
 
         equityIdentifiers.getIdentifiers().add(equityIdentifier);
@@ -307,7 +316,6 @@ public class EquityService implements IEquityService {
         sourceDetails.setSourceName(Constants.SOURCE_MONEY_CONTROL);
         return sourceDetails;
     }
-
 
 
 }
