@@ -3,13 +3,17 @@ package com.pd.finance.service;
 
 import com.pd.finance.exceptions.EquityNotFoundException;
 import com.pd.finance.exceptions.PersistenceException;
+import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.filter.code.EquityNamesFilter;
 import com.pd.finance.filter.db.EquityExchangeFilter;
+import com.pd.finance.filter.db.EquityUpdateDateFilter;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.model.EquityIdentifiers;
 import com.pd.finance.model.SourceDetails;
 import com.pd.finance.persistence.EquityRepository;
+import com.pd.finance.request.BulkCreateEquityRequest;
+import com.pd.finance.request.CreateEquityRequest;
 import com.pd.finance.request.EquityBulkUpdateRequest;
 import com.pd.finance.response.EquityStockExchangeDetailsResponse;
 import com.pd.finance.response.chart.EquityBulkUpdateResponse;
@@ -26,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,6 +119,44 @@ public class EquityService implements IEquityService {
     }
 
     @Override
+    public List<Equity> createEquity(BulkCreateEquityRequest bulkCreateEquityRequest) throws ServiceException {
+        logger.info("createEquity exec started for bulkCreateEquityRequest");
+        List<Equity> result = new ArrayList<>();
+        List<CreateEquityRequest> createEquityRequests = bulkCreateEquityRequest.getEquities();
+        createEquityRequests.parallelStream().forEach(createEquityRequest->{
+
+            try {
+                Equity equity = createEquity(createEquityRequest);
+                result.add(equity);
+            } catch (ServiceException e) {
+                logger.info("createEquity exec failed for CreateEquityRequest {}",createEquityRequest);
+            }
+        });
+        logger.info("createEquity exec completed for bulkCreateEquityRequest");
+        return result;
+    }
+
+    @Override
+    public Equity createEquity(CreateEquityRequest request) throws ServiceException {
+        Equity equity = null;
+        logger.info("createEquity exec started for CreateEquityRequest {}",request);
+        try {
+            equity = createEquityWithMandatoryAttributes(request.getName(), request.getSrcUrl(), request.getExchange(), Constants.SOURCE_MONEY_CONTROL);
+            equity =  upsertEquity(equity);
+            boolean success   =  fetchAndPersistEquityAttributes(equity);
+            if(success){
+                equity = getEquity(equity.getDefaultEquityIdentifier());
+            }
+            logger.info("createEquity exec completed for CreateEquityRequest {}",request);
+        } catch ( Exception e) {
+            logger.error(e.getMessage(), e);
+            logger.info("createEquity exec failed for CreateEquityRequest {}",request);
+            throw new ServiceException(e);
+        }
+        return equity;
+    }
+
+    @Override
     public Equity updateEquity(Equity equity) throws PersistenceException {
 
         try {
@@ -193,6 +236,11 @@ public class EquityService implements IEquityService {
         EquityNamesFilter namesFilter = request.getNamesFilter();
         if (namesFilter != null) {
             criteriaList.add(namesFilter.getCriteria(""));
+        }
+
+        EquityUpdateDateFilter updateDateFilter = request.getUpdateDateFilter();
+        if (updateDateFilter != null) {
+            criteriaList.add(updateDateFilter.getCriteria(""));
         }
 
         Criteria criteria = null;
@@ -288,6 +336,8 @@ public class EquityService implements IEquityService {
         }
         return result;
     }
+
+
 
     @NotNull
     private EquityIdentifiers getEquityIdentifiers(String equityName, EquityStockExchangeDetailsResponse details) {

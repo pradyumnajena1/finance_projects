@@ -5,6 +5,8 @@ import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
+import com.pd.finance.request.BulkCreateEquityRequest;
+import com.pd.finance.request.CreateEquityRequest;
 import com.pd.finance.request.EquityBulkUpdateRequest;
 import com.pd.finance.response.chart.EquityBulkUpdateResponse;
 import org.springframework.data.domain.Page;
@@ -29,7 +31,9 @@ public interface IEquityService {
 
     Equity createEquity(Equity equity) throws PersistenceException;
 
-    Equity updateEquity( Equity equity) throws PersistenceException;
+    Equity createEquity(CreateEquityRequest request) throws ServiceException;
+
+    Equity updateEquity(Equity equity) throws PersistenceException;
 
     Equity deleteEquity(String id) throws PersistenceException;
 
@@ -39,4 +43,6 @@ public interface IEquityService {
     boolean fetchAndPersistEquityAttributes(Equity equity);
 
     Equity createEquityWithMandatoryAttributes(String extractedName, String equitySourceUrl, String exchange, String source);
+
+    List<Equity> createEquity(BulkCreateEquityRequest request) throws ServiceException;
 }

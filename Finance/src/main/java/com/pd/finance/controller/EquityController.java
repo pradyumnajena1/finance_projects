@@ -2,7 +2,9 @@ package com.pd.finance.controller;
 
 
 import com.pd.finance.exceptions.EquityNotFoundException;
+import com.pd.finance.exceptions.PersistenceException;
 import com.pd.finance.model.Equity;
+import com.pd.finance.request.BulkCreateEquityRequest;
 import com.pd.finance.request.CreateEquityRequest;
 import com.pd.finance.request.EquityBulkUpdateRequest;
 import com.pd.finance.response.BaseResponse;
@@ -14,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class EquityController {
@@ -39,18 +43,29 @@ public class EquityController {
     public BaseResponse createEquity(@RequestBody CreateEquityRequest request ){
 
         try {
-            Equity equity = equityService.createEquityWithMandatoryAttributes(request.getName(), request.getSrcUrl(), request.getExchange(), Constants.SOURCE_MONEY_CONTROL);
-            equity = equityService.upsertEquity(equity);
-            boolean success   = equityService.fetchAndPersistEquityAttributes(equity);
-            if(success){
-                equity = equityService.getEquity(equity.getDefaultEquityIdentifier());
-            }
+            logger.info("createEquity exec started for equity request {}",request);
+            Equity equity = equityService.createEquity(request);
+            logger.info("createEquity exec completed for equity request {}",request);
             return new BaseResponse(equity);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return new BaseResponse(e);
         }
     }
+    @RequestMapping(value = "/equities/bulkCreate",method = RequestMethod.POST,consumes =MediaType.APPLICATION_JSON_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse bulkCreateEquity(@RequestBody BulkCreateEquityRequest request ){
+
+        try {
+            logger.info("createEquity exec started for equity request {}",request);
+            List<Equity> equities = equityService.createEquity(request);
+            logger.info("createEquity exec completed for equity request {}",request);
+            return new BaseResponse(equities);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
 
 
     @RequestMapping(value = "/equities/bulkUpdate",method = RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
