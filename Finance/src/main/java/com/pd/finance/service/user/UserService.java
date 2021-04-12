@@ -5,6 +5,8 @@ import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.EncryptedPassword;
 import com.pd.finance.model.user.User;
 import com.pd.finance.persistence.UserRepository;
+import com.pd.finance.request.UserLoginRequest;
+import com.pd.finance.response.UserLoginResponse;
 import com.pd.finance.service.SequenceGeneratorService;
 import com.pd.finance.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,5 +76,33 @@ public class UserService implements IUserService{
     @Override
     public List<User> getAllUsers() throws ServiceException {
         return userRepository.findAll();
+    }
+
+    @Override
+    public UserLoginResponse loginUser(UserLoginRequest loginRequest) throws ServiceException {
+
+        try {
+            String email = loginRequest.getEmail();
+            User user = userRepository.findByEmail(email);
+            if(user==null){
+                return new UserLoginResponse(false,"user with email:"+email+" doesn't exist!");
+
+            }
+
+            EncryptedPassword encryptedPassword = new EncryptedPassword(user.getPassword(),user.getSalt());
+            boolean isValidPassword = encryptedPassword.validatePassword(loginRequest.getPassword());
+            if(!isValidPassword){
+                return new UserLoginResponse(false,"Invalid Password!");
+
+            }
+
+            return new UserLoginResponse(true,"");
+
+
+        } catch (Exception exception) {
+            return new UserLoginResponse(false,exception.getMessage());
+        }
+
+
     }
 }

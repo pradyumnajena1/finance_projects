@@ -104,5 +104,22 @@ public class CommonUtils {
         return CommonUtils.isBetween(value,start,end);
 
     }
+    public static String  getHexString(byte[] byteArray) {
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<byteArray.length;i++){
+            String substring = Integer.toString((byteArray[i] & 0xff) + 0x100, 16).substring(1);
+            sb.append(substring);
+        }
+        return sb.toString();
+    }
+    public static   byte[] hexStringToByteArray(String hexString) {
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return data;
+    }
 
 }

@@ -4,6 +4,8 @@ import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.user.User;
 import com.pd.finance.persistence.UserRepository;
+import com.pd.finance.request.UserLoginRequest;
+import com.pd.finance.response.UserLoginResponse;
 import com.pd.finance.service.SequenceGeneratorService;
 import com.pd.finance.service.user.IUserService;
 import com.pd.finance.utils.UserUtils;
@@ -82,7 +84,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<User> deleteEmployee(@PathVariable(value = "id") Long userId) {
+    public ResponseEntity<User> deleteUser(@PathVariable(value = "id") Long userId) {
         try {
             User deletedUser = userService.deleteUser(userId);
             return ResponseEntity.ok(deletedUser);
@@ -90,6 +92,18 @@ public class UserController {
             if(ExceptionUtils.getRootCause(e) instanceof UserNotFoundException){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @PostMapping("/users/login")
+    public ResponseEntity<UserLoginResponse> loginUser(@Valid @RequestBody UserLoginRequest loginRequest) {
+
+        try {
+            UserLoginResponse loginResponse = userService.loginUser(loginRequest);
+            return ResponseEntity.ok(loginResponse);
+        } catch (ServiceException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
