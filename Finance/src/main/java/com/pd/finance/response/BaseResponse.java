@@ -13,6 +13,7 @@ public class BaseResponse {
     }
 
 
+
     public BaseResponse(Throwable throwable) {
         this.errorMessage = throwable.getMessage();
         this.success = false;
