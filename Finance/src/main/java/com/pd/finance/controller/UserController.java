@@ -1,10 +1,12 @@
 package com.pd.finance.controller;
 
+import com.pd.finance.exceptions.DuplicateEntityException;
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.user.User;
 import com.pd.finance.persistence.UserRepository;
 import com.pd.finance.request.UserLoginRequest;
+import com.pd.finance.response.BaseResponse;
 import com.pd.finance.response.UserLoginResponse;
 import com.pd.finance.service.SequenceGeneratorService;
 import com.pd.finance.service.user.IUserService;
@@ -57,12 +59,18 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
 
         try {
             User userFromDb = userService.createUser(user);
             return ResponseEntity.ok(userFromDb);
         } catch (ServiceException e) {
+
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if(rootCause instanceof DuplicateEntityException){
+                BaseResponse baseResponse = new BaseResponse(rootCause);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(baseResponse);
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 

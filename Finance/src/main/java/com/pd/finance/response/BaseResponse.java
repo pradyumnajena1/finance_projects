@@ -12,7 +12,7 @@ public class BaseResponse {
         this.success = true;
     }
 
-    public BaseResponse(Exception exception) {
+    public BaseResponse(Throwable exception) {
         this.errorMessage = exception.getMessage();
         this.success = false;
     }
