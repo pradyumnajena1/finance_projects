@@ -1,5 +1,7 @@
 package com.pd.finance.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
@@ -18,10 +20,15 @@ public class User {
 
     @NotBlank
     @Size(max = 20)
-    private String username;
+    private String userName;
 
     @NotBlank
+    @JsonIgnore
     private String password;
+
+    @NotBlank
+    @JsonIgnore
+    private String salt;
 
     @NotBlank
     @Size(max = 100)
@@ -40,18 +47,19 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
-
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
@@ -70,5 +78,13 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+    @JsonIgnore
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

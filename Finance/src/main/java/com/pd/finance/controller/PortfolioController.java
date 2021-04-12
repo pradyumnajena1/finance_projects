@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PortfolioController {
-    Logger logger = LoggerFactory.getLogger(EquityController.class);
+    private static Logger logger = LoggerFactory.getLogger(EquityController.class);
 
     @Autowired
     private IPortfolioService portfolioService;
@@ -58,8 +58,7 @@ public class PortfolioController {
         try {
             logger.info("updatePortfolio exec started for portfolioId   {}",id);
 
-
-            Portfolio portfolio = portfolioService.updatePortfolio(request);
+            Portfolio portfolio = portfolioService.updatePortfolio(id,request);
             logger.info("updatePortfolio exec completed for portfolioId {}",id);
             return new BaseResponse(portfolio);
         } catch (Exception e) {

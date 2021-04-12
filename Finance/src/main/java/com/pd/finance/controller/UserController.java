@@ -1,13 +1,20 @@
 package com.pd.finance.controller;
 
+import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.user.User;
 import com.pd.finance.persistence.UserRepository;
 import com.pd.finance.service.SequenceGeneratorService;
+import com.pd.finance.service.user.IUserService;
 import com.pd.finance.utils.UserUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -16,56 +23,76 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
-
+    private static Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
-    @Autowired
-    private SequenceGeneratorService sequenceGeneratorService;
 
     @GetMapping("/users")
-    public List<User> getAllEmployees() {
-        return userRepository.findAll();
+    public ResponseEntity<List<User>> getAllUsers() {
+        try {
+            List<User> allUsers = userService.getAllUsers();
+            return ResponseEntity.ok().body(allUsers);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity < User > getEmployeeById(@PathVariable(value = "id") Long userId)
-            throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found for this id :: " + userId));
-        return ResponseEntity.ok().body(user);
+    public ResponseEntity<User> getUserById(@PathVariable(value = "id") Long userId) {
+        try {
+            User user = userService.getUser(userId);
+            return ResponseEntity.ok().body(user);
+
+        } catch (ServiceException e) {
+
+           if(ExceptionUtils.getRootCause(e) instanceof UserNotFoundException){
+               return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+           }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PostMapping("/users")
-    public User createEmployee(@Valid @RequestBody User user){
-        user.setId(sequenceGeneratorService.generateSequence(User.SEQUENCE_NAME));
-        user.setPassword(UserUtils.getEncryptedPassword(user.getPassword()));
-        return userRepository.save(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
+        try {
+            User userFromDb = userService.createUser(user);
+            return ResponseEntity.ok(userFromDb);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity <User> updateEmployee(@PathVariable(value = "id") Long userId,
-                                                      @Valid @RequestBody User userDetaila) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found for this id :: " + userId));
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable(value = "id") Long userId,
+                                           @Valid @RequestBody User userDetails) throws UserNotFoundException {
+        try {
+            User updatedUser = userService.updateUser(userId, userDetails);
+            return ResponseEntity.ok(updatedUser);
+        } catch (ServiceException e) {
+            if(ExceptionUtils.getRootCause(e) instanceof UserNotFoundException){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
 
-        user.setUsername(userDetaila.getUsername());
-        user.setEmail(userDetaila.getEmail());
-        user.setMobile(userDetaila.getMobile());
-        final User updatedUser = userRepository.save(user);
-        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/users/{id}")
-    public Map< String,Boolean > deleteEmployee(@PathVariable(value = "id") Long userId)
-            throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found for this id :: " + userId));
+    public ResponseEntity<User> deleteEmployee(@PathVariable(value = "id") Long userId) {
+        try {
+            User deletedUser = userService.deleteUser(userId);
+            return ResponseEntity.ok(deletedUser);
+        } catch (ServiceException e) {
+            if(ExceptionUtils.getRootCause(e) instanceof UserNotFoundException){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
 
-        userRepository.delete(user);
-        Map < String, Boolean > response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return response;
     }
 
 
