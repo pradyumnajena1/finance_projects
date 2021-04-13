@@ -17,6 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -70,6 +73,42 @@ public class EquitySearchService implements IEquitySearchService {
         }
         logger.info("search exec completed for searchRequest "+searchRequest);
         return equitiesCollector;
+    }
+
+    @Override
+    public List<Equity> searchByName(EquitySearchByNameRequest request) {
+
+        logger.info("searchByName exec started for searchRequest "+request);
+        List<Equity> equitiesCollector  = new ArrayList<>();
+
+        TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(request.getSearchTerms().toArray(new String[0]));
+        Query query = TextQuery.queryText(criteria);
+        Pageable  pageRequest = PageRequest.of(0, 500);
+        Page<Equity> page = equityRepository.searchEquity(query,pageRequest);
+        int totalPages = page.getTotalPages();
+        int currentPageNumber = page.getNumber();
+        logger.info("searchByName No of equities after applying db_filters {} ",page.getTotalElements());
+
+        while (!page.isEmpty() && currentPageNumber<totalPages)
+        {
+
+            logger.info("searchByName process started pageNumber {} ", currentPageNumber);
+
+            List<Equity> equities = page.toList();
+            logger.info("searchByName  pageNumber {} numEquities {} ", currentPageNumber, equities.size());
+            equitiesCollector.addAll(equities);
+            logger.info("searchByName pageNumber {} numEquities {} after in_code filters", currentPageNumber, equitiesCollector.size());
+            logger.info("search process completed pageNumber {}", currentPageNumber);
+
+
+            pageRequest = pageRequest.next();
+            page = equityRepository.searchEquity(query,pageRequest);
+            currentPageNumber = page.getNumber();
+
+        }
+        logger.info("search exec completed for searchRequest "+request);
+        return equitiesCollector;
+
     }
 
     @NotNull

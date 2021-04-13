@@ -1,8 +1,10 @@
 package com.pd.finance.service.portfolio;
 
 import com.pd.finance.exceptions.ServiceException;
+import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.portfolio.Portfolio;
 import com.pd.finance.persistence.PortfolioRepository;
+import com.pd.finance.persistence.UserRepository;
 import com.pd.finance.request.CreatePortfolioRequest;
 import com.pd.finance.request.UpdatePortfolioRequest;
 import com.pd.finance.service.EquityService;
@@ -21,17 +23,25 @@ public class PortfolioService implements IPortfolioService{
 
     @Autowired
     private PortfolioRepository portfolioRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public Portfolio createPortfolio(CreatePortfolioRequest request) throws ServiceException {
         try {
-            Portfolio portfolio = new Portfolio();
-            portfolio.setName(request.getPortfolioName());
-            portfolio.setUserId(request.getUserId());
-            portfolio.setCreatedDate(new Date());
-            portfolio.setUpdatedDate(new Date());
-            Portfolio createdPortfolio = portfolioRepository.save(portfolio);
-            return createdPortfolio;
+            Long userId = request.getUserId();
+            if(userRepository.existsById(userId)){
+                Portfolio portfolio = new Portfolio();
+                portfolio.setName(request.getPortfolioName());
+                portfolio.setUserId(userId);
+                portfolio.setCreatedDate(new Date());
+                portfolio.setUpdatedDate(new Date());
+                Portfolio createdPortfolio = portfolioRepository.save(portfolio);
+                return createdPortfolio;
+            }else {
+                throw new UserNotFoundException("User with id:"+userId+" doesn't exist");
+            }
+
         } catch (Exception exception) {
 
             logger.error(exception.getMessage(),exception);

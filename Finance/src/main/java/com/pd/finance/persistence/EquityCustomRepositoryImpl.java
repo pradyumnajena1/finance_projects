@@ -40,6 +40,11 @@ public class EquityCustomRepositoryImpl implements EquityCustomRepository{
         return searchEquities(query, pageable);
     }
 
+    @Override
+    public Page<Equity> searchEquity(Query query, Pageable pageable) {
+        return searchEquities(query, pageable);
+    }
+
     @NotNull
     protected Page<Equity> searchEquities(Query query, Pageable pageable) {
         List<Equity> list = mongoTemplate.find(query, Equity.class);
