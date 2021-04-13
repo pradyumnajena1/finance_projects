@@ -5,6 +5,7 @@ import com.pd.finance.model.EquityIdentifier;
 import com.pd.finance.model.WebDocument;
 import com.pd.finance.persistence.WebDocumentRepository;
 import okhttp3.Interceptor;
+import org.apache.commons.collections.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,7 +43,8 @@ public class DocumentService extends AbstractHttpService implements IDocumentSer
 
             WebDocument result = getWebDocument(url, ttl);
             String content = result.getContent();
-            return Jsoup.parse(content);
+            Document document = Jsoup.parse(content);
+            return document;
         } catch (Exception exception) {
             logger.error(exception.getMessage(),exception);
             throw new ServiceException(exception);
@@ -53,8 +55,13 @@ public class DocumentService extends AbstractHttpService implements IDocumentSer
         WebDocument result = null;
 
         try {
-            WebDocument existingWebDocument = documentRepository.findByUrl(url);
-            result = existingWebDocument;
+            WebDocument existingWebDocument = null;
+            List<WebDocument> byUrl = documentRepository.findByUrl(url);
+            if(CollectionUtils.isNotEmpty(byUrl)){
+
+                  existingWebDocument = byUrl.get(0);
+            }
+            result = existingWebDocument ;
             if(isUpdateRequired(existingWebDocument)){
 
                 String content = get(url);
@@ -107,7 +114,12 @@ public class DocumentService extends AbstractHttpService implements IDocumentSer
 
     @Override
     public Document getDocument(EquityIdentifier identifier,TemporalAmount ttl) throws Exception {
-        return getDocument((String) identifier.getAdditionalAttribute("url"), ttl);
+        Document document = null;
+        if (identifier!=null) {
+            String url = (String) identifier.getAdditionalAttribute("url");
+            document = getDocument(url, ttl);
+        }
+        return document;
     }
 
     @Override

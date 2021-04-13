@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 public class CommonUtils {
@@ -121,5 +122,11 @@ public class CommonUtils {
         }
         return data;
     }
+    public static Comparator<String> nullSafeStringComparator = Comparator
+            .nullsFirst(String::compareToIgnoreCase);
+
+    public static Comparator<Date> nullSafeDateComparator = Comparator
+            .nullsFirst(Date::compareTo);
+
 
 }

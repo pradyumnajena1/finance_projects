@@ -11,7 +11,8 @@ public abstract class AbstractEquityEnricherService implements IEquityEnricherSe
         if(equityAttribute==null){
             return true;
         }
-        return DateTimeComparator.getDateOnlyInstance().compare(new Date(), equityAttribute.getUpdatedDate()) > 0;
+        boolean isUpdatedOneDayBefore = DateTimeComparator.getDateOnlyInstance().compare(new Date(), equityAttribute.getUpdatedDate()) > 0;
+        return isUpdatedOneDayBefore;
 
     }
 }

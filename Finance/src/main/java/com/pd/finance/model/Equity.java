@@ -33,7 +33,7 @@ public class Equity extends EquityAttribute{
     private String sector;
     private EquityHistoricalData historicalData;
     private EquitySummary equitySummary;
-
+    private BrokerResearchDetails brokerResearchDetails;
 
 
     private EquityPerformances performances;
@@ -61,6 +61,14 @@ public class Equity extends EquityAttribute{
 
     public void setStockExchangeDetails(EquityStockExchangeDetailsResponse stockExchangeDetails) {
         this.stockExchangeDetails = stockExchangeDetails;
+    }
+
+    public BrokerResearchDetails getBrokerResearchDetails() {
+        return brokerResearchDetails;
+    }
+
+    public void setBrokerResearchDetails(BrokerResearchDetails brokerResearchDetails) {
+        this.brokerResearchDetails = brokerResearchDetails;
     }
 
     public EquitySummary getEquitySummary() {

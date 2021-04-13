@@ -12,6 +12,14 @@ public class EquityUpdateDateFilter implements EquityFilter {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private Date updatedBefore;
 
+    public Date getUpdatedBefore() {
+        return updatedBefore;
+    }
+
+    public void setUpdatedBefore(Date updatedBefore) {
+        this.updatedBefore = updatedBefore;
+    }
+
     @Override
     public FilterType getFilterType() {
         return FilterType.InDb;

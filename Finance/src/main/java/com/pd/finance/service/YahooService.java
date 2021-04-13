@@ -182,10 +182,13 @@ public class YahooService extends AbstractHttpService implements IYahooService {
         try {
 
             WebDocument webDocument = documentService.getWebDocument(historicalDataUrl, interval.getTtl());
-            csvString = webDocument.getContent();
+            if(webDocument!=null){
+
+                csvString = webDocument.getContent();
+            }
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            logger.error(exception.getMessage(),exception);
         }
         return csvString;
     }

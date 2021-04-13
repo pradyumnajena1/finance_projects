@@ -54,8 +54,10 @@ public class EquityHistoricalStockPriceAttributeService extends HttpGatewayEquit
     @NotNull
     protected EquityHistoricalIntervalData getEquityHistoricalIntervalData(EquityIdentifier identifier, HistoricalDataInterval oneDay) throws ServiceException {
         EquityHistoricalIntervalData dailyHistoricalIntervalData = yahooService.getHistoricalStockPrice(identifier, Period.ofDays(20 * 365), oneDay);
-        dailyHistoricalIntervalData.setSource(Constants.SOURCE_YAHOO_FINANCE);
-        dailyHistoricalIntervalData.setUpdatedDate(new Date());
+        if (dailyHistoricalIntervalData!=null) {
+            dailyHistoricalIntervalData.setSource(Constants.SOURCE_YAHOO_FINANCE);
+            dailyHistoricalIntervalData.setUpdatedDate(new Date());
+        }
         return dailyHistoricalIntervalData;
     }
 }

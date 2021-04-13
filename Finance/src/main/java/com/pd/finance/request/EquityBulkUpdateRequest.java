@@ -1,16 +1,30 @@
 package com.pd.finance.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.code.EquityNamesFilter;
 import com.pd.finance.filter.db.EquityExchangeFilter;
 import com.pd.finance.filter.db.EquityUpdateDateFilter;
 
 public class EquityBulkUpdateRequest {
 
+    @JsonProperty("exchangeFilter")
     private EquityExchangeFilter exchangeFilter;
+    @JsonProperty("namesFilter")
     private EquityNamesFilter  namesFilter;
+    @JsonProperty("updateDateFilter")
     private EquityUpdateDateFilter updateDateFilter;
+    @JsonProperty("debugFilter")
+    private DebugFilter debugFilter;
 
     public EquityBulkUpdateRequest() {
+    }
+
+    public DebugFilter getDebugFilter() {
+        return debugFilter;
+    }
+
+    public void setDebugFilter(DebugFilter debugFilter) {
+        this.debugFilter = debugFilter;
     }
 
     public EquityExchangeFilter getExchangeFilter() {

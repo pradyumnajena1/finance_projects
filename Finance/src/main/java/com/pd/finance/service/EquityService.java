@@ -180,6 +180,11 @@ public class EquityService implements IEquityService {
         result.setCompleted(false);
         AtomicInteger successfulUpdates = new AtomicInteger(0);
         AtomicInteger currentEquityNumber = new AtomicInteger(0);
+        int maxEquitiesToUpdate  = -1;
+        if(request.getDebugFilter()!=null){
+            maxEquitiesToUpdate = request.getDebugFilter().getNumEquities();
+
+        }
 
 
         try {
@@ -206,11 +211,15 @@ public class EquityService implements IEquityService {
                         logger.info("successfully updated  attributes of  equity {}", anEquity.getDefaultEquityIdentifier());
                         logger.info("updateEquities numSuccessfulUpdates:{}", successfulUpdates);
 
+
                     }
                     logger.info("updateEquities currentEquityNumber:{} numEquitiesToUpdate:{} pageNumber:{} totalPages:{}", currentEquityNumber , numEquitiesToUpdate, currentPageNumber, totalPages);
 
 
                 });
+                if(maxEquitiesToUpdate!=-1&& successfulUpdates.get()>maxEquitiesToUpdate){
+                    break;
+                }
 
 
                 logger.info("updateEquities process completed pageNumber {}", currentPageNumber);

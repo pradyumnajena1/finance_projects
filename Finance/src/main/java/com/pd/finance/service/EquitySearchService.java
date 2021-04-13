@@ -83,7 +83,7 @@ public class EquitySearchService implements IEquitySearchService {
 
         TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(request.getSearchTerms().toArray(new String[0]));
         Query query = TextQuery.queryText(criteria);
-        Pageable  pageRequest = PageRequest.of(0, 500);
+        Pageable  pageRequest = PageRequest.of(0, 200);
         Page<Equity> page = equityRepository.searchEquity(query,pageRequest);
         int totalPages = page.getTotalPages();
         int currentPageNumber = page.getNumber();

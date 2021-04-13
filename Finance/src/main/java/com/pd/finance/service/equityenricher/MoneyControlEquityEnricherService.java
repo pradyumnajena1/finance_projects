@@ -43,6 +43,9 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     @Resource(name = "equityCurrentPriceStatsAttributeService")
     private IEquityAttributeService equityCurrentPriceStatsAttributeService;
 
+    @Resource(name = "equityBrokerResearchAttributeService")
+    private IEquityAttributeService equityBrokerResearchAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
@@ -58,6 +61,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             addEquityOverview(identifier,equity,equityFromDb);
             addTechnicalDetails(identifier,equity,equityFromDb);
             addEquityInsights(identifier,equity,equityFromDb);
+            addBrokerResearchDetails(identifier,equity,equityFromDb);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
@@ -68,6 +72,20 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
 
     }
 
+    private void addBrokerResearchDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+        try {
+            boolean isUpdateRequired = equityFromDb == null  || isUpdateRequiredForEquityAttribute(equityFromDb.getBrokerResearchDetails());
+           // isUpdateRequired = true;
+            if(isUpdateRequired){
+
+                equityBrokerResearchAttributeService.enrichEquity(identifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addBrokerResearchDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
+        }
+    }
 
 
     private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {

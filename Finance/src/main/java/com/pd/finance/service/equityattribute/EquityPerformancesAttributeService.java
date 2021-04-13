@@ -32,31 +32,33 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
             logger.info( "enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
 
             EquityHistoricalIntervalData equityHistoricalIntervalData = yahooService.getHistoricalStockPrice(identifier, Period.ofDays(20), HistoricalDataInterval.OneDay);
-            List<EquityPerformance> performances = new ArrayList<>();
-            List<EquityHistoricalDataLineItem> lineItems = equityHistoricalIntervalData.getLineItems();
-            Collections.sort(lineItems);
+            if (equityHistoricalIntervalData!=null) {
+                List<EquityPerformance> performances = new ArrayList<>();
+                List<EquityHistoricalDataLineItem> lineItems = equityHistoricalIntervalData.getLineItems();
+                Collections.sort(lineItems);
 
-            int startIndex = Math.max(lineItems.size() - 5, 0);
-            int endIndex = lineItems.size() - 1;
+                int startIndex = Math.max(lineItems.size() - 5, 0);
+                int endIndex = lineItems.size() - 1;
 
-            for(int i = startIndex; i<= endIndex; i++){
+                for(int i = startIndex; i<= endIndex; i++){
 
-                EquityHistoricalDataLineItem currentLineItem = lineItems.get(i);
-                EquityHistoricalDataLineItem previousLineItem = null;
-                if(i>0){
+                    EquityHistoricalDataLineItem currentLineItem = lineItems.get(i);
+                    EquityHistoricalDataLineItem previousLineItem = null;
+                    if(i>0){
 
-                      previousLineItem = lineItems.get(i - 1);
+                          previousLineItem = lineItems.get(i - 1);
+                    }
+
+                    EquityPerformance performance = getPerformance(currentLineItem, previousLineItem);
+
+                    performances.add(performance);
                 }
+                EquityPerformances equityPerformances =new EquityPerformances("Last 5 day performance", performances );
+                equityPerformances.setSource(Constants.SOURCE_YAHOO_FINANCE);
+                equityPerformances.setUpdatedDate(new Date());
 
-                EquityPerformance performance = getPerformance(currentLineItem, previousLineItem);
-
-                performances.add(performance);
+                equity.setPerformances(equityPerformances);
             }
-            EquityPerformances equityPerformances =new EquityPerformances("Last 5 day performance", performances );
-            equityPerformances.setSource(Constants.SOURCE_YAHOO_FINANCE);
-            equityPerformances.setUpdatedDate(new Date());
-
-            equity.setPerformances(equityPerformances);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
