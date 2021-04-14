@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OverviewFilter  implements EquityFilter {
+public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 
@@ -62,8 +62,7 @@ public class OverviewFilter  implements EquityFilter {
         criteriaList.add(Criteria.where("overview.volume").gte(getMinVolume()));
         criteriaList.add(Criteria.where("overview.marketCap").gte(getMinMarketCap()));
 
-        Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
-        return criteria;
+         return getAsCompositeCriteria(criteriaList);
     }
 
     @Override

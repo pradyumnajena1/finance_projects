@@ -3,6 +3,7 @@ package com.pd.finance.filter.db;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedProfitGrowthDetails;
+import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -10,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfitGrowthFilter  extends AbstractProfitLossFilter implements IFilter<CompoundedProfitGrowthDetails> {
+public class ProfitGrowthFilter  extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
 
     private BigDecimal minTTMGrowth;

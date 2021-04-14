@@ -2,6 +2,7 @@ package com.pd.finance.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.filter.code.EquityInsightFilter;
@@ -22,16 +23,43 @@ public class EquitySearchRequest {
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(EquitySearchRequest.class);
 
+    @JsonProperty("recentGainersFilter")
     private RecentGainersFilter  recentGainersFilter;
+
+    @JsonProperty("exchangeFilter")
     private EquityExchangeFilter exchangeFilter;
+
+    @JsonProperty("namesFilter")
     private EquityNamesFilter namesFilter;
+
+    @JsonProperty("performanceFilter")
     private PerformanceFilter performanceFilter;
+
+    @JsonProperty("swotFilter")
     private SwotFilter swotFilter;
+
+    @JsonProperty("overviewFilter")
     private OverviewFilter overviewFilter;
+
+    @JsonProperty("technicalPeriodFilter")
     private TechnicalPeriodFilter technicalPeriodFilter;
+
+    @JsonProperty("insightFilter")
     private EquityInsightFilter insightFilter;
 
+    @JsonProperty("profitLossFilter")
     private ProfitLossFilter profitLossFilter;
+
+    @JsonProperty("brokerResearchFilter")
+    private BrokerResearchFilter brokerResearchFilter;
+
+    public BrokerResearchFilter getBrokerResearchFilter() {
+        return brokerResearchFilter;
+    }
+
+    public void setBrokerResearchFilter(BrokerResearchFilter brokerResearchFilter) {
+        this.brokerResearchFilter = brokerResearchFilter;
+    }
 
     public RecentGainersFilter getRecentGainersFilter() {
         return recentGainersFilter;
@@ -137,6 +165,7 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getInsightFilter());
         CollectFilters(filters,  getProfitLossFilter());
         CollectFilters(filters,  getRecentGainersFilter());
+        CollectFilters(filters,  getBrokerResearchFilter());
 
         return filters;
     }

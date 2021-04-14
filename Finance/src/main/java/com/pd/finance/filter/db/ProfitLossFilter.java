@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfitLossFilter implements EquityFilter {
+public class ProfitLossFilter extends AbstractDBFilter<Equity> implements EquityFilter {
 
     private SalesGrowthFilter salesGrowthFilter;
     private ProfitGrowthFilter profitGrowthFilter;
@@ -68,18 +68,9 @@ public class ProfitLossFilter implements EquityFilter {
         if(getStockPriceCagrFilter()!=null){
             criteriaList.add(getSalesGrowthFilter().getCriteria("profitLossDetails"));
         }
-        return getFinalCriteria(criteriaList);
+        return getAsCompositeCriteria(criteriaList);
     }
-    private Criteria getFinalCriteria(List<Criteria> criteriaList) {
-        Criteria criteria = null;
-        if(criteriaList.size()>1){
 
-            criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
-        }else{
-            criteria = criteriaList.get(0);
-        }
-        return criteria;
-    }
     @Override
     public boolean apply(Equity obj) {
         return false;

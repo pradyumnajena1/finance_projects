@@ -2,6 +2,9 @@ package com.pd.finance.filter.db;
 
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.CompoundedProfitGrowthDetails;
+import com.pd.finance.model.CompoundedSalesGrowthDetails;
+import com.pd.finance.model.Equity;
+import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -9,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractProfitLossFilter {
+public abstract class AbstractProfitLossFilter extends AbstractDBFilter<EquityProfitLossDetails> {
 
 
     private BigDecimal minTenYearsGrowth;
@@ -68,7 +71,7 @@ public abstract class AbstractProfitLossFilter {
         }
 
 
-        return getFinalCriteria(criteriaList);
+        return getAsCompositeCriteria(criteriaList);
     }
 
     @NotNull
@@ -83,17 +86,7 @@ public abstract class AbstractProfitLossFilter {
 
     protected abstract String getFieldName();
 
-    @NotNull
-    protected Criteria getFinalCriteria(List<Criteria> criteriaList) {
-        Criteria criteria = null;
-        if(criteriaList.size()>1){
 
-              criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
-        }else{
-            criteria = criteriaList.get(0);
-        }
-        return criteria;
-    }
 
     @NotNull
     protected Criteria getFieldCriteria(String parentObject, String s, BigDecimal minGrowth) {
@@ -104,7 +97,7 @@ public abstract class AbstractProfitLossFilter {
         return FilterType.InDb;
     }
 
-    public boolean apply(CompoundedProfitGrowthDetails profitGrowthDetails) {
+    public boolean apply(EquityProfitLossDetails profitGrowthDetails) {
         return false;
     }
 }

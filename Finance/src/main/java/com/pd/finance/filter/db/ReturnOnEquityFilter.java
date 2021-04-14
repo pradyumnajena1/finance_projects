@@ -3,12 +3,13 @@ package com.pd.finance.filter.db;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedReturnOnEquity;
+import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
 
-public class ReturnOnEquityFilter extends AbstractProfitLossFilter implements IFilter<CompoundedReturnOnEquity> {
+public class ReturnOnEquityFilter extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
     private BigDecimal minLastOneYearGrowth;
 
@@ -16,7 +17,7 @@ public class ReturnOnEquityFilter extends AbstractProfitLossFilter implements IF
     private String lastOneYearAttributeName = "lastOneYear";
 
     @Override
-    public boolean apply(CompoundedReturnOnEquity obj) {
+    public boolean apply(EquityProfitLossDetails obj) {
         return false;
     }
 
