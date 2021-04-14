@@ -189,7 +189,8 @@ public class EquityService implements IEquityService {
 
         try {
             Criteria criteria = getBulkUpdateFilterCriteria(request);
-            Pageable pageRequest = PageRequest.of(0, 100);
+            Sort sort = Sort.by(Sort.Direction.ASC, "updatedDate");
+            Pageable pageRequest = PageRequest.of(0, 100,sort);
             Page<Equity> equitiesPage = getPage(criteria, pageRequest);
             final int numEquitiesToUpdate = (int) equitiesPage.getTotalElements();
             final int totalPages = equitiesPage.getTotalPages();
@@ -264,9 +265,6 @@ public class EquityService implements IEquityService {
     }
 
     protected Page<Equity> getPage(Criteria dbFilterCriteria, Pageable pageRequest) {
-
-        Sort sort = Sort.by(Sort.Direction.ASC, "updatedDate");
-
         return dbFilterCriteria != null ? equityRepository.searchEquity(dbFilterCriteria, pageRequest) : equityRepository.findAll(pageRequest);
     }
 

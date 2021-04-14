@@ -70,6 +70,15 @@ public class BrokerResearchLineItem implements Comparable<BrokerResearchLineItem
         this.targetPrice = targetPrice;
     }
 
+    @JsonIgnore
+    public boolean isRecommendedPriceAvailable( ) {
+        return  getRecoPrice() != null && !BigDecimal.ZERO.equals( getRecoPrice());
+    }
+    @JsonIgnore
+    public boolean isTargetPriceAvailable( ) {
+        return  getTargetPrice() != null && !BigDecimal.ZERO.equals( getTargetPrice());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
