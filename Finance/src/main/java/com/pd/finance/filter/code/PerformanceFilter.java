@@ -1,5 +1,6 @@
 package com.pd.finance.filter.code;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -38,6 +39,7 @@ public class PerformanceFilter  implements EquityFilter {
     }
 
     @Override
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.Partial;
     }

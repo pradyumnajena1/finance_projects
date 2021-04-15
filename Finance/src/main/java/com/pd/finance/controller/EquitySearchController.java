@@ -4,6 +4,7 @@ import com.pd.finance.model.Equity;
 import com.pd.finance.request.EquitySearchByNameRequest;
 import com.pd.finance.request.EquitySearchRequest;
 import com.pd.finance.response.BaseResponse;
+import com.pd.finance.response.EquitySearchResponse;
 import com.pd.finance.service.EquitySearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,9 @@ public class EquitySearchController {
                 return baseResponse;
             }
             List<Equity> equities =  searchService.search(request);
-            return new BaseResponse(equities);
+            EquitySearchResponse searchResponse = new EquitySearchResponse();
+            searchResponse.setEquities(equities);
+            return new BaseResponse(searchResponse);
         } catch (Exception e) {
             logger.error("Failed to process Gainers",e);
             return  new BaseResponse(e);

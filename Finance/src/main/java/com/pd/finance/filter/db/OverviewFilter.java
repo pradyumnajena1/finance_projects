@@ -1,5 +1,6 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.db.SwotFilter;
@@ -50,6 +51,7 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
     }
 
     @Override
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.InDb;
     }

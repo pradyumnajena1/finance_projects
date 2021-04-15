@@ -72,6 +72,7 @@ public class EquitySearchService implements IEquitySearchService {
 
         }
         logger.info("search exec completed for searchRequest "+searchRequest);
+
         return equitiesCollector;
     }
 

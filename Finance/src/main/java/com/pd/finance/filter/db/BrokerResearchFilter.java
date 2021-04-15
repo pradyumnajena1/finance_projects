@@ -1,5 +1,6 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
@@ -28,6 +29,7 @@ public class BrokerResearchFilter extends AbstractDBFilter<Equity> implements Eq
     private BigDecimal minAvgGainPercentage;
 
     @Override
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.InDb;
     }

@@ -1,6 +1,7 @@
 package com.pd.finance.model;
 
 import com.mysema.query.annotations.QueryEntity;
+import com.pd.finance.request.EquitySearchRequest;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -34,9 +35,8 @@ public class UserEquityQuery {
     @Size(max = 500)
     private String queryDescription;
 
-    @NotBlank
-    @Size(max = 5120)
-    private String queryJsonContent;
+    @NotNull
+    private EquitySearchRequest searchRequest;
 
     private Date updatedDate;
     private Date createdDate;
@@ -73,13 +73,7 @@ public class UserEquityQuery {
         this.queryDescription = queryDescription;
     }
 
-    public String getQueryJsonContent() {
-        return queryJsonContent;
-    }
 
-    public void setQueryJsonContent(String queryJsonContent) {
-        this.queryJsonContent = queryJsonContent;
-    }
 
     public Date getUpdatedDate() {
         return updatedDate;
@@ -95,5 +89,13 @@ public class UserEquityQuery {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public EquitySearchRequest getSearchRequest() {
+        return searchRequest;
+    }
+
+    public void setSearchRequest(EquitySearchRequest searchRequest) {
+        this.searchRequest = searchRequest;
     }
 }

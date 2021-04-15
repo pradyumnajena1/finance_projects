@@ -1,5 +1,6 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.*;
@@ -103,6 +104,7 @@ public class TechnicalFilter  implements IFilter<TechnicalAnalysis> {
     }
 
     @Override
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.InDb;
     }

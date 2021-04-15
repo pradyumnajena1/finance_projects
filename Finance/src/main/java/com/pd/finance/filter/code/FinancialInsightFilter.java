@@ -1,5 +1,6 @@
 package com.pd.finance.filter.code;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
@@ -50,6 +51,7 @@ public class FinancialInsightFilter  implements IFilter<FinancialInsights> {
     }
 
     @Override
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.InCode;
     }
