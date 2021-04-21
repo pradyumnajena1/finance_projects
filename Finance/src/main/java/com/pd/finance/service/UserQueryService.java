@@ -144,4 +144,20 @@ public class UserQueryService implements IUserQueryService{
         }
         return equities;
     }
+
+    @Override
+    public List<UserEquityQuery> getAllUserEquityQuery(Long userId) throws ServiceException {
+        try {
+            logger.info("getUserEquityQuery exec started for userId:{}",userId );
+
+            List<UserEquityQuery> queries = userQueryRepository.findByUserId(userId);
+            logger.info("getUserEquityQuery exec completed for userId:{} id:{}",userId );
+            return queries;
+
+
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new ServiceException(exception);
+        }
+    }
 }

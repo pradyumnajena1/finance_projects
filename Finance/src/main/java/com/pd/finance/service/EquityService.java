@@ -205,7 +205,7 @@ public class EquityService implements IEquityService {
                 equities.parallelStream().forEach(anEquity -> {
 
                     currentEquityNumber.incrementAndGet();
-                    boolean success = fetchAndPersistEquityAttributes(anEquity);
+                    boolean success = fetchAndPersistEquityAttributes(anEquity,request.getForceUpdate());
                     if (success) {
                         successfulUpdates.incrementAndGet();
 
@@ -276,9 +276,13 @@ public class EquityService implements IEquityService {
         bulkUpdateResponse.setCompleted(true);
         return bulkUpdateResponse;
     }
+    @Override
+    public boolean fetchAndPersistEquityAttributes(Equity equity   ) {
+        return fetchAndPersistEquityAttributes(equity,false);
+    }
 
     @Override
-    public boolean fetchAndPersistEquityAttributes(Equity equity) {
+    public boolean fetchAndPersistEquityAttributes(Equity equity,boolean forceUpdate) {
         boolean success = false;
         try {
             logger.info("fetchAndPersistEquity exec started for equity {}", equity.getDefaultEquityIdentifier());
@@ -294,7 +298,7 @@ public class EquityService implements IEquityService {
             }
             ;
 
-            equityEnricherService.enrichEquity(identifier, equity);
+            equityEnricherService.enrichEquity(identifier, equity,forceUpdate);
             equity.setUpdatedDate(new Date());
             upsertEquity(equity);
             //Thread.sleep(500);

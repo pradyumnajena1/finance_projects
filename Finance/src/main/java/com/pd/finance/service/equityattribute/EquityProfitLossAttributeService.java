@@ -36,10 +36,12 @@ public class EquityProfitLossAttributeService extends HtmlScrapperEquityAttribut
 
 
             EquityIdentifier screenerEquityIdentifier = equity.getEquityIdentifier(Constants.SOURCE_SCREENER_IO);
-            Document document = getDocument(screenerEquityIdentifier);
+            if (screenerEquityIdentifier!=null) {
+                Document document = getDocument(screenerEquityIdentifier);
 
-            EquityProfitLossDetails profitLossDetails = profitLossDetailsFactory.create(document);
-            equity.setProfitLossDetails(profitLossDetails);
+                EquityProfitLossDetails profitLossDetails = profitLossDetailsFactory.create(document);
+                equity.setProfitLossDetails(profitLossDetails);
+            }
 
             logger.info( "enrichEquity completed for equity: "+ equity.getDefaultEquityIdentifier());
         } catch (Exception e) {

@@ -42,6 +42,8 @@ public interface IEquityService {
 
     boolean fetchAndPersistEquityAttributes(Equity equity);
 
+    boolean fetchAndPersistEquityAttributes(Equity equity, boolean forceUpdate);
+
     Equity createEquityWithMandatoryAttributes(String extractedName, String equitySourceUrl, String exchange, String source);
 
     List<Equity> createEquity(BulkCreateEquityRequest request) throws ServiceException;

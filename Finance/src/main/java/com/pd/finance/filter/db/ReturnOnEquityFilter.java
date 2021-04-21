@@ -1,5 +1,7 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedReturnOnEquity;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 
 public class ReturnOnEquityFilter extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
+    @JsonProperty("minLastOneYearGrowth")
     private BigDecimal minLastOneYearGrowth;
 
     private String fieldName = "returnOnEquity";
@@ -28,11 +31,13 @@ public class ReturnOnEquityFilter extends AbstractProfitLossFilter implements IF
 
     @NotNull
     @Override
+    @JsonIgnore
     protected String getLastOneYearAttributeName() {
         return lastOneYearAttributeName;
     }
 
     @Override
+    @JsonIgnore
     protected String getFieldName() {
         return fieldName;
     }

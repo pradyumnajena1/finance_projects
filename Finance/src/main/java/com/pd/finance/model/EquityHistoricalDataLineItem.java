@@ -8,11 +8,13 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
 public class EquityHistoricalDataLineItem  implements Comparable<EquityHistoricalDataLineItem>{
 
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     @Nonnull
     private Date date;
 
@@ -132,21 +134,29 @@ public class EquityHistoricalDataLineItem  implements Comparable<EquityHistorica
         return  getClose()!= null &&  getOpen() != null && getHigh() != null && getLow() != null;
     }
 
-    public boolean isWithinRange(EquityHistoricalDataLineItem otherLineItem, BigDecimal percentage) {
-        if(!CommonUtils.isWithinRange( getOpen(), otherLineItem.getOpen(),percentage)){
+    public boolean isWithinRange(EquityHistoricalDataLineItem pivotLineItem, BigDecimal percentage) {
+
+        BigDecimal lowerBound = CommonUtils.getLowerBound(pivotLineItem.getClose(), percentage);
+        BigDecimal upperBound = CommonUtils.getUpperBound(pivotLineItem.getClose(), percentage);
+
+        return isWithinRange(lowerBound,upperBound);
+    }
+
+    public boolean isWithinRange(BigDecimal lowerBound,BigDecimal upperBound ) {
+
+        if(!CommonUtils.isBetween( getClose(), lowerBound,upperBound)){
             return false;
         }
-        if(!CommonUtils.isWithinRange( getClose(), otherLineItem.getClose(),percentage)){
-            return false;
-        }
-        if(!CommonUtils.isWithinRange( getLow(), otherLineItem.getLow(),percentage)){
-            return false;
-        }
-        if(!CommonUtils.isWithinRange( getHigh(), otherLineItem.getHigh(),percentage)){
-            return false;
-        }
+
         return true;
     }
 
-
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("HDLineItem{");
+        sb.append("date=").append(DATE_FORMAT.format( date));
+        sb.append(", close=").append(close);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -23,6 +23,8 @@ import java.text.MessageFormat;
 public class YahooEquityEnricherService extends AbstractEquityEnricherService implements IEquityEnricherService {
 
     private static final Logger logger = LoggerFactory.getLogger(YahooEquityEnricherService.class);
+
+
     @Autowired
     private ApplicationConfig config;
     @Resource(name = "equityStockExchangeDetailsAttributeService")
@@ -41,18 +43,19 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
     private IEquityService equityService;
 
     @Override
-    public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity) throws ServiceException {
+    public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity, boolean forceUpdate) throws ServiceException {
         try {
             logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             Equity equityFromDb = equityService.getEquity(defaultEquityIdentifier);
-            addEquityStockExchangeDetails(defaultEquityIdentifier,equity,equityFromDb);
+
+            addEquityStockExchangeDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
 
-            addHistoricalStockPrice(defaultEquityIdentifier,equity,equityFromDb);
+            addHistoricalStockPrice(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
-            addRecentPerformances(defaultEquityIdentifier,equity,equityFromDb);
+            addRecentPerformances(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
-            addSummary(defaultEquityIdentifier,equity,equityFromDb);
+            addSummary(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
@@ -62,9 +65,9 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
         }
     }
 
-    private void addSummary(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+    private void addSummary(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
-            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances(),forceUpdate);
 
             if(isUpdateRequired){
                 equitySummaryAttributeService.enrichEquity(identifier,equity);
@@ -76,9 +79,9 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
         }
     }
 
-    private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
+    private void addRecentPerformances(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)  {
         try {
-            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances());
+            boolean isUpdateRequired =  equityFromDb == null || isUpdateRequiredForEquityAttribute(equityFromDb.getPerformances(),forceUpdate);
 
             if(isUpdateRequired){
                 equityPerformancesAttributeService.enrichEquity(identifier,equity);
@@ -89,9 +92,9 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
 
         }
     }
-    private void addHistoricalStockPrice(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+    private void addHistoricalStockPrice(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb)) {
+            if(equityFromDb==null || isUpdateRequiredForHistoricalDate(equityFromDb,forceUpdate)) {
                 historicalStockPriceAttributeService.enrichEquity(identifier, equity);
             }
         } catch (Exception e) {
@@ -100,24 +103,24 @@ public class YahooEquityEnricherService extends AbstractEquityEnricherService im
         }
     }
 
-    private boolean isUpdateRequiredForEquityAttribute(Equity equityFromDb) {
+    private boolean isUpdateRequiredForHistoricalDate(Equity equityFromDb, boolean forceUpdate) {
         EquityHistoricalData historicalData = equityFromDb.getHistoricalData();
         if(historicalData==null){
             return true;
         }
-        if(isUpdateRequiredForEquityAttribute(historicalData.getDailyHistoricalData())){
+        if(isUpdateRequiredForEquityAttribute(historicalData.getDailyHistoricalData(),forceUpdate)){
             return true;
         }
-        if(isUpdateRequiredForEquityAttribute(historicalData.getWeeklyHistoricalIntervalData())){
+        if(isUpdateRequiredForEquityAttribute(historicalData.getWeeklyHistoricalIntervalData(),forceUpdate)){
             return true;
         }
-        if(isUpdateRequiredForEquityAttribute(historicalData.getMonthlyEquityHistoricalIntervalData())){
+        if(isUpdateRequiredForEquityAttribute(historicalData.getMonthlyEquityHistoricalIntervalData(),forceUpdate)){
             return true;
         }
         return false;
     }
 
-    private void addEquityStockExchangeDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+    private void addEquityStockExchangeDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
             if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getStockExchangeDetails())) {
                 equityStockExchangeDetailsAttributeService.enrichEquity(identifier, equity);

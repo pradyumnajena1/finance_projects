@@ -17,4 +17,6 @@ public interface IUserQueryService {
     UserEquityQuery deleteUserEquityQuery(Long userId,Long id) throws ServiceException;
 
     List<Equity> executeUserEquityQuery(Long userId, Long userQueryId)throws ServiceException;
+
+    List<UserEquityQuery> getAllUserEquityQuery(Long userId)throws ServiceException;
 }

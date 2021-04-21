@@ -20,12 +20,16 @@ public class RecentGainersFilter implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(RecentGainersFilter.class);
 
     public static final int DefaultFlatPeriodMaxLengthInDays = 1500;
+    public static final int DefaultAllowedNumMissesInInterval = 2;
+    public static final int DefaultAllowedNumMissesInFlatPeriod = 10;
 
     private HistoricalDataInterval peakUpInterval = HistoricalDataInterval.OneWeek;
 
     private BigDecimal boundPercentage = BigDecimal.valueOf(0.05d);
 
     private Integer flatPeriodMaxLengthInDays  = DefaultFlatPeriodMaxLengthInDays;
+    private Integer allowedNumMissesInInterval = DefaultAllowedNumMissesInInterval;
+    private Integer allowedNumMissesInFlatPeriod = DefaultAllowedNumMissesInFlatPeriod;
 
     public HistoricalDataInterval getPeakUpInterval() {
         return peakUpInterval;
@@ -51,6 +55,22 @@ public class RecentGainersFilter implements EquityFilter {
         this.flatPeriodMaxLengthInDays = flatPeriodMaxLengthInDays;
     }
 
+    public Integer getAllowedNumMissesInInterval() {
+        return allowedNumMissesInInterval;
+    }
+
+    public void setAllowedNumMissesInInterval(Integer allowedNumMissesInInterval) {
+        this.allowedNumMissesInInterval = allowedNumMissesInInterval;
+    }
+
+    public Integer getAllowedNumMissesInFlatPeriod() {
+        return allowedNumMissesInFlatPeriod;
+    }
+
+    public void setAllowedNumMissesInFlatPeriod(Integer allowedNumMissesInFlatPeriod) {
+        this.allowedNumMissesInFlatPeriod = allowedNumMissesInFlatPeriod;
+    }
+
     @Override
     @JsonIgnore
     public FilterType getFilterType() {
@@ -67,6 +87,8 @@ public class RecentGainersFilter implements EquityFilter {
         boolean result = false;
 
         result = isRecentPeakUpEquity(equity, peakUpInterval, boundPercentage);
+
+
         return result;
     }
 
@@ -78,30 +100,17 @@ public class RecentGainersFilter implements EquityFilter {
                 return false;
             }
             EquityHistoricalIntervalData intervalData = historicalData.getIntervalData(HistoricalDataInterval.OneDay);
-            if(interval==null){
+            if(intervalData==null){
                 return false;
             }
             List<EquityHistoricalDataLineItem> lineItems = intervalData.getLineItems();
             Collections.sort(lineItems);
             Integer intervalLengthInDays = getIntervalLengthInDays(interval);
-            HistoricalDataPartition historicalDataPartition = new HistoricalDataPartition(lineItems,intervalLengthInDays);
-            historicalDataPartition.process();
 
-            if (!historicalDataPartition.isAllBoundaryIndicesAvailable()){
-                return false;
-            }
+            HistoricalDataPartition historicalDataPartition = new HistoricalDataPartition(lineItems,intervalLengthInDays,flatPeriodMaxLengthInDays,percentage,allowedNumMissesInInterval,allowedNumMissesInFlatPeriod);
+            logger.info("isRecentPeakUp equity: {} Partition: {} ",equity.getDefaultEquityIdentifier(),historicalDataPartition);
+            return historicalDataPartition.isRecentPeakUpEquity();
 
-            if (!isMonotonicallyIncreasingBetweenInterval(lineItems,historicalDataPartition.getIntervalLastLineItemIndex(),historicalDataPartition.getIntervalStartLineItemIndex())) {
-
-                return false;
-            }
-
-            if (!isFlatBeforeInterval(percentage, lineItems, historicalDataPartition.getIntervalStartLineItemIndex(), historicalDataPartition.getIndexBeforeStartOfInterval())) {
-
-                return false;
-
-            }
-            return true;
         } catch (Exception exception) {
             logger.error(exception.getMessage());
             return false;
@@ -121,44 +130,9 @@ public class RecentGainersFilter implements EquityFilter {
     }
 
 
-    private boolean isMonotonicallyIncreasingBetweenInterval(List<EquityHistoricalDataLineItem> lineItems, Integer lastLineItemIndex, Integer secondLastLineItemIndex) {
-        try {
-            for (int currentIndex = lastLineItemIndex; currentIndex > secondLastLineItemIndex; currentIndex--) {
-
-                EquityHistoricalDataLineItem lineItem = lineItems.get(currentIndex);
-                EquityHistoricalDataLineItem previousLineItem = lineItems.get(currentIndex - 1);
-
-                if (lineItem.getClose().compareTo(previousLineItem.getClose()) < 0) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (Exception exception) {
-            logger.error(exception.getMessage());
-            return false;
-        }
-    }
 
 
-    private boolean isFlatBeforeInterval(BigDecimal percentage, List<EquityHistoricalDataLineItem> lineItems, Integer intervalStartLineItemIndex, Integer indexBeforeStartOfInterval) {
-        try {
-            int endIndex = flatPeriodMaxLengthInDays!=null? Math.max(0,intervalStartLineItemIndex-flatPeriodMaxLengthInDays):0;
-            int startIndex = indexBeforeStartOfInterval;
 
-            for (int currentIndex = startIndex; currentIndex >= endIndex; currentIndex--) {
-
-                EquityHistoricalDataLineItem lineItem = lineItems.get(currentIndex);
-                EquityHistoricalDataLineItem otherLineItem = lineItems.get(intervalStartLineItemIndex);
-                if (lineItem.isAllFieldsAvailable() && !lineItem.isWithinRange(otherLineItem, percentage)) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (Exception exception) {
-            logger.error(exception.getMessage());
-            return false;
-        }
-    }
 
 
 }

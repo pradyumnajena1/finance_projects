@@ -15,6 +15,8 @@ public class EquityBulkUpdateRequest {
     private EquityUpdateDateFilter updateDateFilter;
     @JsonProperty("debugFilter")
     private DebugFilter debugFilter;
+    @JsonProperty("forceUpdate")
+    private boolean forceUpdate;
 
     public EquityBulkUpdateRequest() {
     }
@@ -49,5 +51,13 @@ public class EquityBulkUpdateRequest {
 
     public void setUpdateDateFilter(EquityUpdateDateFilter updateDateFilter) {
         this.updateDateFilter = updateDateFilter;
+    }
+
+    public boolean getForceUpdate() {
+        return forceUpdate;
+    }
+
+    public void setForceUpdate(boolean forceUpdate) {
+        this.forceUpdate = forceUpdate;
     }
 }

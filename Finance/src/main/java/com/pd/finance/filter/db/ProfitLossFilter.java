@@ -1,6 +1,7 @@
 package com.pd.finance.filter.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -11,9 +12,16 @@ import java.util.List;
 
 public class ProfitLossFilter extends AbstractDBFilter<Equity> implements EquityFilter {
 
+    @JsonProperty("salesGrowthFilter")
     private SalesGrowthFilter salesGrowthFilter;
+
+    @JsonProperty("profitGrowthFilter")
     private ProfitGrowthFilter profitGrowthFilter;
+
+    @JsonProperty("stockPriceCagrFilter")
     private StockPriceCagrFilter stockPriceCagrFilter;
+
+    @JsonProperty("returnOnEquityFilter")
     private ReturnOnEquityFilter returnOnEquityFilter;
 
     public SalesGrowthFilter getSalesGrowthFilter() {

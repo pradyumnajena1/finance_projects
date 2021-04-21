@@ -2,12 +2,14 @@ package com.pd.finance.service.portfolio;
 
 import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.exceptions.UserNotFoundException;
+import com.pd.finance.model.UserEquityQuery;
 import com.pd.finance.model.portfolio.Portfolio;
 import com.pd.finance.persistence.PortfolioRepository;
 import com.pd.finance.persistence.UserRepository;
 import com.pd.finance.request.CreatePortfolioRequest;
 import com.pd.finance.request.UpdatePortfolioRequest;
 import com.pd.finance.service.EquityService;
+import com.pd.finance.service.SequenceGeneratorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +27,22 @@ public class PortfolioService implements IPortfolioService{
     private PortfolioRepository portfolioRepository;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private SequenceGeneratorService sequenceGeneratorService;
     @Override
-    public Portfolio createPortfolio(CreatePortfolioRequest request) throws ServiceException {
+    public Portfolio createPortfolio(Long userId,CreatePortfolioRequest request) throws ServiceException {
         try {
-            Long userId = request.getUserId();
+            logger.info("createPortfolio exec started for userId:{}",userId );
             if(userRepository.existsById(userId)){
                 Portfolio portfolio = new Portfolio();
+                long id = sequenceGeneratorService.generateSequence(Portfolio.SEQUENCE_NAME);
+                portfolio.setId(id);
                 portfolio.setName(request.getPortfolioName());
                 portfolio.setUserId(userId);
                 portfolio.setCreatedDate(new Date());
                 portfolio.setUpdatedDate(new Date());
                 Portfolio createdPortfolio = portfolioRepository.save(portfolio);
+                logger.info("createPortfolio exec completed for userId:{}",userId );
                 return createdPortfolio;
             }else {
                 throw new UserNotFoundException("User with id:"+userId+" doesn't exist");
@@ -50,14 +56,20 @@ public class PortfolioService implements IPortfolioService{
     }
 
     @Override
-    public Portfolio getPortfolio(String id) throws ServiceException {
+    public Portfolio getPortfolio(Long userId,Long id) throws ServiceException {
         try {
-            Portfolio portfolio = null;
-            Optional<Portfolio> byId = portfolioRepository.findById(id);
-            if(byId.isPresent()){
-                portfolio = byId.get();
+            logger.info("getPortfolio exec started for userId:{} portfolioId:{}",userId,id);
+            if (userRepository.existsById(userId)) {
+                Portfolio portfolio = null;
+                Optional<Portfolio> byId = portfolioRepository.findById(id);
+                if(byId.isPresent()){
+                    portfolio = byId.get();
+                }
+                logger.info("getPortfolio exec completed for userId:{} portfolioId:{}",userId,id);
+                return portfolio;
+            }else {
+                throw new UserNotFoundException("User with id:"+userId+" doesn't exist");
             }
-            return portfolio;
         } catch (Exception exception) {
             logger.error(exception.getMessage(),exception);
             throw new ServiceException(exception);
@@ -65,20 +77,27 @@ public class PortfolioService implements IPortfolioService{
     }
 
     @Override
-    public Portfolio updatePortfolio(String id,UpdatePortfolioRequest request) throws ServiceException {
+    public Portfolio updatePortfolio(Long userId,Long id,UpdatePortfolioRequest request) throws ServiceException {
         try {
-            Portfolio portfolio = null;
-            Optional<Portfolio> byId = portfolioRepository.findById(id);
-            if(byId.isPresent()){
-                portfolio = byId.get();
+            logger.info("updatePortfolio exec started for userId:{} portfolioId:{}",userId,id);
+            if (userRepository.existsById(userId)) {
+                Portfolio portfolio = null;
+                Optional<Portfolio> byId = portfolioRepository.findById(id);
+                if(byId.isPresent()){
+                    portfolio = byId.get();
+                }
+                if(portfolio!=null){
+                    portfolio.setName(request.getPortfolioName());
+                    portfolio.setUpdatedDate(new Date());
+                    portfolioRepository.save(portfolio);
+                }else{
+                    throw new ServiceException("Equity with id "+id+" not found");
+                }
+                logger.info("updatePortfolio exec completed for userId:{} portfolioId:{}",userId,id);
+                return portfolio;
+            }else {
+                throw new UserNotFoundException("User with id:"+userId+" doesn't exist");
             }
-            if(portfolio!=null){
-                portfolio.setName(request.getPortfolioName());
-                portfolioRepository.save(portfolio);
-            }else{
-                throw new ServiceException("Equity with id "+id+" not found");
-            }
-            return portfolio;
         } catch (ServiceException e) {
             throw e;
         }catch (Exception e){
@@ -88,19 +107,25 @@ public class PortfolioService implements IPortfolioService{
     }
 
     @Override
-    public Portfolio deletePortfolio(String id) throws ServiceException {
+    public Portfolio deletePortfolio(Long userId,Long id) throws ServiceException {
         try {
-            Portfolio portfolio = null;
-            Optional<Portfolio> byId = portfolioRepository.findById(id);
-            if(byId.isPresent()){
-                portfolio = byId.get();
+            logger.info("deletePortfolio exec started for userId:{} portfolioId:{}",userId,id);
+            if (userRepository.existsById(userId)) {
+                Portfolio portfolio = null;
+                Optional<Portfolio> byId = portfolioRepository.findById(id);
+                if(byId.isPresent()){
+                    portfolio = byId.get();
+                }
+                if(portfolio!=null){
+                     portfolioRepository.deleteById(id);
+                }else{
+                    throw new ServiceException("Equity with id "+id+" not found");
+                }
+                logger.info("deletePortfolio exec completed for userId:{} portfolioId:{}",userId,id);
+                return portfolio;
+            }else {
+                throw new UserNotFoundException("User with id:"+userId+" doesn't exist");
             }
-            if(portfolio!=null){
-                 portfolioRepository.deleteById(id);
-            }else{
-                throw new ServiceException("Equity with id "+id+" not found");
-            }
-            return portfolio;
         } catch (ServiceException e) {
             throw e;
         }catch (Exception e){

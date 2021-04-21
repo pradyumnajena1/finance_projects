@@ -7,11 +7,11 @@ import com.pd.finance.request.CreatePortfolioRequest;
 import com.pd.finance.request.UpdatePortfolioRequest;
 
 public interface IPortfolioService {
-    Portfolio createPortfolio(CreatePortfolioRequest request) throws ServiceException;
+    Portfolio createPortfolio(Long userId,CreatePortfolioRequest request) throws ServiceException;
 
-    Portfolio getPortfolio(String id)throws ServiceException;
+    Portfolio getPortfolio(Long userId,Long id)throws ServiceException;
 
-    Portfolio updatePortfolio(String id,UpdatePortfolioRequest request) throws ServiceException;
+    Portfolio updatePortfolio(Long userId,Long id,UpdatePortfolioRequest request) throws ServiceException;
 
-    Portfolio deletePortfolio(String id) throws ServiceException;
+    Portfolio deletePortfolio(Long userId,Long id) throws ServiceException;
 }

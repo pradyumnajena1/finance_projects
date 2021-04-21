@@ -145,7 +145,7 @@ public class EquityProfitLossDetailsFactory implements IEquityProfitLossDetailsF
     @NotNull
     private String getCssQuery(int tableNum) {
 
-        return   "#profit-loss > div:nth-child(3) > table:nth-child("+tableNum+ ") > tbody > tr" ;
+        return   "#profit-loss > div:nth-child(4) > table:nth-child("+tableNum+ ") > tbody > tr" ;
     }
 
 

@@ -1,21 +1,38 @@
 package com.pd.finance.model.portfolio;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pd.finance.model.BrokerResearchLineItem;
+import com.pd.finance.utils.CommonUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class PortfolioEquity {
+public class PortfolioEquity  implements Comparable<PortfolioEquity>{
+    @JsonIgnore
+    private static Comparator<PortfolioEquity> portfolioEquityComparator = Comparator
+            .comparing(PortfolioEquity::getPortfolioId, CommonUtils.nullSafeLongComparator)
+            .thenComparing(PortfolioEquity::getEquityId, CommonUtils.nullSafeStringComparator);
 
-    private String portfolioId;
+
+    @Field(targetType = FieldType.INT64)
+    private Long portfolioId;
+
     private String equityId;
+
     private List<PortfolioEquityLot> lots;
+
     private Date createdDate;
     private Date updatedDate;
 
-    public String getPortfolioId() {
+    public Long getPortfolioId() {
         return portfolioId;
     }
 
-    public void setPortfolioId(String portfolioId) {
+    public void setPortfolioId(Long portfolioId) {
         this.portfolioId = portfolioId;
     }
 
@@ -49,5 +66,10 @@ public class PortfolioEquity {
 
     public void setLots(List<PortfolioEquityLot> lots) {
         this.lots = lots;
+    }
+
+    @Override
+    public int compareTo(@NotNull PortfolioEquity other) {
+        return portfolioEquityComparator.compare(this, other);
     }
 }

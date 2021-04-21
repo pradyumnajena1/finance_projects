@@ -1,5 +1,7 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedSalesGrowthDetails;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 
 public class SalesGrowthFilter extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
+    @JsonProperty("minTTMGrowth")
     private BigDecimal minTTMGrowth;
 
     private String fieldName = "salesGrowthDetails";
@@ -27,12 +30,14 @@ public class SalesGrowthFilter extends AbstractProfitLossFilter implements IFilt
     }
 
     @NotNull
+    @JsonIgnore
     @Override
     protected String getLastOneYearAttributeName() {
         return lastOneYearAttributeName;
     }
 
     @Override
+    @JsonIgnore
     protected String getFieldName() {
         return fieldName;
     }

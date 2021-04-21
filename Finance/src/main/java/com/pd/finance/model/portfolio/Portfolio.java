@@ -2,7 +2,10 @@ package com.pd.finance.model.portfolio;
 
 import com.mysema.query.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.util.Date;
 import java.util.Set;
@@ -10,19 +13,25 @@ import java.util.Set;
 @QueryEntity
 @Document
 public class Portfolio {
+    @Transient
+    public static final String SEQUENCE_NAME = "users_portfolio_sequence";
     @Id
-    private String id;
+    private Long id;
+
     private String name;
+
+    @Field(targetType = FieldType.INT64)
     private Long userId;
+
     private Set<PortfolioEquity> portfolioEquities;
     private Date createdDate;
     private Date updatedDate;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

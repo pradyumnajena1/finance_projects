@@ -35,13 +35,13 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
 
 
     @Override
-    public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity) throws ServiceException {
+    public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity, boolean forceUpdate) throws ServiceException {
         try {
             logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             Equity equityFromDb = equityService.getEquity(defaultEquityIdentifier);
 
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
-            addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb);
+            addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
@@ -52,9 +52,10 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
         }
     }
 
-    private void addProfitLossDetails(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb) {
+    private void addProfitLossDetails(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getEquityCurrentPriceStats())){
+            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getEquityCurrentPriceStats(),forceUpdate);
+            if(updateRequiredForEquityAttribute){
 
                 profitLossAttributeService.enrichEquity(defaultEquityIdentifier,equity);
             }

@@ -1,5 +1,7 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedStockPriceCagr;
@@ -10,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.math.BigDecimal;
 
 public class StockPriceCagrFilter extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
+   @JsonProperty("minLastOneYearGrowth")
     private BigDecimal minLastOneYearGrowth;
 
     private String fieldName = "stockPriceCagr";
@@ -26,12 +29,14 @@ public class StockPriceCagrFilter extends AbstractProfitLossFilter implements IF
     }
 
     @NotNull
+    @JsonIgnore
     @Override
     protected String getLastOneYearAttributeName() {
         return lastOneYearAttributeName;
     }
 
     @Override
+    @JsonIgnore
     protected String getFieldName() {
         return fieldName;
     }

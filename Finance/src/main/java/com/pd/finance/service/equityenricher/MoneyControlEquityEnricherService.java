@@ -48,20 +48,20 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
 
 
     @Override
-    public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException {
+    public void enrichEquity(EquityIdentifier identifier, Equity equity, boolean forceUpdate) throws ServiceException {
         try {
             logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
             Equity equityFromDb = equityService.getEquity(identifier);
 
-            addCurrentPriceDetails(identifier,equity,equityFromDb);
+            addCurrentPriceDetails(identifier,equity,equityFromDb,forceUpdate);
 
             addBasicDetails(identifier,equity);
-            addSwotDetails(identifier,equity,equityFromDb);
-            addEssentialDetails(identifier,equity,equityFromDb);
-            addEquityOverview(identifier,equity,equityFromDb);
-            addTechnicalDetails(identifier,equity,equityFromDb);
-            addEquityInsights(identifier,equity,equityFromDb);
-            addBrokerResearchDetails(identifier,equity,equityFromDb);
+            addSwotDetails(identifier,equity,equityFromDb,forceUpdate);
+            addEssentialDetails(identifier,equity,equityFromDb,forceUpdate);
+            addEquityOverview(identifier,equity,equityFromDb,forceUpdate);
+            addTechnicalDetails(identifier,equity,equityFromDb,forceUpdate);
+            addEquityInsights(identifier,equity,equityFromDb,forceUpdate);
+            addBrokerResearchDetails(identifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
@@ -72,9 +72,9 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
 
     }
 
-    private void addBrokerResearchDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb) {
+    private void addBrokerResearchDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
-            boolean isUpdateRequired = equityFromDb == null  || isUpdateRequiredForEquityAttribute(equityFromDb.getBrokerResearchDetails());
+            boolean isUpdateRequired = equityFromDb==null|| isUpdateRequiredForEquityAttribute(equityFromDb.getBrokerResearchDetails(),forceUpdate);
            // isUpdateRequired = true;
             if(isUpdateRequired){
 
@@ -88,9 +88,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     }
 
 
-    private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
+    private void addCurrentPriceDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)   {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getEquityCurrentPriceStats())){
+            boolean isUpdateRequired = equityFromDb==null|| isUpdateRequiredForEquityAttribute(equityFromDb.getEquityCurrentPriceStats(),forceUpdate);
+            if(isUpdateRequired){
 
                 equityCurrentPriceStatsAttributeService.enrichEquity(identifier,equity);
             }
@@ -102,6 +103,8 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     }
 
 
+
+
     private void addBasicDetails(EquityIdentifier identifier, Equity equity)   {
         try {
             basicDetailsAttributeService.enrichEquity(identifier,equity);
@@ -111,9 +114,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         }
     }
 
-    private void addEquityInsights(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
+    private void addEquityInsights(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)   {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getInsights())){
+            boolean isUpdateRequired = equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getInsights(),forceUpdate);
+            if(isUpdateRequired){
                 equityInsightsAttributeService.enrichEquity(identifier,equity);
             }
 
@@ -123,9 +127,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         }
     }
 
-    private void addTechnicalDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
+    private void addTechnicalDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)   {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getTechnicalDetails())){
+            boolean isUpdateRequired = equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getTechnicalDetails(),forceUpdate);
+            if(isUpdateRequired){
                 equityTechnicalDetailsAttributeService.enrichEquity(identifier,equity);
             }
 
@@ -135,9 +140,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         }
     }
 
-    private   void addEquityOverview(EquityIdentifier identifier, Equity equity, Equity equityFromDb)  {
+    private   void addEquityOverview(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)  {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getOverview())){
+            boolean isUpdateRequired =  equityFromDb==null|| isUpdateRequiredForEquityAttribute( equityFromDb.getOverview(),forceUpdate);
+            if(isUpdateRequired){
                 equityOverviewAttributeService.enrichEquity(identifier,equity);
             }
 
@@ -147,9 +153,10 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         }
     }
 
-    private   void addEssentialDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
+    private   void addEssentialDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)   {
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getEssentials())){
+            boolean isUpdateRequired = equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getEssentials(),forceUpdate);
+            if(isUpdateRequired){
                 equityEssentialsAttributeService.enrichEquity(identifier,equity);
             }
 
@@ -159,11 +166,12 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         }
     }
 
-    private   void addSwotDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb)   {
+    private   void addSwotDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate)   {
 
 
         try {
-            if(equityFromDb==null || isUpdateRequiredForEquityAttribute(equityFromDb.getSwotDetails())){
+            boolean isUpdateRequired =  equityFromDb==null|| isUpdateRequiredForEquityAttribute( equityFromDb.getSwotDetails(),forceUpdate);
+            if(isUpdateRequired){
                 equitySwotAttributeService.enrichEquity(identifier,equity);
             }
 

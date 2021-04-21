@@ -110,6 +110,21 @@ public class UserQueryController {
 
     }
 
+    @GetMapping("/users/{userId}/queries")
+    public ResponseEntity<BaseResponse> getAllUserQueries(@PathVariable(value = "userId") Long userId ) {
+        try {
+            List<UserEquityQuery> userEquityQueries = userQueryService.getAllUserEquityQuery(userId);
+             BaseResponse baseResponse = new BaseResponse(userEquityQueries);
+            return ResponseEntity.ok().body(baseResponse);
+
+
+        } catch (ServiceException e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
     @DeleteMapping("/users/{userId}/queries/{id}")
     public ResponseEntity<?> deleteUserQueryById(@PathVariable(value = "userId") Long userId,@PathVariable(value = "id") Long userQueryId) {
         try {

@@ -5,5 +5,5 @@ import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityIdentifier;
 
 public interface IEquityEnricherService {
-    void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException;
+    void enrichEquity(EquityIdentifier identifier, Equity equity, boolean forceUpdate) throws ServiceException;
 }

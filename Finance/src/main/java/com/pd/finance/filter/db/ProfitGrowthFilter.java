@@ -1,5 +1,7 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedProfitGrowthDetails;
@@ -13,7 +15,7 @@ import java.util.List;
 
 public class ProfitGrowthFilter  extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
-
+    @JsonProperty("minTTMGrowth")
     private BigDecimal minTTMGrowth;
 
     private String fieldName = "profitGrowthDetails";
@@ -35,12 +37,14 @@ public class ProfitGrowthFilter  extends AbstractProfitLossFilter implements IFi
     }
 
     @NotNull
+    @JsonIgnore
     @Override
     protected String getLastOneYearAttributeName() {
         return lastOneYearAttributeName;
     }
 
     @Override
+    @JsonIgnore
     protected String getFieldName() {
         return fieldName;
     }

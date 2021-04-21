@@ -1,5 +1,7 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.CompoundedProfitGrowthDetails;
 import com.pd.finance.model.CompoundedSalesGrowthDetails;
@@ -14,9 +16,13 @@ import java.util.List;
 
 public abstract class AbstractProfitLossFilter extends AbstractDBFilter<EquityProfitLossDetails> {
 
-
+    @JsonProperty("minTenYearsGrowth")
     private BigDecimal minTenYearsGrowth;
+
+    @JsonProperty("minFiveYearsGrowth")
     private BigDecimal minFiveYearsGrowth;
+
+    @JsonProperty("minThreeYearsGrowth")
     private BigDecimal minThreeYearsGrowth;
 
     private String lastTenYears = "lastTenYears";
@@ -93,6 +99,7 @@ public abstract class AbstractProfitLossFilter extends AbstractDBFilter<EquityPr
         return Criteria.where(parentObject + s).exists(true).andOperator(Criteria.where(parentObject + s).gte(minGrowth));
     }
 
+    @JsonIgnore
     public FilterType getFilterType() {
         return FilterType.InDb;
     }

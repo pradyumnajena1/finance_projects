@@ -100,11 +100,20 @@ public class CommonUtils {
 
     public static boolean isWithinRange(BigDecimal value, BigDecimal target, BigDecimal percentage) {
 
-        BigDecimal end  = target.multiply(percentage.add(BigDecimal.ONE));
-        BigDecimal start  = target.multiply(BigDecimal.ONE.subtract(percentage));
+        BigDecimal end  = getUpperBound(target, percentage);
+        BigDecimal start  = getLowerBound(target, percentage);
         return CommonUtils.isBetween(value,start,end);
 
     }
+
+    public static BigDecimal getLowerBound(BigDecimal target, BigDecimal percentage) {
+        return target.multiply(BigDecimal.ONE.subtract(percentage));
+    }
+
+    public static BigDecimal getUpperBound(BigDecimal target, BigDecimal percentage) {
+        return target.multiply(percentage.add(BigDecimal.ONE));
+    }
+
     public static String  getHexString(byte[] byteArray) {
         StringBuilder sb = new StringBuilder();
         for(int i=0;i<byteArray.length;i++){
@@ -127,6 +136,7 @@ public class CommonUtils {
 
     public static Comparator<Date> nullSafeDateComparator = Comparator
             .nullsFirst(Date::compareTo);
-
+    public static Comparator<Long> nullSafeLongComparator = Comparator
+            .nullsFirst(Long::compareTo);
 
 }

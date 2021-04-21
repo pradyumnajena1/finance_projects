@@ -24,14 +24,14 @@ public class EquityEnricherService implements IEquityEnricherService {
 
 
     @Override
-    public void enrichEquity(EquityIdentifier identifier, Equity equity) throws ServiceException{
+    public void enrichEquity(EquityIdentifier identifier, Equity equity, boolean forceUpdate) throws ServiceException{
 
             try {
                 logger.info("enrichEquity exec started for equity:{}",equity.getDefaultEquityIdentifier());
 
-                mcEquityEnricherService.enrichEquity(identifier,equity);
-                yahooEquityEnricherService.enrichEquity(identifier,equity);
-                screenerEquityEnricherService.enrichEquity(identifier,equity);
+                mcEquityEnricherService.enrichEquity(identifier,equity, forceUpdate);
+                yahooEquityEnricherService.enrichEquity(identifier,equity, forceUpdate);
+                screenerEquityEnricherService.enrichEquity(identifier,equity, forceUpdate);
 
                 logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
             } catch (Exception e) {
