@@ -28,6 +28,7 @@ public class SchedulingService {
     private IWebDocumentService webDocumentService;
     @Autowired
     private IEquityService equityService;
+    private int x;
 
     @Scheduled(fixedRate = 1000*60*60)
     public void reportCurrentTime() {
@@ -40,6 +41,9 @@ public class SchedulingService {
         try {
             logger.info("removeExpiredWebDocuments exec started ");
             webDocumentService.removeExpiredWebDocuments();
+           int y=10;
+
+
 
             logger.info("removeExpiredWebDocuments exec completed ");
         } catch (Exception e) {
@@ -54,7 +58,7 @@ public class SchedulingService {
 
         try {
             logger.info("updateEquities exec started by scheduling service");
-            //doUpdateEquities();
+            doUpdateEquities();
 
             logger.info("updateEquities exec started by scheduling service completed ");
         } catch (Exception e) {
@@ -62,6 +66,9 @@ public class SchedulingService {
 
         }
     }
+
+
+
 
     protected void doUpdateEquities() throws ServiceException {
         EquityBulkUpdateRequest request = new EquityBulkUpdateRequest();
@@ -73,4 +80,6 @@ public class SchedulingService {
         request.setDebugFilter(debugFilter);
         equityService.updateEquities(request);
     }
+
+
 }

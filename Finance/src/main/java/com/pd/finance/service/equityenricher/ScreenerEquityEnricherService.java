@@ -33,6 +33,9 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
     @Resource(name = "equityProfitLossAttributeService")
     private IEquityAttributeService profitLossAttributeService;
 
+    @Resource(name = "equityProsAndConsAttributeService")
+    private IEquityAttributeService prosAndConsAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity, boolean forceUpdate) throws ServiceException {
@@ -42,6 +45,7 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
 
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
             addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
+            addProsAndConsDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
@@ -52,16 +56,30 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
         }
     }
 
+    private void addProsAndConsDetails(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
+        try {
+            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getProsAndConsDetails(),forceUpdate);
+            if(updateRequiredForEquityAttribute){
+
+                prosAndConsAttributeService.enrichEquity(defaultEquityIdentifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addProsAndConsDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
+        }
+    }
+
     private void addProfitLossDetails(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
         try {
-            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getEquityCurrentPriceStats(),forceUpdate);
+            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getProfitLossDetails(),forceUpdate);
             if(updateRequiredForEquityAttribute){
 
                 profitLossAttributeService.enrichEquity(defaultEquityIdentifier,equity);
             }
 
         } catch (Exception e) {
-            logger.error("addCurrentPriceDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addProfitLossDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
 
         }
     }

@@ -23,6 +23,9 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
     @JsonProperty("maxPE")
     private BigDecimal maxPE = BigDecimal.valueOf(100000);
 
+    @JsonProperty("maxCurrentPrice")
+    private BigDecimal maxCurrentPrice = BigDecimal.valueOf(0);
+
     @JsonProperty("minMarketCap")
     private BigDecimal minMarketCap = BigDecimal.valueOf(0);
 
@@ -55,6 +58,14 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
         this.minVolume = minVolume;
     }
 
+    public BigDecimal getMaxCurrentPrice() {
+        return maxCurrentPrice;
+    }
+
+    public void setMaxCurrentPrice(BigDecimal currentPrice) {
+        this.maxCurrentPrice = currentPrice;
+    }
+
     @Override
     @JsonIgnore
     public FilterType getFilterType() {
@@ -73,6 +84,10 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
         }
         if (getMinMarketCap()!=null) {
             criteriaList.add(Criteria.where("overview.marketCap").gte(getMinMarketCap()));
+        }
+
+        if (getMinMarketCap()!=null) {
+            criteriaList.add(Criteria.where("equitySummary.financialData.currentPrice").lte(getMaxCurrentPrice()));
         }
 
         return getAsCompositeCriteria(criteriaList);

@@ -81,7 +81,7 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
          }
         BigDecimal changePercent = null;
 
-        if(change!=null){
+        if(change!=null && !BigDecimal.ZERO.equals( prevClose)){
 
               changePercent = performance.getChange().divide(prevClose, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100.00));
         }

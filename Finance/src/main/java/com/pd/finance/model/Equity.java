@@ -46,6 +46,15 @@ public class Equity extends EquityAttribute{
 
 
     private EquityProfitLossDetails profitLossDetails;
+    private EquityProsAndConsDetails prosAndConsDetails;
+
+    public EquityProsAndConsDetails getProsAndConsDetails() {
+        return prosAndConsDetails;
+    }
+
+    public void setProsAndConsDetails(EquityProsAndConsDetails prosAndConsDetails) {
+        this.prosAndConsDetails = prosAndConsDetails;
+    }
 
     public EquityProfitLossDetails getProfitLossDetails() {
         return profitLossDetails;

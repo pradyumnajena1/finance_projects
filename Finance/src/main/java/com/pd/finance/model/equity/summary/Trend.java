@@ -1,6 +1,5 @@
 package com.pd.finance.model.equity.summary;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
@@ -69,5 +68,39 @@ public class Trend {
 
     public void setStrongSell(Long strongSell) {
         this.strongSell = strongSell;
+    }
+
+    public long getTotalRecommendations( ) {
+        long numRecommendations = 0;
+        Long strongBuy =  getStrongBuy();
+        if(strongBuy!=null){
+
+            numRecommendations = numRecommendations + strongBuy;
+        }
+
+        Long buy =  getBuy();
+        if(buy!=null){
+
+            numRecommendations = numRecommendations + buy;
+        }
+
+
+        Long strongSell =  getStrongSell();
+        if(strongSell!=null){
+
+            numRecommendations = numRecommendations + strongSell;
+        }
+
+        Long sell =  getSell();
+        if(sell!=null){
+
+            numRecommendations = numRecommendations + sell;
+        }
+        Long hold =  getHold();
+        if(hold!=null){
+
+            numRecommendations = numRecommendations + hold;
+        }
+        return  numRecommendations;
     }
 }

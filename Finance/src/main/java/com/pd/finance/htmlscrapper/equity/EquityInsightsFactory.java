@@ -16,10 +16,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Component
-public class EquityInsightsFactory implements IEquityInsightsFactory{
+public class EquityInsightsFactory implements IEquityInsightsFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(EquityInsightsFactory.class);
-    public static void main(String[] args) throws Exception{
+
+    public static void main(String[] args) throws Exception {
         EquityInsightsFactory factory = new EquityInsightsFactory();
         Document document = Jsoup.parse(new File("C:\\Users\\prjen\\Desktop\\Template.html"), "UTF-8");
         EquityInsights equityInsights = factory.create(document);
@@ -46,7 +47,7 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
 
         EquityInsightLineItem lineItem = new EquityInsightLineItem();
         Element first = document.select("div#mc_insight > div.mcpperf.grey_bx > p:nth-child(1)").first();
-        lineItem.setInsight( first.text());
+        lineItem.setInsight(first.text());
         String pclass = first.attr("class");
         StockMarketSentiments sms = getSms(pclass);
         lineItem.setMarketSentiments(sms);
@@ -54,15 +55,14 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
     }
 
     private StockMarketSentiments getSms(String attrValue) {
-        if(attrValue==null){
-            attrValue="";
+        if (attrValue == null) {
+            attrValue = "";
         }
-        if(attrValue.contains("green")){
+        if (attrValue.contains("green")) {
             return StockMarketSentiments.Bearish;
-        }
-        else if(attrValue.contains("red")){
+        } else if (attrValue.contains("red")) {
             return StockMarketSentiments.Bullish;
-        }else if(attrValue.contains("neutral")){
+        } else if (attrValue.contains("neutral")) {
             return StockMarketSentiments.Neutral;
         }
 
@@ -72,12 +72,11 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
     }
 
 
-
     private PriceInsights extractPriceInsights(Document document) {
         PriceInsights priceInsights = new PriceInsights();
         ArrayList<EquityInsightLineItem> lineItems = new ArrayList<>();
         priceInsights.setLineItems(lineItems);
-        document.select("div#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(1) > ul > li").stream().forEach(li->{
+        document.select("div#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(1) > ul > li").stream().forEach(li -> {
 
             EquityInsightLineItem equityInsightLineItem = new EquityInsightLineItem();
             equityInsightLineItem.setInsight(li.text());
@@ -87,6 +86,7 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
         });
         return priceInsights;
     }
+
     private FinancialInsights extractFinancialInsights(Document document) {
         FinancialInsights financialInsights = new FinancialInsights();
 
@@ -95,12 +95,22 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
         financialInsights.setPiotroskiScore(CommonUtils.extractDecimalFromText(piotroskiValueText));
 
         String tableBodySelector = " > table > tbody";
-        String netprofitText = document.select(baseSelector + tableBodySelector + " > tr:nth-child(2) > td:nth-child(2)").first().text();
-        financialInsights.setNetProfitCagrGrowth(CommonUtils.extractDecimalFromText(netprofitText));
-        String operatingProfitText = document.select(baseSelector + tableBodySelector + " > tr:nth-child(3) > td:nth-child(2)").first().text();
-        financialInsights.setOperatingProfitCagrGrowth(CommonUtils.extractDecimalFromText(operatingProfitText));
-        String revenueText = document.select(baseSelector + tableBodySelector + " > tr:nth-child(1) > td:nth-child(2)").first().text();
-        financialInsights.setRevenueCagrGrowth(CommonUtils.extractDecimalFromText(revenueText));
+        Element first = document.select(baseSelector + tableBodySelector + " > tr:nth-child(2) > td:nth-child(2)").first();
+        if (first != null) {
+            String netprofitText = first.text();
+            financialInsights.setNetProfitCagrGrowth(CommonUtils.extractDecimalFromText(netprofitText));
+        }
+
+        first = document.select(baseSelector + tableBodySelector + " > tr:nth-child(3) > td:nth-child(2)").first();
+        if (first != null) {
+            String operatingProfitText = first.text();
+            financialInsights.setOperatingProfitCagrGrowth(CommonUtils.extractDecimalFromText(operatingProfitText));
+        }
+        first = document.select(baseSelector + tableBodySelector + " > tr:nth-child(1) > td:nth-child(2)").first();
+        if (first != null) {
+            String revenueText = first.text();
+            financialInsights.setRevenueCagrGrowth(CommonUtils.extractDecimalFromText(revenueText));
+        }
 
         return financialInsights;
     }
@@ -110,7 +120,7 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
         ArrayList<EquityInsightLineItem> lineItems = new ArrayList<>();
         industryComparisionInsights.setLineItems(lineItems);
 
-        document.select("div#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(3) > ul > li").stream().forEach(li->{
+        document.select("div#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(3) > ul > li").stream().forEach(li -> {
             EquityInsightLineItem equityInsightLineItem = new EquityInsightLineItem();
             equityInsightLineItem.setInsight(li.text());
             equityInsightLineItem.setMarketSentiments(getSms(li.attr("class")));
@@ -125,7 +135,7 @@ public class EquityInsightsFactory implements IEquityInsightsFactory{
         ArrayList<EquityInsightLineItem> lineItems = new ArrayList<>();
         shareholdingPatternInsights.setLineItems(lineItems);
 
-        document.select("#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(4) > ul > li").stream().forEach(li->{
+        document.select("#mc_insight > div.clearfix.mcibx_cnt > div:nth-child(4) > ul > li").stream().forEach(li -> {
             EquityInsightLineItem lineItem = new EquityInsightLineItem();
             lineItem.setInsight(li.text());
             lineItem.setMarketSentiments(getSms(li.attr("class")));

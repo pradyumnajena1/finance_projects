@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pd.finance.filter.IFilter;
-import com.pd.finance.filter.code.EquityInsightFilter;
-import com.pd.finance.filter.code.EquityNamesFilter;
-import com.pd.finance.filter.code.PerformanceFilter;
-import com.pd.finance.filter.code.RecentGainersFilter;
+import com.pd.finance.filter.code.*;
 import com.pd.finance.filter.db.*;
 import com.pd.finance.model.Equity;
 import com.pd.finance.utils.JsonUtils;
@@ -52,6 +49,28 @@ public class EquitySearchRequest {
 
     @JsonProperty("brokerResearchFilter")
     private BrokerResearchFilter brokerResearchFilter;
+
+    @JsonProperty("recommendationTrendFilter")
+    private RecommendationTrendFilter recommendationTrendFilter;
+
+    @JsonProperty("prosAndConsFilter")
+    private ProsAndConsFilter prosAndConsFilter;
+
+    public ProsAndConsFilter getProsAndConsFilter() {
+        return prosAndConsFilter;
+    }
+
+    public void setProsAndConsFilter(ProsAndConsFilter prosAndConsFilter) {
+        this.prosAndConsFilter = prosAndConsFilter;
+    }
+
+    public RecommendationTrendFilter getRecommendationTrendFilter() {
+        return recommendationTrendFilter;
+    }
+
+    public void setRecommendationTrendFilter(RecommendationTrendFilter recommendationTrendFilter) {
+        this.recommendationTrendFilter = recommendationTrendFilter;
+    }
 
     public BrokerResearchFilter getBrokerResearchFilter() {
         return brokerResearchFilter;
@@ -166,13 +185,15 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getProfitLossFilter());
         CollectFilters(filters,  getRecentGainersFilter());
         CollectFilters(filters,  getBrokerResearchFilter());
+        CollectFilters(filters,  getRecommendationTrendFilter());
+        CollectFilters(filters,  getProsAndConsFilter());
 
         return filters;
     }
 
-    private void CollectFilters(List<IFilter<Equity>> filters, IFilter<Equity> exchangeFilter) {
-        if(exchangeFilter!=null){
-            filters.add(exchangeFilter);
+    private void CollectFilters(List<IFilter<Equity>> filters, IFilter<Equity> filter) {
+        if(filter!=null){
+            filters.add(filter);
         }
     }
 }

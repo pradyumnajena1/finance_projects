@@ -201,9 +201,13 @@ public class EquityTechnicalDetailsFactory implements IEquityTechnicalDetailsFac
         String value = null;
         try {
             Element tbody = techRatingSummaryDiv.select("tbody").first();
-            Element tr = tbody.select(rowSelector).first();
-            Element valueTd = tr.select("td:eq(2)").first();
-            value=  valueTd.select("div:eq(0)").first().text();
+            if (tbody!=null) {
+                Element tr = tbody.select(rowSelector).first();
+                if (tr!=null) {
+                    Element valueTd = tr.select("td:eq(2)").first();
+                    value=  valueTd.select("div:eq(0)").first().text();
+                }
+            }
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
         }

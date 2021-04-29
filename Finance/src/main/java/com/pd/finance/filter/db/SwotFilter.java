@@ -12,14 +12,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwotFilter  implements EquityFilter {
+public class SwotFilter extends AbstractDBFilter<Equity> implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 
 
-    private int minStrengths =0 ;
-    private int minOpportunities = 0;
-    private int maxThreats = Integer.MAX_VALUE;
-    private int maxWeaknesses = Integer.MAX_VALUE;
+    private Integer minStrengths   ;
+    private Integer minOpportunities  ;
+    private Integer maxThreats  ;
+    private Integer maxWeaknesses  ;
 
     public int getMinStrengths() {
         return minStrengths;
@@ -64,13 +64,24 @@ public class SwotFilter  implements EquityFilter {
     public Criteria getCriteria(String parentObject) {
 
         List<Criteria> criteriaList = new ArrayList<>();
-        criteriaList.add(Criteria.where("swotDetails.strengths."+(this.minStrengths-1)).exists(true));
-        criteriaList.add(Criteria.where("swotDetails.opportunities."+(this.minOpportunities-1)).exists(true));
-        criteriaList.add(Criteria.where("swotDetails.threats."+(this.maxThreats)).exists(false));
-        criteriaList.add(Criteria.where("swotDetails.weaknesses."+(this.maxWeaknesses)).exists(false));
+        if(minStrengths!=null){
 
-        Criteria criteria = new Criteria().andOperator(criteriaList.toArray( new Criteria[criteriaList.size()]));
-        return criteria;
+            criteriaList.add(Criteria.where("swotDetails.strengths."+(this.minStrengths-1)).exists(true));
+        }
+        if(minOpportunities!=null){
+
+            criteriaList.add(Criteria.where("swotDetails.opportunities."+(this.minOpportunities-1)).exists(true));
+        }
+        if(maxThreats!=null){
+
+            criteriaList.add(Criteria.where("swotDetails.threats."+(this.maxThreats)).exists(false));
+        }
+        if(maxWeaknesses!=null){
+
+            criteriaList.add(Criteria.where("swotDetails.weaknesses."+(this.maxWeaknesses)).exists(false));
+        }
+
+        return getAsCompositeCriteria(criteriaList);
 
     }
 
