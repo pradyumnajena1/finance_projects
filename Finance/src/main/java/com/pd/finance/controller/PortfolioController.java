@@ -3,8 +3,7 @@ package com.pd.finance.controller;
 import com.pd.finance.exceptions.ValidationException;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.portfolio.Portfolio;
-import com.pd.finance.request.CreatePortfolioRequest;
-import com.pd.finance.request.UpdatePortfolioRequest;
+import com.pd.finance.request.*;
 import com.pd.finance.response.BaseResponse;
 import com.pd.finance.service.portfolio.IPortfolioService;
 import org.slf4j.Logger;
@@ -32,6 +31,75 @@ public class PortfolioController {
             }
             Portfolio portfolio = portfolioService.createPortfolio(userId,request);
             logger.info("createPortfolio exec completed for CreatePortfolioRequest {}",request);
+            return new BaseResponse(portfolio);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
+    @RequestMapping(value = "/users/{userId}/portfolios/{portfolioId}/equities",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse addPortfolioEquity(@PathVariable(value = "userId") Long userId,@PathVariable(value = "portfolioId") Long portfolioId,@RequestBody AddPortfolioEquityRequest request){
+        try {
+            logger.info("addPortfolioEquity exec started for AddPortfolioEquityRequest {}",request);
+
+            if(!request.isValid()){
+                throw new ValidationException(request.getValidationErrors());
+            }
+            Portfolio portfolio = portfolioService.addPortfolioEquities(userId,portfolioId,request);
+            logger.info("createPortfolio exec completed for CreatePortfolioRequest {}",request);
+            return new BaseResponse(portfolio);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
+    @RequestMapping(value = "/users/{userId}/portfolios/{portfolioId}/equities/{portfolioEquityId}/lots",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse addPortfolioEquityLots(@PathVariable(value = "userId") Long userId,@PathVariable(value = "portfolioId") Long portfolioId,@PathVariable(value = "portfolioEquityId") String portfolioEquityId,@RequestBody AddPortfolioEquityLotsRequest request){
+        try {
+            logger.info("addPortfolioEquity exec started for AddPortfolioEquityRequest {}",request);
+
+            if(!request.isValid()){
+                throw new ValidationException(request.getValidationErrors());
+            }
+            Portfolio portfolio = portfolioService.addPortfolioEquityLots(userId,portfolioId,portfolioEquityId,request);
+            logger.info("createPortfolio exec completed for CreatePortfolioRequest {}",request);
+            return new BaseResponse(portfolio);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
+    @RequestMapping(value = "/users/{userId}/portfolios/{portfolioId}/equities/{portfolioEquityId}/lots",method = RequestMethod.DELETE,consumes = MediaType.APPLICATION_JSON_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse deletePortfolioEquityLots(@PathVariable(value = "userId") Long userId,@PathVariable(value = "portfolioId") Long portfolioId,@PathVariable(value = "portfolioEquityId") String portfolioEquityId,@RequestBody DeletePortfolioEquityLotsRequest request){
+        try {
+            logger.info("addPortfolioEquity exec started for AddPortfolioEquityRequest {}",request);
+
+            if(!request.isValid()){
+                throw new ValidationException(request.getValidationErrors());
+            }
+            Portfolio portfolio = portfolioService.deletePortfolioEquityLots(userId,portfolioId,portfolioEquityId,request);
+            logger.info("createPortfolio exec completed for CreatePortfolioRequest {}",request);
+            return new BaseResponse(portfolio);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return new BaseResponse(e);
+        }
+    }
+
+
+    @RequestMapping(value = "/users/{userId}/portfolios/{portfolioId}/equities",method = RequestMethod.DELETE,consumes = MediaType.APPLICATION_JSON_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse deletePortfolioEquity(@PathVariable(value = "userId") Long userId,@PathVariable(value = "portfolioId") Long portfolioId,@RequestBody DeletePortfolioEquityRequest request){
+        try {
+            logger.info("deletePortfolioEquity exec started for AddPortfolioEquityRequest {}",request);
+
+            if(!request.isValid()){
+                throw new ValidationException(request.getValidationErrors());
+            }
+            Portfolio portfolio = portfolioService.deletePortfolioEquities(userId,portfolioId,request);
+            logger.info("deletePortfolioEquity exec completed for CreatePortfolioRequest {}",request);
             return new BaseResponse(portfolio);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -67,7 +135,7 @@ public class PortfolioController {
             return new BaseResponse(e);
         }
     }
-    @RequestMapping(value = "/portfolios/{id}",method = RequestMethod.DELETE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/users/{userId}/portfolios/{id}",method = RequestMethod.DELETE,produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse deletePortfolio(@PathVariable(value = "userId") Long userId,@PathVariable("id") Long id){
         try {
             logger.info("deletePortfolio exec started for portfolioId   {}",id);

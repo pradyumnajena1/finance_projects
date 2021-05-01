@@ -7,9 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class PortfolioEquity  implements Comparable<PortfolioEquity>{
     @JsonIgnore
@@ -17,13 +15,24 @@ public class PortfolioEquity  implements Comparable<PortfolioEquity>{
             .comparing(PortfolioEquity::getPortfolioId, CommonUtils.nullSafeLongComparator)
             .thenComparing(PortfolioEquity::getEquityId, CommonUtils.nullSafeStringComparator);
 
+    public PortfolioEquity(Long portfolioId, String equityId) {
+        this.portfolioId = portfolioId;
+        this.equityId = equityId;
+        this.createdDate = new Date();
+        this.updatedDate = new Date();
+    }
+
+    public PortfolioEquity() {
+        this.createdDate = new Date();
+        this.updatedDate = new Date();
+    }
 
     @Field(targetType = FieldType.INT64)
     private Long portfolioId;
 
     private String equityId;
 
-    private List<PortfolioEquityLot> lots;
+    private List<PortfolioEquityLot> lots = new ArrayList<>();
 
     private Date createdDate;
     private Date updatedDate;
@@ -71,5 +80,18 @@ public class PortfolioEquity  implements Comparable<PortfolioEquity>{
     @Override
     public int compareTo(@NotNull PortfolioEquity other) {
         return portfolioEquityComparator.compare(this, other);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PortfolioEquity that = (PortfolioEquity) o;
+        return portfolioId.equals(that.portfolioId) && equityId.equals(that.equityId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(portfolioId, equityId);
     }
 }

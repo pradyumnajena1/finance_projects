@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @QueryEntity
@@ -23,7 +24,7 @@ public class Portfolio {
     @Field(targetType = FieldType.INT64)
     private Long userId;
 
-    private Set<PortfolioEquity> portfolioEquities;
+    private Set<PortfolioEquity> portfolioEquities = new HashSet<>();
     private Date createdDate;
     private Date updatedDate;
 
