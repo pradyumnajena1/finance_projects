@@ -5,6 +5,7 @@ import com.pd.finance.model.*;
 import com.pd.finance.service.HistoricalDataInterval;
 import com.pd.finance.service.IYahooService;
 import com.pd.finance.utils.Constants;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,31 +34,14 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
 
             EquityHistoricalIntervalData equityHistoricalIntervalData = yahooService.getHistoricalStockPrice(identifier, Period.ofDays(20), HistoricalDataInterval.OneDay);
             if (equityHistoricalIntervalData!=null) {
-                List<EquityPerformance> performances = new ArrayList<>();
-                List<EquityHistoricalDataLineItem> lineItems = equityHistoricalIntervalData.getLineItems();
-                Collections.sort(lineItems);
-
-                int startIndex = Math.max(lineItems.size() - 5, 0);
-                int endIndex = lineItems.size() - 1;
-
-                for(int i = startIndex; i<= endIndex; i++){
-
-                    EquityHistoricalDataLineItem currentLineItem = lineItems.get(i);
-                    EquityHistoricalDataLineItem previousLineItem = null;
-                    if(i>0){
-
-                          previousLineItem = lineItems.get(i - 1);
-                    }
-
-                    EquityPerformance performance = getPerformance(currentLineItem, previousLineItem);
-
-                    performances.add(performance);
-                }
+                List<EquityPerformance> performances = getEquityPerformances(equityHistoricalIntervalData);
                 EquityPerformances equityPerformances =new EquityPerformances("Last 5 day performance", performances );
                 equityPerformances.setSource(Constants.SOURCE_YAHOO_FINANCE);
                 equityPerformances.setUpdatedDate(new Date());
 
                 equity.setPerformances(equityPerformances);
+            }else {
+                logger.warn("enrichEquity exec failed fetch equityHistoricalIntervalData for equity:{}",equity.getDefaultEquityIdentifier());
             }
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
@@ -65,6 +49,31 @@ public class EquityPerformancesAttributeService extends HttpGatewayEquityAttribu
             logger.error( "enrichEquity exec failed for equity:{}",e.getMessage(),e);
             throw new ServiceException(e);
         }
+    }
+
+    @NotNull
+    private List<EquityPerformance> getEquityPerformances(EquityHistoricalIntervalData equityHistoricalIntervalData) {
+        List<EquityPerformance> performances = new ArrayList<>();
+        List<EquityHistoricalDataLineItem> lineItems = equityHistoricalIntervalData.getLineItems();
+        Collections.sort(lineItems);
+
+        int startIndex = Math.max(lineItems.size() - 5, 0);
+        int endIndex = lineItems.size() - 1;
+
+        for(int i = startIndex; i<= endIndex; i++){
+
+            EquityHistoricalDataLineItem currentLineItem = lineItems.get(i);
+            EquityHistoricalDataLineItem previousLineItem = null;
+            if(i>0){
+
+                  previousLineItem = lineItems.get(i - 1);
+            }
+
+            EquityPerformance performance = getPerformance(currentLineItem, previousLineItem);
+
+            performances.add(performance);
+        }
+        return performances;
     }
 
     private EquityPerformance getPerformance( EquityHistoricalDataLineItem currentLineItem,EquityHistoricalDataLineItem previousLineItem) {

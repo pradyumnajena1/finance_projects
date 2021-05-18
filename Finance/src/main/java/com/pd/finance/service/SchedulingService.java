@@ -53,7 +53,7 @@ public class SchedulingService {
     }
 
 
-    @Scheduled(fixedRate = 1000*60*60)
+    @Scheduled(fixedRate = 1000*60*15)
     public void updateEquities() {
 
         try {
