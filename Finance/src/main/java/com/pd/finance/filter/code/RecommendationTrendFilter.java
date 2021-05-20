@@ -1,6 +1,7 @@
 package com.pd.finance.filter.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
@@ -18,7 +19,7 @@ import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RecommendationTrendFilter implements EquityFilter {
 
     @JsonIgnore

@@ -32,11 +32,23 @@ public class EquityOverviewFactory implements IEquityOverviewFactory {
        equityOverview.setStockPB(extractPB(document));
        equityOverview.setStockPE(extractPE(document));
        equityOverview.setVolume(extractVolume(document));
+       equityOverview.setSector(extractSector(document));
 
        equityOverview.setSource(Constants.SOURCE_MONEY_CONTROL);
        equityOverview.setUpdatedDate(new Date());
 
         return equityOverview;
+    }
+
+    private String extractSector(Document document) {
+        String sector = null;
+        try {
+            Element sectorAnchor = document.select("#stockName > span > strong > a").first();
+            sector = sectorAnchor.text();
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return sector;
     }
 
     private   BigDecimal extractVolume(Document document) {

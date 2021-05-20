@@ -1,6 +1,7 @@
 package com.pd.finance.filter.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
@@ -15,24 +16,34 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 
     @JsonProperty("maxPE")
-    private BigDecimal maxPE = BigDecimal.valueOf(100000);
+    private BigDecimal maxPE  ;
 
     @JsonProperty("maxCurrentPrice")
-    private BigDecimal maxCurrentPrice = BigDecimal.valueOf(0);
+    private BigDecimal maxCurrentPrice ;
 
     @JsonProperty("minMarketCap")
-    private BigDecimal minMarketCap = BigDecimal.valueOf(0);
+    private BigDecimal minMarketCap  ;
 
     @JsonProperty("minVolume")
-    private BigDecimal minVolume = BigDecimal.valueOf(0);
+    private BigDecimal minVolume ;
+
+    @JsonProperty("sector")
+    private String sector;
 
 
+    public String getSector() {
+        return sector;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
 
     public BigDecimal getMaxPE() {
         return maxPE;
@@ -84,6 +95,9 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
         }
         if (getMinMarketCap()!=null) {
             criteriaList.add(Criteria.where("overview.marketCap").gte(getMinMarketCap()));
+        }
+        if (getSector()!=null) {
+            criteriaList.add(Criteria.where("overview.sector").is(getSector()));
         }
 
         if (getMinMarketCap()!=null) {

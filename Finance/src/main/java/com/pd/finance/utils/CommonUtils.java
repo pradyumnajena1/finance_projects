@@ -32,7 +32,7 @@ public class CommonUtils {
             textValue = textValue.trim();
             return new BigDecimal( textValue);
         } catch (NumberFormatException ex) {
-            logger.error("extractDecimalFromText exec failed error: "+ex.getMessage());
+            logger.error("extractDecimalFromText exec failed  for input "+textValue+" error: "+ex.getMessage());
             return BigDecimal.ZERO;
         }
     }
@@ -49,7 +49,7 @@ public class CommonUtils {
             textValue = textValue.trim();
             return new BigInteger( textValue);
         } catch (NumberFormatException ex) {
-            logger.error("extractIntegerFromText exec failed error: "+ex.getMessage());
+            logger.error("extractIntegerFromText exec failed for input "+textValue+" error: "+ex.getMessage());
             return BigInteger.ZERO;
         }
     }

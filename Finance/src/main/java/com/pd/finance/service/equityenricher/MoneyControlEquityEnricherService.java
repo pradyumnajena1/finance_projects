@@ -46,6 +46,9 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     @Resource(name = "equityBrokerResearchAttributeService")
     private IEquityAttributeService equityBrokerResearchAttributeService;
 
+    @Resource(name = "equityDealDetailsAttributeService")
+    private IEquityAttributeService equityDealDetailsAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity, boolean forceUpdate) throws ServiceException {
@@ -62,6 +65,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             addTechnicalDetails(identifier,equity,equityFromDb,forceUpdate);
             addEquityInsights(identifier,equity,equityFromDb,forceUpdate);
             addBrokerResearchDetails(identifier,equity,equityFromDb,forceUpdate);
+            addDealDetails(identifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
@@ -70,6 +74,21 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             throw new ServiceException(e);
         }
 
+    }
+
+    private void addDealDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
+        try {
+            boolean isUpdateRequired = equityFromDb==null|| isUpdateRequiredForEquityAttribute(equityFromDb.getEquityDealsDetails(),forceUpdate);
+
+            if(isUpdateRequired){
+
+                equityDealDetailsAttributeService.enrichEquity(identifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addDealDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
+
+        }
     }
 
     private void addBrokerResearchDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
@@ -82,7 +101,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addBrokerResearchDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addBrokerResearchDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -97,7 +116,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addCurrentPriceDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addCurrentPriceDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -109,7 +128,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
         try {
             basicDetailsAttributeService.enrichEquity(identifier,equity);
         } catch (Exception e) {
-            logger.error("addBasicDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addBasicDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -122,7 +141,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addEquityInsights exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addEquityInsights exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -135,7 +154,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addTechnicalDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addTechnicalDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -148,7 +167,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addEquityOverview exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addEquityOverview exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -161,7 +180,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addEssentialDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addEssentialDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
     }
@@ -176,7 +195,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             }
 
         } catch (Exception e) {
-            logger.error("addSwotDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addSwotDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
 
         }
 

@@ -1,6 +1,7 @@
 package com.pd.finance.filter.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
@@ -10,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BrokerResearchFilter extends AbstractDBFilter<Equity> implements EquityFilter {
 
     @JsonProperty("minTotalNumReviews")

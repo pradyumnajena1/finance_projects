@@ -20,8 +20,18 @@ public class EquityOverview extends EquityAttribute{
     private BigDecimal stockPE;
     @Field(targetType = FieldType.DECIMAL128)
     private  BigDecimal stockPB;
+    @Field(targetType = FieldType.STRING)
+    private String sector;
 
     public EquityOverview() {
+    }
+
+    public String getSector() {
+        return sector;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
     }
 
     public BigDecimal getVolume() {

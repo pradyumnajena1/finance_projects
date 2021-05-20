@@ -1,6 +1,7 @@
 package com.pd.finance.filter.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -13,7 +14,7 @@ import org.springframework.validation.FieldError;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TechnicalPeriodFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(TechnicalPeriodFilter.class);
 

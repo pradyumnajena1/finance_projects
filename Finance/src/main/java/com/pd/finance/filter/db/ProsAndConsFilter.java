@@ -1,5 +1,6 @@
 package com.pd.finance.filter.db;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -9,7 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProsAndConsFilter  extends AbstractDBFilter<Equity> implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(ProsAndConsFilter.class);
 

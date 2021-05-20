@@ -1,6 +1,8 @@
 package com.pd.finance.filter.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -11,11 +13,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.HashSet;
 import java.util.Set;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquityNamesFilter implements EquityFilter {
 
     public static final String DefaultSource = Constants.SOURCE_MONEY_CONTROL;
+
+    @JsonProperty("source")
     private String source = DefaultSource;
+
+    @JsonProperty("names")
     private Set<String> names = new HashSet<>();
 
 

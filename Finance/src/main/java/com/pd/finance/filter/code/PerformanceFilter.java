@@ -1,6 +1,7 @@
 package com.pd.finance.filter.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PerformanceFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(PerformanceFilter.class);
 

@@ -1,13 +1,14 @@
 package com.pd.finance.filter.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquityInsightFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(EquityInsightFilter.class);
 
