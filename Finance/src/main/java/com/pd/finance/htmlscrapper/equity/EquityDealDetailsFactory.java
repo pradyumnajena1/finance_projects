@@ -6,6 +6,7 @@ import com.pd.finance.model.BulkDealDetails;
 import com.pd.finance.model.EquityDeal;
 import com.pd.finance.model.EquityDealsDetails;
 import com.pd.finance.utils.CommonUtils;
+import com.pd.finance.utils.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,6 +32,8 @@ public class EquityDealDetailsFactory implements IEquityDealsDetailsFactory{
         EquityDealsDetails dealsDetails = new EquityDealsDetails();
         dealsDetails.setBlockDealDetails(extractBlockDetails(document));
         dealsDetails.setBulkDealDetails(extractBulkDetails(document));
+        dealsDetails.setSource(Constants.SOURCE_MONEY_CONTROL);
+        dealsDetails.setUpdatedDate(new Date());
         return dealsDetails;
     }
 

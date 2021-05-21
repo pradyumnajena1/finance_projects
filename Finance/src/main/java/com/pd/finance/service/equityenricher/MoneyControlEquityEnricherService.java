@@ -49,6 +49,11 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
     @Resource(name = "equityDealDetailsAttributeService")
     private IEquityAttributeService equityDealDetailsAttributeService;
 
+    @Resource(name = "equityInsiderTransactionDetailsAttributeService")
+    private IEquityAttributeService equityInsiderTransactionDetailsAttributeService;
+
+
+
 
     @Override
     public void enrichEquity(EquityIdentifier identifier, Equity equity, boolean forceUpdate) throws ServiceException {
@@ -66,6 +71,7 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             addEquityInsights(identifier,equity,equityFromDb,forceUpdate);
             addBrokerResearchDetails(identifier,equity,equityFromDb,forceUpdate);
             addDealDetails(identifier,equity,equityFromDb,forceUpdate);
+            addInsiderTransactionDetails(identifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
@@ -74,6 +80,21 @@ public class MoneyControlEquityEnricherService  extends AbstractEquityEnricherSe
             throw new ServiceException(e);
         }
 
+    }
+
+    private void addInsiderTransactionDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
+        try {
+            boolean isUpdateRequired = equityFromDb==null|| isUpdateRequiredForEquityAttribute(equityFromDb.getInsiderTransactionDetails(),forceUpdate);
+
+            if(isUpdateRequired){
+
+                equityInsiderTransactionDetailsAttributeService.enrichEquity(identifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addInsiderTransactionDetails exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
+
+        }
     }
 
     private void addDealDetails(EquityIdentifier identifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {

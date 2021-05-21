@@ -58,7 +58,7 @@ public class SchedulingService {
 
         try {
             logger.info("updateEquities exec started by scheduling service");
-             doUpdateEquities();
+            // doUpdateEquities();
 
             logger.info("updateEquities exec started by scheduling service completed ");
         } catch (Exception e) {
