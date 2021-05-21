@@ -56,6 +56,17 @@ public class EquitySearchRequest {
     @JsonProperty("prosAndConsFilter")
     private ProsAndConsFilter prosAndConsFilter;
 
+    @JsonProperty("dealsFilter")
+    private DealsFilter dealsFilter;
+
+    public DealsFilter getDealsFilter() {
+        return dealsFilter;
+    }
+
+    public void setDealsFilter(DealsFilter dealsFilter) {
+        this.dealsFilter = dealsFilter;
+    }
+
     public ProsAndConsFilter getProsAndConsFilter() {
         return prosAndConsFilter;
     }
@@ -187,6 +198,7 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getBrokerResearchFilter());
         CollectFilters(filters,  getRecommendationTrendFilter());
         CollectFilters(filters,  getProsAndConsFilter());
+        CollectFilters(filters,  getDealsFilter());
 
         return filters;
     }
