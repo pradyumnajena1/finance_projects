@@ -1,12 +1,28 @@
 package com.pd.finance.model;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
+import java.math.BigDecimal;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FinancialInsights {
 
+    @Field(targetType =  FieldType.DECIMAL128)
+    @JsonProperty("piotroskiScore")
     private BigDecimal piotroskiScore;
+
+    @Field(targetType =  FieldType.DECIMAL128)
+    @JsonProperty("revenueCagrGrowth")
     private BigDecimal revenueCagrGrowth;
+
+    @Field(targetType =  FieldType.DECIMAL128)
+    @JsonProperty("netProfitCagrGrowth")
     private BigDecimal netProfitCagrGrowth;
+
+    @Field(targetType =  FieldType.DECIMAL128)
+    @JsonProperty("operatingProfitCagrGrowth")
     private BigDecimal operatingProfitCagrGrowth;
 
     public BigDecimal getPiotroskiScore() {

@@ -53,12 +53,12 @@ public class SchedulingService {
     }
 
 
-    @Scheduled(fixedRate = 1000*60*60)
+    @Scheduled(cron = "0 0 * * * *")
     public void updateEquities() {
 
         try {
             logger.info("updateEquities exec started by scheduling service");
-            // doUpdateEquities();
+             doUpdateEquities();
 
             logger.info("updateEquities exec started by scheduling service completed ");
         } catch (Exception e) {

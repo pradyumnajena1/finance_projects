@@ -36,6 +36,9 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
     @Resource(name = "equityProsAndConsAttributeService")
     private IEquityAttributeService prosAndConsAttributeService;
 
+    @Resource(name = "shareholdingPatternAttributeService")
+    private IEquityAttributeService shareholdingPatternAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity, boolean forceUpdate) throws ServiceException {
@@ -46,13 +49,27 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
             updateEquityIdentityAndSourceDetails(defaultEquityIdentifier, equity);
             addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
             addProsAndConsDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
-
+            addShareholdingDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
 
             logger.error("enrichEquity exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
             throw new ServiceException(e);
+        }
+    }
+
+    private void addShareholdingDetails(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
+        try {
+            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getShareholdingDetails(),forceUpdate);
+            if(updateRequiredForEquityAttribute){
+
+                shareholdingPatternAttributeService.enrichEquity(defaultEquityIdentifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addProsAndConsDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
         }
     }
 

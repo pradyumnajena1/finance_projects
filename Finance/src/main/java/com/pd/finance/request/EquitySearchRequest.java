@@ -62,6 +62,17 @@ public class EquitySearchRequest {
     @JsonProperty("insiderTransactionFilter")
     private InsiderTransactionFilter insiderTransactionFilter;
 
+    @JsonProperty("shareholdingFilter")
+    private ShareholdingFilter shareholdingFilter;
+
+    public ShareholdingFilter getShareholdingFilter() {
+        return shareholdingFilter;
+    }
+
+    public void setShareholdingFilter(ShareholdingFilter shareholdingFilter) {
+        this.shareholdingFilter = shareholdingFilter;
+    }
+
     public InsiderTransactionFilter getInsiderTransactionFilter() {
         return insiderTransactionFilter;
     }
@@ -211,6 +222,7 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getProsAndConsFilter());
         CollectFilters(filters,  getDealsFilter());
         CollectFilters(filters,  getInsiderTransactionFilter());
+        CollectFilters(filters,  getShareholdingFilter());
 
         return filters;
     }

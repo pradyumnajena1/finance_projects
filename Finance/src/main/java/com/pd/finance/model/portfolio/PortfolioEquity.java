@@ -79,6 +79,7 @@ public class PortfolioEquity  implements Comparable<PortfolioEquity>{
 
     @Override
     public int compareTo(@NotNull PortfolioEquity other) {
+
         return portfolioEquityComparator.compare(this, other);
     }
 

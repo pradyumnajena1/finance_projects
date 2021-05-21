@@ -50,6 +50,15 @@ public class Equity extends EquityAttribute{
 
     private EquityDealsDetails equityDealsDetails;
     private InsiderTransactionDetails insiderTransactionDetails;
+    private ShareholdingDetails shareholdingDetails;
+
+    public ShareholdingDetails getShareholdingDetails() {
+        return shareholdingDetails;
+    }
+
+    public void setShareholdingDetails(ShareholdingDetails shareholdingDetails) {
+        this.shareholdingDetails = shareholdingDetails;
+    }
 
     public InsiderTransactionDetails getInsiderTransactionDetails() {
         return insiderTransactionDetails;

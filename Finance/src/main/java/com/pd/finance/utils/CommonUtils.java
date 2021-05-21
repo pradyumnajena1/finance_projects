@@ -136,7 +136,9 @@ public class CommonUtils {
 
     public static Comparator<Date> nullSafeDateComparator = Comparator
             .nullsFirst(Date::compareTo);
+
     public static Comparator<Long> nullSafeLongComparator = Comparator
             .nullsFirst(Long::compareTo);
+
 
 }

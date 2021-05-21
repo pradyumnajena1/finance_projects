@@ -139,7 +139,7 @@ public class EquityInsiderTransactionDetailsFactory implements IEquityInsiderTra
     private String extractInsiderType(Element transElement) {
         String transactionTypeText = null;
         try {
-            Element first = transElement.select("div.clearfix > button").first();
+            Element first = transElement.select("div.desinper").first();
             if(first!=null){
 
                 transactionTypeText = first.text();
