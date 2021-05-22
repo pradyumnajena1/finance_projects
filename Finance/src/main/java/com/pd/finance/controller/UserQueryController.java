@@ -152,8 +152,8 @@ public class UserQueryController {
         try {
             List<Equity> equities = userQueryService.executeUserEquityQuery(userId,userQueryId);
             if(equities!=null){
-                EquitySearchResponse searchResponse = new EquitySearchResponse();
-                searchResponse.setEquities(equities);
+                EquitySearchResponse searchResponse = new EquitySearchResponse(equities);
+
                 return ResponseEntity.ok().body(searchResponse);
             }else{
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

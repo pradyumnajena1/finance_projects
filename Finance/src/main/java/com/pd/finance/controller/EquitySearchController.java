@@ -35,8 +35,8 @@ public class EquitySearchController {
                 return baseResponse;
             }
             List<Equity> equities =  searchService.search(request);
-            EquitySearchResponse searchResponse = new EquitySearchResponse();
-            searchResponse.setEquities(equities);
+            EquitySearchResponse searchResponse = new EquitySearchResponse(equities);
+
             return new BaseResponse(searchResponse);
         } catch (Exception e) {
             logger.error("Failed to process Gainers",e);
@@ -55,7 +55,9 @@ public class EquitySearchController {
                 return baseResponse;
             }
             List<Equity> equities =  searchService.searchByName(request);
-            return new BaseResponse(equities);
+            EquitySearchResponse searchResponse = new EquitySearchResponse(equities);
+
+            return new BaseResponse(searchResponse);
         } catch (Exception e) {
             logger.error("Failed to process Gainers",e);
             return  new BaseResponse(e);
