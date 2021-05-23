@@ -39,6 +39,9 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
     @Resource(name = "shareholdingPatternAttributeService")
     private IEquityAttributeService shareholdingPatternAttributeService;
 
+    @Resource(name = "fundamentalRationAttributeService")
+    private IEquityAttributeService fundamentalRationAttributeService;
+
 
     @Override
     public void enrichEquity(EquityIdentifier defaultEquityIdentifier, Equity equity, boolean forceUpdate) throws ServiceException {
@@ -50,12 +53,27 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
             addProfitLossDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
             addProsAndConsDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
             addShareholdingDetails(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
+            addFundamentalRatios(defaultEquityIdentifier,equity,equityFromDb,forceUpdate);
 
             logger.info("enrichEquity exec completed for equity:{}",equity.getDefaultEquityIdentifier());
         } catch (Exception e) {
 
             logger.error("enrichEquity exec failed for equity:{} {}",equity.getDefaultEquityIdentifier(),e.getMessage(),e);
             throw new ServiceException(e);
+        }
+    }
+
+    private void addFundamentalRatios(EquityIdentifier defaultEquityIdentifier, Equity equity, Equity equityFromDb, boolean forceUpdate) {
+        try {
+            boolean updateRequiredForEquityAttribute =equityFromDb==null||  isUpdateRequiredForEquityAttribute( equityFromDb.getFundamentalRatios(),forceUpdate);
+            if(updateRequiredForEquityAttribute){
+
+                fundamentalRationAttributeService.enrichEquity(defaultEquityIdentifier,equity);
+            }
+
+        } catch (Exception e) {
+            logger.error("addFundamentalRatios exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+
         }
     }
 
@@ -68,7 +86,7 @@ public class ScreenerEquityEnricherService  extends AbstractEquityEnricherServic
             }
 
         } catch (Exception e) {
-            logger.error("addProsAndConsDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
+            logger.error("addShareholdingDetails exec failed for equity:{} {}",equity.getEquityIdentifiers(),e.getMessage(),e);
 
         }
     }

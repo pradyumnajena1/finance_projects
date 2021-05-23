@@ -180,10 +180,12 @@ public class EquityInsiderTransactionDetailsFactory implements IEquityInsiderTra
     }
 
     private boolean isSale(InsiderTransaction transaction) {
-        return transaction.getTransactionType().toUpperCase( ).startsWith("DISPOSAL");
+        String transactionType = transaction.getTransactionType();
+        return transactionType!=null && transactionType.toUpperCase( ).startsWith("DISPOSAL");
     }
 
     private boolean isPurchase(InsiderTransaction transaction) {
-        return transaction.getTransactionType().toUpperCase( ).startsWith("ACQUISITION");
+        String transactionType = transaction.getTransactionType();
+        return transactionType!=null && transactionType.toUpperCase( ).startsWith("ACQUISITION");
     }
 }

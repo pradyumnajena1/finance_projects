@@ -57,6 +57,9 @@ public class BaseShareholding {
     }
 
     private boolean isIncreasingPattern(List<ShareholdingLineItem> shareholdingPatterns) {
+        if(shareholdingPatterns==null || shareholdingPatterns.size()<2){
+            return false;
+        }
         boolean isIncreasing = true;
         for(int i=1;i<shareholdingPatterns.size();i++){
             ShareholdingLineItem current = shareholdingPatterns.get(i);

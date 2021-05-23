@@ -65,6 +65,17 @@ public class EquitySearchRequest {
     @JsonProperty("shareholdingFilter")
     private ShareholdingFilter shareholdingFilter;
 
+    @JsonProperty("fundamentalRatiosFilter")
+    private FundamentalRatiosFilter fundamentalRatiosFilter;
+
+    public FundamentalRatiosFilter getFundamentalRatiosFilter() {
+        return fundamentalRatiosFilter;
+    }
+
+    public void setFundamentalRatiosFilter(FundamentalRatiosFilter fundamentalRatiosFilter) {
+        this.fundamentalRatiosFilter = fundamentalRatiosFilter;
+    }
+
     public ShareholdingFilter getShareholdingFilter() {
         return shareholdingFilter;
     }
@@ -223,6 +234,7 @@ public class EquitySearchRequest {
         CollectFilters(filters,  getDealsFilter());
         CollectFilters(filters,  getInsiderTransactionFilter());
         CollectFilters(filters,  getShareholdingFilter());
+        CollectFilters(filters,  getFundamentalRatiosFilter());
 
         return filters;
     }

@@ -15,13 +15,18 @@ import java.util.List;
 import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquitySearchResponse {
+    @JsonProperty("numEquitiesFound")
+    private final int numEquitiesFound;
+
     @JsonIgnore
     private List<Equity> equities;
+    @JsonIgnore
     private List<Map<String,IViewAttribute<Equity>>> equitySearchViews;
 
     public EquitySearchResponse(List<Equity> equities) {
         this.equities = equities;
         this.equitySearchViews = getEquitySearchViews();
+        this.numEquitiesFound = equities.size();
     }
     @JsonProperty("equities")
     public List<Map<String,IViewAttribute<Equity>>> getEquities() {

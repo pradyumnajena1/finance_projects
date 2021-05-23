@@ -51,6 +51,7 @@ public class Equity extends EquityAttribute{
     private EquityDealsDetails equityDealsDetails;
     private InsiderTransactionDetails insiderTransactionDetails;
     private ShareholdingDetails shareholdingDetails;
+    private FundamentalRatios fundamentalRatios;
 
     public ShareholdingDetails getShareholdingDetails() {
         return shareholdingDetails;
@@ -245,5 +246,13 @@ public class Equity extends EquityAttribute{
     @Override
     public int hashCode() {
         return Objects.hash(equityIdentifiers);
+    }
+
+    public void setFundamentalRatios(FundamentalRatios fundamentalRatios) {
+        this.fundamentalRatios = fundamentalRatios;
+    }
+
+    public FundamentalRatios getFundamentalRatios() {
+        return fundamentalRatios;
     }
 }
