@@ -8,6 +8,8 @@ import com.pd.finance.model.CompoundedSalesGrowthDetails;
 import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -17,12 +19,15 @@ import java.util.List;
 public abstract class AbstractProfitLossFilter extends AbstractDBFilter<EquityProfitLossDetails> {
 
     @JsonProperty("minTenYearsGrowth")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minTenYearsGrowth;
 
     @JsonProperty("minFiveYearsGrowth")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minFiveYearsGrowth;
 
     @JsonProperty("minThreeYearsGrowth")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minThreeYearsGrowth;
 
     private String lastTenYears = "lastTenYears";

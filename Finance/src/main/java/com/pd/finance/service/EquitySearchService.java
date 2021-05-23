@@ -31,6 +31,8 @@ public class EquitySearchService implements IEquitySearchService {
     private static final Logger logger = LoggerFactory.getLogger(EquitySearchService.class);
     @Autowired
     private EquityRepository equityRepository;
+    @Autowired
+    private IGlobalEquityQueryService globalEquityQueryService;
 
     @Override
     public List<Equity> search(EquitySearchRequest searchRequest){
@@ -72,6 +74,7 @@ public class EquitySearchService implements IEquitySearchService {
 
         }
         logger.info("search exec completed for searchRequest "+searchRequest);
+        globalEquityQueryService.recordGlobalEquityQueryExecution(searchRequest);
 
         return equitiesCollector;
     }

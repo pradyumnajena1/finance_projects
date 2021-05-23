@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ public class BrokerResearchFilter extends AbstractDBFilter<Equity> implements Eq
     private Integer maxNumNeutralReviews;
 
     @JsonProperty("minAvgGainPercentage")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minAvgGainPercentage;
 
     @Override

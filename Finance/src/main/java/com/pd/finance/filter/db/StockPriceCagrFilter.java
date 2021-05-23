@@ -7,12 +7,15 @@ import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedStockPriceCagr;
 import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
 
 public class StockPriceCagrFilter extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
    @JsonProperty("minLastOneYearGrowth")
+   @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minLastOneYearGrowth;
 
     private String fieldName = "stockPriceCagr";

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pd.finance.filter.EquityFilter;
 import com.pd.finance.filter.FilterType;
 import com.pd.finance.model.Equity;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -15,9 +17,11 @@ public class BaseShareholdingFilter extends AbstractDBFilter<Equity>  implements
     private Boolean increasing;
 
     @JsonProperty("min")
+    @Field(targetType = FieldType.DECIMAL128)
    private BigDecimal min;
 
     @JsonProperty("max")
+    @Field(targetType = FieldType.DECIMAL128)
    private BigDecimal max;
 
     public Boolean getIncreasing() {

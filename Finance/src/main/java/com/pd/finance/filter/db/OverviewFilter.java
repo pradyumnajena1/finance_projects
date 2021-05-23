@@ -10,6 +10,8 @@ import com.pd.finance.model.Equity;
 import com.pd.finance.model.EquityOverview;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -22,15 +24,19 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
     private static final Logger logger = LoggerFactory.getLogger(SwotFilter.class);
 
     @JsonProperty("maxPE")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal maxPE  ;
 
     @JsonProperty("maxCurrentPrice")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal maxCurrentPrice ;
 
     @JsonProperty("minMarketCap")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minMarketCap  ;
 
     @JsonProperty("minVolume")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minVolume ;
 
     @JsonProperty("sector")

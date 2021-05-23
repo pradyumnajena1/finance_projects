@@ -9,6 +9,8 @@ import com.pd.finance.model.EquityPerformance;
 import com.pd.finance.model.EquityPerformances;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -19,8 +21,9 @@ import java.util.stream.Collectors;
 public class PerformanceFilter  implements EquityFilter {
     private static final Logger logger = LoggerFactory.getLogger(PerformanceFilter.class);
 
-
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minimumGainPerSession = new BigDecimal("0.0");
+    @Field(targetType = FieldType.INT32)
     private int minimumGainSessions = 5;
 
     public BigDecimal getMinimumGainPerSession() {

@@ -122,12 +122,25 @@ public class GlobalEquityQueryService implements IGlobalEquityQueryService{
         return result;
     }
 
-
+    @Override
+    public void recordGlobalEquityQueryExecution(EquitySearchRequest searchRequest) {
+        try {
+            GlobalEquityQuery globalEquityQuery = findBySearchRequest(searchRequest);
+            if(globalEquityQuery == null){
+                globalEquityQuery=  createGlobalEquityQuery(searchRequest);
+            }
+            updateGlobalEquityQueryLastExecTime(globalEquityQuery.getId());
+        } catch (ServiceException e) {
+           logger.error(e.getMessage(),e);
+        }
+    }
 
 
     @NotNull
     private ExampleMatcher getExampleMatcher() {
+
         return ExampleMatcher.matching()
-                .withIgnoreNullValues();
+                .withIgnoreNullValues()
+                .withIgnorePaths("numExecutions","numOneStarRatings","numTwoStarRatings","numThreeStarRatings","numFourStarRatings","numFiveStarRatings","totalNumRatings","avgRatings","avgNumExecutionsPerDay","lastExecutionDate","updatedDate","createdDate");
     }
 }

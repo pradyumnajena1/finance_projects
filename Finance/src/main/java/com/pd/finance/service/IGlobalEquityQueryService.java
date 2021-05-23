@@ -14,4 +14,6 @@ public interface IGlobalEquityQueryService {
     GlobalEquityQuery updateGlobalEquityQueryRatings(Long queryId, int numStars) throws ServiceException;
 
     GlobalEquityQuery updateGlobalEquityQueryLastExecTime(Long queryId) throws ServiceException;
+
+    void recordGlobalEquityQueryExecution(EquitySearchRequest searchRequest);
 }

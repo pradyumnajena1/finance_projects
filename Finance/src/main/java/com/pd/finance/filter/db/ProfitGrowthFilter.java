@@ -7,6 +7,8 @@ import com.pd.finance.filter.IFilter;
 import com.pd.finance.model.CompoundedProfitGrowthDetails;
 import com.pd.finance.model.EquityProfitLossDetails;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.math.BigDecimal;
@@ -16,6 +18,7 @@ import java.util.List;
 public class ProfitGrowthFilter  extends AbstractProfitLossFilter implements IFilter<EquityProfitLossDetails> {
 
     @JsonProperty("minTTMGrowth")
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minTTMGrowth;
 
     private String fieldName = "profitGrowthDetails";

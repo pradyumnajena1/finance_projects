@@ -5,6 +5,7 @@ import com.pd.finance.exceptions.UserNotFoundException;
 import com.pd.finance.model.GlobalEquityQuery;
 import com.pd.finance.model.UserEquityQuery;
 import com.pd.finance.request.CreateGlobalEquityQueryRequest;
+import com.pd.finance.request.EquitySearchRequest;
 import com.pd.finance.response.BaseResponse;
 import com.pd.finance.service.IGlobalEquityQueryService;
 import com.pd.finance.service.IUserQueryService;
@@ -50,6 +51,23 @@ public class GlobalEquityQueryController {
     public ResponseEntity<GlobalEquityQuery> getGlobalQueryById(@PathVariable(value = "id") Long queryId) {
         try {
             GlobalEquityQuery globalEquityQuery = globalEquityQueryService.getGlobalEquityQueryById(queryId);
+            if(globalEquityQuery!=null){
+
+                return ResponseEntity.ok().body(globalEquityQuery);
+            }else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+        } catch (ServiceException e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+    @PostMapping("/equity/globalQueries/search")
+    public ResponseEntity<GlobalEquityQuery> getGlobalQueryByEquitySearch(@Valid @RequestBody EquitySearchRequest searchRequest) {
+        try {
+            GlobalEquityQuery globalEquityQuery = globalEquityQueryService.findBySearchRequest( searchRequest);
             if(globalEquityQuery!=null){
 
                 return ResponseEntity.ok().body(globalEquityQuery);
