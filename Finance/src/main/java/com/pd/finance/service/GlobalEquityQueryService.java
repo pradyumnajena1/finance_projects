@@ -4,12 +4,12 @@ import com.pd.finance.exceptions.ServiceException;
 import com.pd.finance.model.GlobalEquityQuery;
 import com.pd.finance.persistence.GlobalEquityQueryRepository;
 import com.pd.finance.request.EquitySearchRequest;
+import com.pd.finance.response.PaginatedResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -82,6 +82,28 @@ public class GlobalEquityQueryService implements IGlobalEquityQueryService{
         }
         return result;
     }
+
+    @Override
+    public PaginatedResponse<GlobalEquityQuery> getAllGlobalEquityQueries(int pageNum, int pageSize) throws ServiceException {
+        PaginatedResponse<GlobalEquityQuery> result = null;
+        try {
+            Sort sort = Sort.by("avgRatings").descending().and(Sort.by("avgNumExecutionsPerDay").descending());
+            Pageable paging = PageRequest.of(pageNum, pageSize,sort);
+
+            Page<GlobalEquityQuery> page = globalEquityQueryRepository.findAll(paging)  ;
+            result = new PaginatedResponse<>();
+            result.setValues(page.getContent());
+            result.setCurrentPage(page.getNumber());
+            result.setTotalItems(page.getTotalElements());
+            result.setTotalPages(page.getTotalPages());
+
+        } catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new ServiceException(exception);
+        }
+        return result;
+    }
+
     @Override
     public GlobalEquityQuery updateGlobalEquityQueryRatings(Long queryId, int numStars) throws ServiceException {
         GlobalEquityQuery result = null;

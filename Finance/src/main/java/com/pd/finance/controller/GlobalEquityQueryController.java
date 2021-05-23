@@ -7,6 +7,7 @@ import com.pd.finance.model.UserEquityQuery;
 import com.pd.finance.request.CreateGlobalEquityQueryRequest;
 import com.pd.finance.request.EquitySearchRequest;
 import com.pd.finance.response.BaseResponse;
+import com.pd.finance.response.PaginatedResponse;
 import com.pd.finance.service.IGlobalEquityQueryService;
 import com.pd.finance.service.IUserQueryService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -64,6 +65,23 @@ public class GlobalEquityQueryController {
         }
 
     }
+
+    @GetMapping("/equity/globalQueries")
+    public ResponseEntity<PaginatedResponse<GlobalEquityQuery>> getAllGlobalQueries(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size) {
+        try {
+            PaginatedResponse<GlobalEquityQuery> paginatedResponse = globalEquityQueryService.getAllGlobalEquityQueries(page,size);
+
+            return ResponseEntity.ok().body(paginatedResponse);
+
+
+        } catch (ServiceException e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
     @PostMapping("/equity/globalQueries/search")
     public ResponseEntity<GlobalEquityQuery> getGlobalQueryByEquitySearch(@Valid @RequestBody EquitySearchRequest searchRequest) {
         try {
