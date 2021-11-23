@@ -94,7 +94,9 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (getMaxPE()!=null) {
-            criteriaList.add(Criteria.where("overview.stockPE").lte(getMaxPE()));
+            criteriaList.add(Criteria.where("overview.stockPE").lte(getMaxPE()) );
+            criteriaList.add(Criteria.where("overview.stockPE").gt(BigDecimal.valueOf(0)) );
+
         }
         if (getMinVolume()!=null) {
             criteriaList.add(Criteria.where("overview.volume").gte(getMinVolume()));
@@ -106,8 +108,9 @@ public class OverviewFilter extends AbstractDBFilter<Equity>  implements EquityF
             criteriaList.add(Criteria.where("overview.sector").is(getSector()));
         }
 
-        if (getMinMarketCap()!=null) {
-            criteriaList.add(Criteria.where("equitySummary.financialData.currentPrice").lte(getMaxCurrentPrice()));
+        if (getMaxCurrentPrice()!=null) {
+            criteriaList.add(Criteria.where("equityCurrentPriceStats.lastPrice").lte(getMaxCurrentPrice()) );
+            criteriaList.add(Criteria.where("equityCurrentPriceStats.lastPrice") .gt(BigDecimal.valueOf(0)));
         }
 
         return getAsCompositeCriteria(criteriaList);

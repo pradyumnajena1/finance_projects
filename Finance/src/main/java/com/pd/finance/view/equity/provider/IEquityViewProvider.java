@@ -20,4 +20,7 @@ public interface IEquityViewProvider {
 
     @NotNull
     IViewAttribute<Equity> getEquityMarketCapAttribute();
+
+    @NotNull
+    IViewAttribute<Equity> getEquityCurrentPriceAttribute();
 }

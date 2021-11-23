@@ -22,35 +22,35 @@ public class SwotFilter extends AbstractDBFilter<Equity> implements EquityFilter
     private Integer maxThreats  ;
     private Integer maxWeaknesses  ;
 
-    public int getMinStrengths() {
+    public Integer getMinStrengths() {
         return minStrengths;
     }
 
-    public void setMinStrengths(int minStrengths) {
+    public void setMinStrengths(Integer minStrengths) {
         this.minStrengths = minStrengths;
     }
 
-    public int getMinOpportunities() {
+    public Integer getMinOpportunities() {
         return minOpportunities;
     }
 
-    public void setMinOpportunities(int minOpportunities) {
+    public void setMinOpportunities(Integer minOpportunities) {
         this.minOpportunities = minOpportunities;
     }
 
-    public int getMaxThreats() {
+    public Integer getMaxThreats() {
         return maxThreats;
     }
 
-    public void setMaxThreats(int maxThreats) {
+    public void setMaxThreats(Integer maxThreats) {
         this.maxThreats = maxThreats;
     }
 
-    public int getMaxWeaknesses() {
+    public Integer getMaxWeaknesses() {
         return maxWeaknesses;
     }
 
-    public void setMaxWeaknesses(int maxWeaknesses) {
+    public void setMaxWeaknesses(Integer maxWeaknesses) {
         this.maxWeaknesses = maxWeaknesses;
     }
 

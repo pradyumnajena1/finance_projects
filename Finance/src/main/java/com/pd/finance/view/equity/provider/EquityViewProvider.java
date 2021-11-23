@@ -16,6 +16,7 @@ public class EquityViewProvider implements IEquityViewProvider {
     private IEquityViewAttributeProvider nameAttributeProvider = new EquityNameAttributeProvider( );
     private IEquityViewAttributeProvider peAttributeProvider = new EquityPEAttributeProvider( );
     private IEquityViewAttributeProvider marketCapAttributeProvider = new EquityMarketCapAttributeProvider( );
+    private IEquityViewAttributeProvider currentPriceAttributeProvider = new EquityCurrentPriceAttributeProvider( );
 
     public EquityViewProvider(Equity equity) {
         this.equity = equity;
@@ -49,5 +50,12 @@ public class EquityViewProvider implements IEquityViewProvider {
     public IViewAttribute<Equity> getEquityMarketCapAttribute() {
         IViewAttribute<Equity> marketCapAttribute = new EquityMarketCapAttribute(marketCapAttributeProvider,"MarketCap","MarketCap");
         return marketCapAttribute;
+    }
+
+    @Override
+    @NotNull
+    public IViewAttribute<Equity> getEquityCurrentPriceAttribute() {
+        IViewAttribute<Equity> currentPriceAttribute = new EquityMarketCapAttribute(currentPriceAttributeProvider,"CurrentPrice","CurrentPrice");
+        return currentPriceAttribute;
     }
 }

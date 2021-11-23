@@ -25,6 +25,7 @@ public class EquitySearchView extends BaseEquityView{
         collectViewAttribute(viewAttributeMap, viewProvider.getEquityNameAttribute());
         collectViewAttribute(viewAttributeMap, viewProvider.getEquityPEAttribute());
         collectViewAttribute(viewAttributeMap, viewProvider.getEquityMarketCapAttribute());
+        collectViewAttribute(viewAttributeMap, viewProvider.getEquityCurrentPriceAttribute());
     }
 
 

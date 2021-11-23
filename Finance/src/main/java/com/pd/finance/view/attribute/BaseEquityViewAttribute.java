@@ -41,7 +41,7 @@ public class BaseEquityViewAttribute implements IViewAttribute<Equity> {
     @Override
     @JsonIgnore
     public Object getValue(Equity equity) {
-        return null;
+        return getAttributeProvider().getAttributeValue(equity);
     }
 
     @Override
